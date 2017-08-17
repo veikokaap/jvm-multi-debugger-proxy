@@ -6,9 +6,11 @@ import java.nio.channels.SocketChannel;
 
 public class Main {
     public static void main(String[] args) throws IOException, InterruptedException {
-        InetSocketAddress address = new InetSocketAddress("127.0.0.1", 5123);
-
-        SocketChannel socketChannel = VMConnector.connectToVM(address);
-        Thread.sleep(10000);
+//        InetSocketAddress address = new InetSocketAddress("127.0.0.1", 5123);
+//
+//        SocketChannel socketChannel = VMConnector.connectToVM(address);
+        DebuggerConnector.listenForSocketChannels(5456, sc -> {
+            System.out.println(sc);
+        });
     }
 }
