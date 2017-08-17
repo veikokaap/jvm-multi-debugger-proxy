@@ -1,8 +1,8 @@
 package kaap.veiko.debuggerforker;
 
+import kaap.veiko.debuggerforker.connectors.DebuggerConnector;
+
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.nio.channels.SocketChannel;
 
 public class Main {
     public static void main(String[] args) throws IOException, InterruptedException {

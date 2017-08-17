@@ -1,4 +1,4 @@
-package kaap.veiko.debuggerforker;
+package kaap.veiko.debuggerforker.connectors;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
