@@ -1,4 +1,4 @@
-package kaap.veiko.debuggerforker.connectors;
+package kaap.veiko.debuggerforker.connections;
 
 import kaap.veiko.debuggerforker.packet.PacketStream;
 

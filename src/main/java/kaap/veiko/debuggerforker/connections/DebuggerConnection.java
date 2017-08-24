@@ -1,10 +1,10 @@
-package kaap.veiko.debuggerforker.connectors;
+package kaap.veiko.debuggerforker.connections;
 
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
 
 public class DebuggerConnection extends Connection {
-    DebuggerConnection(SocketChannel socketChannel) throws IOException {
+    public DebuggerConnection(SocketChannel socketChannel) throws IOException {
         super(socketChannel, false);
     }
 }

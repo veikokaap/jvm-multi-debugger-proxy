@@ -1,8 +1,9 @@
 package kaap.veiko.debuggerforker;
 
-import kaap.veiko.debuggerforker.connectors.*;
+import kaap.veiko.debuggerforker.connections.*;
+import kaap.veiko.debuggerforker.connections.connectors.DebuggerConnector;
+import kaap.veiko.debuggerforker.connections.connectors.VMConnector;
 import kaap.veiko.debuggerforker.packet.Packet;
-import kaap.veiko.debuggerforker.packet.PacketStream;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;

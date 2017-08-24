@@ -1,4 +1,6 @@
-package kaap.veiko.debuggerforker.connectors;
+package kaap.veiko.debuggerforker.connections.connectors;
+
+import kaap.veiko.debuggerforker.connections.VirtualMachineConnection;
 
 import java.io.IOException;
 import java.net.ConnectException;
