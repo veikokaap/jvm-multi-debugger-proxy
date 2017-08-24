@@ -15,11 +15,10 @@ class PacketReader {
     }
 
     Packet read() throws IOException {
-        int length;
-        try {
-            length = readBytes(4, 10, ByteBuffer::getInt);
-        } catch (TimeoutException e) {
-            return null; //Read 0 bytes. Therefore no packet incoming.
+        Integer length = readLength();
+
+        if (length == null) {
+            return null;
         }
 
         try {
@@ -28,6 +27,19 @@ class PacketReader {
         } catch (TimeoutException e) {
             throw new IOException("Timeout while reading packet", e);
         }
+    }
+
+    private Integer readLength() throws IOException {
+        ByteBuffer buf = ByteBuffer.allocate(4);
+        while (buf.hasRemaining()) {
+            socketChannel.read(buf);
+            if (buf.remaining() == 4) {
+                return null;
+            }
+        }
+        buf.flip();
+
+        return buf.getInt();
     }
 
     private <T> T readBytes(int nrOfBytes, long timeoutInMilliseconds, Function<ByteBuffer, T> function) throws IOException, TimeoutException {
