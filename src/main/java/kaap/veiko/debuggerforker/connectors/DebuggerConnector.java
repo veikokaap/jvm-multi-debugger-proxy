@@ -7,33 +7,28 @@ import java.nio.ByteBuffer;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Arrays;
-import java.util.function.Consumer;
 
 public class DebuggerConnector {
     private final ServerSocketChannel serverChannel;
-
-    public static void listenForSocketChannels(int port, Consumer<SocketChannel> consumer) throws IOException {
-        new Thread(() -> {
-            try {
-                DebuggerConnector connector = new DebuggerConnector(port);
-                connector.waitForConnection(consumer);
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
-            }
-        }).start();
-    }
 
     private DebuggerConnector(int port) throws IOException {
         this.serverChannel = ServerSocketChannel.open();
         serverChannel.socket().bind(new InetSocketAddress("127.0.0.1", port));
     }
 
-    private void waitForConnection(Consumer<SocketChannel> consumer) throws IOException {
-        while (!Thread.interrupted()) {
-            SocketChannel socketChannel = serverChannel.accept();
-            handshake(socketChannel);
-            consumer.accept(socketChannel);
+    public static DebuggerConnection waitForConnectionFromDebugger(int port) throws IOException {
+        try {
+            DebuggerConnector connector = new DebuggerConnector(port);
+            return connector.waitForConnection();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
+    }
+
+    private DebuggerConnection waitForConnection() throws IOException {
+        SocketChannel socketChannel = serverChannel.accept();
+        handshake(socketChannel);
+        return new DebuggerConnection(socketChannel);
     }
 
     private void handshake(SocketChannel socketChannel) throws IOException {

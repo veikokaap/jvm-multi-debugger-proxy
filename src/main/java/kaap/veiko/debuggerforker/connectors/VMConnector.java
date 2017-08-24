@@ -9,8 +9,9 @@ import java.util.Arrays;
 
 public class VMConnector {
 
-    public static SocketChannel connectToVM(InetSocketAddress address) throws InterruptedException, IOException {
-        return new VMConnector().connectAndHandshake(address);
+    public static VirtualMachineConnection connectToVM(InetSocketAddress address) throws InterruptedException, IOException {
+        SocketChannel socketChannel = new VMConnector().connectAndHandshake(address);
+        return new VirtualMachineConnection(socketChannel);
     }
 
     private SocketChannel connectAndHandshake(InetSocketAddress address) throws InterruptedException, IOException {
