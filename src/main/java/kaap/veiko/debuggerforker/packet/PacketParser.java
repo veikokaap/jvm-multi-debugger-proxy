@@ -51,8 +51,8 @@ class PacketParser {
     }
 
     private byte[] readData() {
-        return readBytesAndApply(length - 11, bf -> {
-            byte[] data = new byte[length - 11];
+        return readBytesAndApply(length - Packet.HEADER_LENGTH, bf -> {
+            byte[] data = new byte[length - Packet.HEADER_LENGTH];
             bf.get(data);
             return data;
         });

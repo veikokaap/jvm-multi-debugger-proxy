@@ -75,7 +75,7 @@ public class Packet {
     }
 
     public boolean isReply() {
-        return getFlags() == 128;
+        return getFlags() == -128;
     }
 
     public boolean isFromVirtualMachine() {
@@ -96,19 +96,23 @@ public class Packet {
 
     @Override
     public String toString() {
-        String string = "Packet{" +
-                "length=" + length +
-                ", id=" + id +
-                ", flags=" + flags;
+        StringBuilder stringBuilder = new StringBuilder();
 
         if (isReply()) {
-            string += ", errorCode=" + errorCode;
+            stringBuilder.append("Reply {")
+                    .append("id=").append(id)
+                    .append(", errorCode=").append(errorCode);
         } else {
-            string += ", commandSet=" + commandSet + ", command=" + command;
+            stringBuilder.append("Packet{")
+                    .append("id=").append(id)
+                    .append(", commandSet=").append(commandSet)
+                    .append(", command=").append(command);
         }
 
-        return string +
-                ", data=" + Arrays.toString(data) +
-                '}';
+        if (hasData()) {
+            stringBuilder.append(", data=").append(Arrays.toString(data));
+        }
+
+        return stringBuilder.append("}").toString();
     }
 }
