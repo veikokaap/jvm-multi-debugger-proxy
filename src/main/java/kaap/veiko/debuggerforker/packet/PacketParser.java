@@ -32,7 +32,7 @@ class PacketParser {
         }
 
         if (packet.hasData()) {
-            packet.setData(readData());
+            packet.setDataBytes(readData());
         }
 
         return packet;

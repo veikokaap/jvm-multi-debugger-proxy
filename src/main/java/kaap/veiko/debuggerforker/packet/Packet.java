@@ -66,12 +66,12 @@ public class Packet {
         this.errorCode = errorCode;
     }
 
-    public byte[] getData() {
+    public byte[] getDataBytes() {
         return data;
     }
 
-    public void setData(byte[] data) {
-        this.data = data;
+    public void setDataBytes(byte[] dataBytes) {
+        this.data = dataBytes;
     }
 
     public boolean isReply() {
@@ -101,6 +101,8 @@ public class Packet {
         if (isReply()) {
             stringBuilder.append("Reply {")
                     .append("id=").append(id)
+                    .append(", commandSet=").append(commandSet)
+                    .append(", command=").append(command)
                     .append(", errorCode=").append(errorCode);
         } else {
             stringBuilder.append("Packet{")

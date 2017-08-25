@@ -1,5 +1,7 @@
 package kaap.veiko.debuggerforker;
 
+import kaap.veiko.debuggerforker.commands.Command;
+import kaap.veiko.debuggerforker.commands.parser.CommandParser;
 import kaap.veiko.debuggerforker.connections.DebuggerConnection;
 import kaap.veiko.debuggerforker.connections.VirtualMachineConnection;
 import kaap.veiko.debuggerforker.connections.connectors.DebuggerConnector;
@@ -15,7 +17,6 @@ public class DebuggerForker implements AutoCloseable {
 
     private final VirtualMachineConnection vm;
     private final List<DebuggerConnection> debuggers = new ArrayList<>();
-
 
     private final Thread debuggerConnectionThread;
 
@@ -50,7 +51,18 @@ public class DebuggerForker implements AutoCloseable {
             Packet vmPacket = vm.getPacketStream().read();
 
             if (vmPacket != null) {
+                if (vmPacket.isReply()) {
+                    Packet packet = debuggers.get(0).getPacketStream().getReadPacketHistory().stream()
+                            .filter(pkt -> pkt.getId() == vmPacket.getId())
+                            .findFirst().get();
+
+                    vmPacket.setCommandSet(packet.getCommandSet());
+                    vmPacket.setCommand(packet.getCommand());
+                }
+
                 System.out.println("VMachine: " + vmPacket);
+                Command command = new CommandParser().parse(vmPacket);
+                System.out.println(command);
                 synchronized (debuggers) {
                     for (DebuggerConnection debugger : debuggers) {
                         debugger.getPacketStream().write(vmPacket);
@@ -63,6 +75,7 @@ public class DebuggerForker implements AutoCloseable {
                     Packet debuggerPacket = debugger.getPacketStream().read();
                     if (debuggerPacket != null) {
                         System.out.println("Debugger: " + debuggerPacket);
+                        System.out.println(new CommandParser().parse(debuggerPacket));
                         vm.getPacketStream().write(debuggerPacket);
                     }
                 }

@@ -31,7 +31,7 @@ class PacketWriter {
         }
 
         if (packet.hasData()) {
-            byteBuffer.put(packet.getData());
+            byteBuffer.put(packet.getDataBytes());
         }
 
         byteBuffer.flip();
