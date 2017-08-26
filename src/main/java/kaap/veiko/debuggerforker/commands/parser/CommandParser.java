@@ -4,7 +4,9 @@ import kaap.veiko.debuggerforker.commands.Command;
 import kaap.veiko.debuggerforker.packet.Packet;
 import org.reflections.Reflections;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
 import java.nio.ByteBuffer;
 import java.util.Set;
@@ -16,18 +18,19 @@ public class CommandParser {
             Class<?> commandClass = findCommandClass(packet.getCommandSet(), packet.getCommand(), packet.isReply());
             Constructor<?> constructor = commandClass.getConstructors()[0];
 
+            ByteBuffer dataBuffer = ByteBuffer.wrap(packet.getDataBytes());
             Object[] parameterValues = getConstructorParameterValues(
-                    packet.getDataBytes(),
+                    dataBuffer,
                     constructor.getParameters()
             );
 
             return (Command) constructor.newInstance(parameterValues);
         } catch (NoCommandException e) {
-            System.out.println("Command POJO not yet defined for " +
-                    "commandSet " + packet.getCommandSet() +
-                    " and command " + packet.getCommand() +
-                    " and reply " + packet.isReply()
-            );
+//            System.out.println("Command POJO not yet defined for " +
+//                    "commandSet " + packet.getCommandSet() +
+//                    " and command " + packet.getCommand() +
+//                    " and reply " + packet.isReply()
+//            );
             return null;
         } catch (Exception e) {
             e.printStackTrace();
@@ -35,24 +38,57 @@ public class CommandParser {
         }
     }
 
-    private Object[] getConstructorParameterValues(byte[] dataBytes, Parameter[] parameters) {
+    private Object[] getConstructorParameterValues(ByteBuffer dataBuffer, Parameter[] parameters) throws IllegalAccessException, InvocationTargetException, InstantiationException {
         Object[] parameterValues = new Object[parameters.length];
 
-        ByteBuffer buffer = ByteBuffer.wrap(dataBytes);
         for (int i = 0; i < parameters.length; i++) {
             Parameter parameter = parameters[i];
 
             if (parameter.getType().equals(byte.class)) {
-                parameterValues[i] = buffer.get();
+                parameterValues[i] = dataBuffer.get();
             } else if (parameter.getType().equals(short.class)) {
-                parameterValues[i] = buffer.getShort();
+                parameterValues[i] = dataBuffer.getShort();
             } else if (parameter.getType().equals(int.class)) {
-                parameterValues[i] = buffer.getInt();
+                parameterValues[i] = dataBuffer.getInt();
             } else if (parameter.getType().equals(long.class)) {
-                parameterValues[i] = buffer.getLong();
+                parameterValues[i] = dataBuffer.getLong();
+            } else if (parameter.getType().isArray()) {
+                int count = ((Number) parameterValues[i - 1]).intValue();
+                parameterValues[i] = getArray(dataBuffer, parameter, count);
             }
         }
         return parameterValues;
+    }
+
+    private Object[] getArray(ByteBuffer buffer, Parameter parameter, int count) throws InstantiationException, IllegalAccessException, InvocationTargetException {
+        Class<?> componentType = parameter.getType().getComponentType();
+        Set<Class<?>> subTypesOfRepetitiveData = (Set<Class<?>>) new Reflections("kaap.veiko.debuggerforker.commands").getSubTypesOf(componentType);
+
+        Class<?> identifierClass = componentType.getAnnotation(JDWPAbstractCommandContent.class).identifierClass();
+        Object[] repetitiveDataArray = (Object[]) Array.newInstance(componentType, count);
+
+        for (int l = 0; l < count; l++) {
+            long identifier;
+
+            if (identifierClass.equals(byte.class)) {
+                identifier = buffer.get();
+            } else if (identifierClass.equals(short.class)) {
+                identifier = buffer.getShort();
+            } else if (identifierClass.equals(int.class)) {
+                identifier = buffer.getInt();
+            } else if (identifierClass.equals(long.class)) {
+                identifier = buffer.getLong();
+            } else {
+                identifier = -1;
+            }
+
+            Class<?> found = subTypesOfRepetitiveData.stream()
+                    .filter(clazz -> clazz.getAnnotation(JDWPCommandContent.class).eventKind() == identifier)
+                    .findFirst().get();
+
+            repetitiveDataArray[l] = found.getConstructors()[0].newInstance(getConstructorParameterValues(buffer, found.getConstructors()[0].getParameters()));
+        }
+        return repetitiveDataArray;
     }
 
     private Class<?> findCommandClass(short commandSet, short command, boolean isReplyPacket) throws AmbiguousCommandException, NoCommandException {
@@ -84,13 +120,13 @@ public class CommandParser {
         return annotatedClasses.iterator().next();
     }
 
-    private class AmbiguousCommandException extends Exception{
+    private class AmbiguousCommandException extends Exception {
         private AmbiguousCommandException(String message) {
             super(message);
         }
     }
 
-    private class NoCommandException extends Exception{
+    private class NoCommandException extends Exception {
         private NoCommandException(String message) {
             super(message);
         }

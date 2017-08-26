@@ -62,7 +62,9 @@ public class DebuggerForker implements AutoCloseable {
 
                 System.out.println("VMachine: " + vmPacket);
                 Command command = new CommandParser().parse(vmPacket);
-                System.out.println(command);
+                if (command != null) {
+                    System.out.println(command);
+                }
                 synchronized (debuggers) {
                     for (DebuggerConnection debugger : debuggers) {
                         debugger.getPacketStream().write(vmPacket);
