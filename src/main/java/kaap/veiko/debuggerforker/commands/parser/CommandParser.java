@@ -83,7 +83,7 @@ public class CommandParser {
             }
 
             Class<?> found = subTypesOfRepetitiveData.stream()
-                    .filter(clazz -> clazz.getAnnotation(JDWPCommandContent.class).eventKind() == identifier)
+                    .filter(clazz -> clazz.getAnnotation(JDWPCommandContent.class).id() == identifier)
                     .findFirst().get();
 
             repetitiveDataArray[l] = found.getConstructors()[0].newInstance(getConstructorParameterValues(buffer, found.getConstructors()[0].getParameters()));
