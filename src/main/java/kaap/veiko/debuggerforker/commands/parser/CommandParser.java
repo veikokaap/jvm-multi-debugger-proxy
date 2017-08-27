@@ -7,6 +7,7 @@ import kaap.veiko.debuggerforker.commands.types.DataType;
 import kaap.veiko.debuggerforker.packet.Packet;
 import org.reflections.Reflections;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -48,7 +49,7 @@ public class CommandParser {
         }
     }
 
-    private Object[] getConstructorParameterValues(ByteBuffer dataBuffer, Parameter[] parameters) throws IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException {
+    private Object[] getConstructorParameterValues(ByteBuffer dataBuffer, Parameter[] parameters) throws IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException, UnsupportedEncodingException {
         Object[] parameterValues = new Object[parameters.length];
 
         for (int i = 0; i < parameters.length; i++) {
@@ -62,6 +63,8 @@ public class CommandParser {
                 parameterValues[i] = dataBuffer.getInt();
             } else if (parameter.getType().equals(long.class)) {
                 parameterValues[i] = dataBuffer.getLong();
+            } else if (parameter.getType().equals(String.class)) {
+                parameterValues[i] = getString(dataBuffer);
             } else if (parameter.getType().isArray()) {
                 int count = ((Number) parameterValues[i - 1]).intValue();
                 parameterValues[i] = getArray(dataBuffer, parameter, count);
@@ -73,6 +76,15 @@ public class CommandParser {
         return parameterValues;
     }
 
+    private String getString(ByteBuffer dataBuffer) throws UnsupportedEncodingException {
+        int length = dataBuffer.getInt();
+        byte[] bytes = new byte[length];
+
+        dataBuffer.get(bytes, 0, length);
+
+        return new String(bytes, "UTF-8");
+    }
+
     private Object getDataType(ByteBuffer dataBuffer, Parameter parameter) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         return parameter.getType()
                 .getConstructor(ByteBuffer.class, IDSizesReplyCommand.class)
@@ -80,7 +92,7 @@ public class CommandParser {
     }
 
 
-    private Object[] getArray(ByteBuffer buffer, Parameter parameter, int count) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    private Object[] getArray(ByteBuffer buffer, Parameter parameter, int count) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, UnsupportedEncodingException {
         Class<?> componentType = parameter.getType().getComponentType();
         Set<Class<?>> subTypesOfRepetitiveData = (Set<Class<?>>) new Reflections("kaap.veiko.debuggerforker.commands").getSubTypesOf(componentType);
 

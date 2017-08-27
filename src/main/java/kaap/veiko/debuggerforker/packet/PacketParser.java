@@ -8,6 +8,7 @@ class PacketParser {
     private final int length;
     private final byte[] packetBytes;
     private int index = 0;
+
     private PacketParser(int length, byte[] packetBytes) {
         this.length = length;
         this.packetBytes = packetBytes;
