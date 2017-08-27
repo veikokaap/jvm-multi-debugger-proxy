@@ -2,9 +2,8 @@ package kaap.veiko.debuggerforker.commands.sets.event;
 
 import kaap.veiko.debuggerforker.commands.constants.EventKindConstants;
 import kaap.veiko.debuggerforker.commands.parser.JDWPCommandContent;
-import kaap.veiko.debuggerforker.commands.parser.JDWPDataType;
+import kaap.veiko.debuggerforker.commands.types.ThreadID;
 
-import static kaap.veiko.debuggerforker.commands.constants.DataType.THREAD_ID;
 
 @JDWPCommandContent(id = EventKindConstants.VM_START)
 public class VMStartEvent extends VirtualMachineEvent {
@@ -13,10 +12,10 @@ public class VMStartEvent extends VirtualMachineEvent {
 
     public VMStartEvent(
             int requestId,
-            @JDWPDataType(THREAD_ID) long thread
+            ThreadID thread
     ) {
         this.requestId = requestId;
-        this.thread = thread;
+        this.thread = thread.asLong();
     }
 
     public int getRequestId() {

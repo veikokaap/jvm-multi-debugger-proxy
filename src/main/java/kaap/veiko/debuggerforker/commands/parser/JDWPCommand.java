@@ -9,6 +9,8 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE})
 public @interface JDWPCommand {
     short commandSet();
+
     short command();
+
     CommandType commandType();
 }

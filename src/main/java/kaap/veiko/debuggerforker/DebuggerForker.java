@@ -2,6 +2,7 @@ package kaap.veiko.debuggerforker;
 
 import kaap.veiko.debuggerforker.commands.Command;
 import kaap.veiko.debuggerforker.commands.parser.CommandParser;
+import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IDSizesReplyCommand;
 import kaap.veiko.debuggerforker.connections.DebuggerConnection;
 import kaap.veiko.debuggerforker.connections.VirtualMachineConnection;
 import kaap.veiko.debuggerforker.connections.connectors.DebuggerConnector;
@@ -19,6 +20,7 @@ public class DebuggerForker implements AutoCloseable {
     private final List<DebuggerConnection> debuggers = new ArrayList<>();
 
     private final Thread debuggerConnectionThread;
+    private IDSizesReplyCommand idSizes = null;
 
     private DebuggerForker(VirtualMachineConnection vm, int debuggerPort) {
         this.vm = vm;
@@ -61,9 +63,12 @@ public class DebuggerForker implements AutoCloseable {
                 }
 
                 System.out.println("VMachine: " + vmPacket);
-                Command command = new CommandParser().parse(vmPacket);
+                Command command = new CommandParser(this).parse(vmPacket);
                 if (command != null) {
                     System.out.println(command);
+                    if (command instanceof IDSizesReplyCommand) {
+                        this.idSizes = (IDSizesReplyCommand) command;
+                    }
                 }
                 synchronized (debuggers) {
                     for (DebuggerConnection debugger : debuggers) {
@@ -77,7 +82,7 @@ public class DebuggerForker implements AutoCloseable {
                     Packet debuggerPacket = debugger.getPacketStream().read();
                     if (debuggerPacket != null) {
                         System.out.println("Debugger: " + debuggerPacket);
-                        System.out.println(new CommandParser().parse(debuggerPacket));
+                        System.out.println(new CommandParser(this).parse(debuggerPacket));
                         vm.getPacketStream().write(debuggerPacket);
                     }
                 }
@@ -103,5 +108,9 @@ public class DebuggerForker implements AutoCloseable {
                 debugger.close();
             }
         }
+    }
+
+    public IDSizesReplyCommand getIdSizes() {
+        return idSizes;
     }
 }

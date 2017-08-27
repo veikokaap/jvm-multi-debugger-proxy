@@ -1,6 +1,9 @@
 package kaap.veiko.debuggerforker.commands.parser;
 
+import kaap.veiko.debuggerforker.DebuggerForker;
 import kaap.veiko.debuggerforker.commands.Command;
+import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IDSizesReplyCommand;
+import kaap.veiko.debuggerforker.commands.types.DataType;
 import kaap.veiko.debuggerforker.packet.Packet;
 import org.reflections.Reflections;
 
@@ -13,6 +16,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class CommandParser {
+
+    private final DebuggerForker forker;
+
+    public CommandParser(DebuggerForker forker) {
+        this.forker = forker;
+    }
+
     public Command parse(Packet packet) {
         try {
             Class<?> commandClass = findCommandClass(packet.getCommandSet(), packet.getCommand(), packet.isReply());
@@ -38,7 +48,7 @@ public class CommandParser {
         }
     }
 
-    private Object[] getConstructorParameterValues(ByteBuffer dataBuffer, Parameter[] parameters) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+    private Object[] getConstructorParameterValues(ByteBuffer dataBuffer, Parameter[] parameters) throws IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException {
         Object[] parameterValues = new Object[parameters.length];
 
         for (int i = 0; i < parameters.length; i++) {
@@ -55,12 +65,22 @@ public class CommandParser {
             } else if (parameter.getType().isArray()) {
                 int count = ((Number) parameterValues[i - 1]).intValue();
                 parameterValues[i] = getArray(dataBuffer, parameter, count);
+            } else if (DataType.class.isAssignableFrom(parameter.getType())) {
+                parameterValues[i] = getDataType(dataBuffer, parameter);
             }
         }
+
         return parameterValues;
     }
 
-    private Object[] getArray(ByteBuffer buffer, Parameter parameter, int count) throws InstantiationException, IllegalAccessException, InvocationTargetException {
+    private Object getDataType(ByteBuffer dataBuffer, Parameter parameter) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        return parameter.getType()
+                .getConstructor(ByteBuffer.class, IDSizesReplyCommand.class)
+                .newInstance(dataBuffer, forker.getIdSizes());
+    }
+
+
+    private Object[] getArray(ByteBuffer buffer, Parameter parameter, int count) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         Class<?> componentType = parameter.getType().getComponentType();
         Set<Class<?>> subTypesOfRepetitiveData = (Set<Class<?>>) new Reflections("kaap.veiko.debuggerforker.commands").getSubTypesOf(componentType);
 
