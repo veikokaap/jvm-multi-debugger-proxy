@@ -5,28 +5,43 @@ import kaap.veiko.debuggerforker.commands.Command;
 import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IDSizesReplyCommand;
 import kaap.veiko.debuggerforker.commands.types.DataType;
 import kaap.veiko.debuggerforker.packet.Packet;
+import kaap.veiko.debuggerforker.utils.ByteBufferUtil;
 import org.reflections.Reflections;
 
-import java.io.UnsupportedEncodingException;
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
+import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class CommandParser {
 
     private final DebuggerForker forker;
+    private final ConcurrentMap<Class<?>, TypeParser> parserHashMap = new ConcurrentHashMap<>();
 
     public CommandParser(DebuggerForker forker) {
         this.forker = forker;
+        this.parserHashMap.put(byte.class, (byteBuffer, type) -> byteBuffer.get());
+        this.parserHashMap.put(boolean.class, (byteBuffer, type) -> byteBuffer.get() != 0);
+        this.parserHashMap.put(short.class, (byteBuffer, type) -> byteBuffer.getShort());
+        this.parserHashMap.put(int.class, (byteBuffer, type) -> byteBuffer.getInt());
+        this.parserHashMap.put(long.class, (byteBuffer, type) -> byteBuffer.getLong());
+        this.parserHashMap.put(String.class, ((byteBuffer, type) -> ByteBufferUtil.getString(byteBuffer)));
+
+        this.parserHashMap.put(DataType.class, (byteBuffer, type) ->
+                type.getConstructor(ByteBuffer.class, IDSizesReplyCommand.class)
+                        .newInstance(byteBuffer, this.forker.getIdSizes())
+        );
     }
 
     public Command parse(Packet packet) {
         try {
-            Class<?> commandClass = findCommandClass(packet.getCommandSet(), packet.getCommand(), packet.isReply());
+            Class<?> commandClass = CommandUtil.findCommandClass(packet.getCommandSet(), packet.getCommand(), packet.isReply());
             Constructor<?> constructor = commandClass.getConstructors()[0];
 
             ByteBuffer dataBuffer = ByteBuffer.wrap(packet.getDataBytes());
@@ -36,7 +51,7 @@ public class CommandParser {
             );
 
             return (Command) constructor.newInstance(parameterValues);
-        } catch (NoCommandException e) {
+        } catch (CommandUtil.NoCommandException e) {
 //            System.out.println("Command POJO not yet defined for " +
 //                    "commandSet " + packet.getCommandSet() +
 //                    " and command " + packet.getCommand() +
@@ -49,118 +64,92 @@ public class CommandParser {
         }
     }
 
-    private Object[] getConstructorParameterValues(ByteBuffer dataBuffer, Parameter[] parameters) throws IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException, UnsupportedEncodingException {
+    private Object[] getConstructorParameterValues(ByteBuffer dataBuffer, Parameter[] parameters) throws ReflectiveOperationException, IOException {
         Object[] parameterValues = new Object[parameters.length];
 
         for (int i = 0; i < parameters.length; i++) {
             Parameter parameter = parameters[i];
-
-            if (parameter.getType().equals(byte.class)) {
-                parameterValues[i] = dataBuffer.get();
-            } else if (parameter.getType().equals(short.class)) {
-                parameterValues[i] = dataBuffer.getShort();
-            } else if (parameter.getType().equals(int.class)) {
-                parameterValues[i] = dataBuffer.getInt();
-            } else if (parameter.getType().equals(long.class)) {
-                parameterValues[i] = dataBuffer.getLong();
-            } else if (parameter.getType().equals(String.class)) {
-                parameterValues[i] = getString(dataBuffer);
-            } else if (parameter.getType().isArray()) {
-                int count = ((Number) parameterValues[i - 1]).intValue();
-                parameterValues[i] = getArray(dataBuffer, parameter, count);
-            } else if (DataType.class.isAssignableFrom(parameter.getType())) {
-                parameterValues[i] = getDataType(dataBuffer, parameter);
+            Object previousParameterValue = null;
+            if (i > 0) {
+                previousParameterValue = parameterValues[i - 1];
             }
+
+            parameterValues[i] = getParameterValue(dataBuffer, parameter.getType(), previousParameterValue);
         }
 
         return parameterValues;
     }
 
-    private String getString(ByteBuffer dataBuffer) throws UnsupportedEncodingException {
-        int length = dataBuffer.getInt();
-        byte[] bytes = new byte[length];
+    private Object getParameterValue(ByteBuffer dataBuffer, Class<?> parameterType, Object previousParameterValue) throws ReflectiveOperationException, IOException {
+        TypeParser parser = findParser(parameterType);
 
-        dataBuffer.get(bytes, 0, length);
-
-        return new String(bytes, "UTF-8");
+        if (parser != null) {
+            return parser.parse(dataBuffer, parameterType);
+        } else if (parameterType.isArray()) {
+            int count = ((Number) previousParameterValue).intValue();
+            return parseArray(dataBuffer, parameterType, count);
+        } else {
+            return null;
+        }
     }
 
-    private Object getDataType(ByteBuffer dataBuffer, Parameter parameter) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        return parameter.getType()
-                .getConstructor(ByteBuffer.class, IDSizesReplyCommand.class)
-                .newInstance(dataBuffer, forker.getIdSizes());
+    private TypeParser findParser(Class type) {
+        if (parserHashMap.containsKey(type)) {
+            return parserHashMap.get(type);
+        }
+
+        for (Class<?> aClass : parserHashMap.keySet()) {
+            if (aClass.isAssignableFrom(type) || Arrays.asList(type.getInterfaces()).contains(aClass)) {
+                return parserHashMap.get(aClass);
+            }
+        }
+
+        return null;
     }
 
-
-    private Object[] getArray(ByteBuffer buffer, Parameter parameter, int count) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, UnsupportedEncodingException {
-        Class<?> componentType = parameter.getType().getComponentType();
-        Set<Class<?>> subTypesOfRepetitiveData = (Set<Class<?>>) new Reflections("kaap.veiko.debuggerforker.commands").getSubTypesOf(componentType);
+    private Object[] parseArray(ByteBuffer buffer, Class<?> parameterType, int count) throws ReflectiveOperationException, IOException {
+        Class<?> componentType = parameterType.getComponentType();
+        Set<Class<?>> subTypesOfRepetitiveData =
+                (Set<Class<?>>) new Reflections("kaap.veiko.debuggerforker.commands").getSubTypesOf(componentType);
 
         Class<?> identifierClass = componentType.getAnnotation(JDWPAbstractCommandContent.class).identifierClass();
         Object[] repetitiveDataArray = (Object[]) Array.newInstance(componentType, count);
 
         for (int l = 0; l < count; l++) {
-            long identifier;
+            long identifier = -1;
 
-            if (identifierClass.equals(byte.class)) {
-                identifier = buffer.get();
-            } else if (identifierClass.equals(short.class)) {
-                identifier = buffer.getShort();
-            } else if (identifierClass.equals(int.class)) {
-                identifier = buffer.getInt();
-            } else if (identifierClass.equals(long.class)) {
-                identifier = buffer.getLong();
-            } else {
-                identifier = -1;
+            if (isNumber(identifierClass)) {
+                Object parameterValue = getParameterValue(buffer, identifierClass, null);
+                if (parameterValue != null && parameterValue instanceof Number) {
+                    identifier = ((Number) parameterValue).longValue();
+                }
             }
 
-            Class<?> found = subTypesOfRepetitiveData.stream()
-                    .filter(clazz -> clazz.getAnnotation(JDWPCommandContent.class).id() == identifier)
-                    .findFirst().get();
-
-            repetitiveDataArray[l] = found.getConstructors()[0].newInstance(getConstructorParameterValues(buffer, found.getConstructors()[0].getParameters()));
+            long finalIdentifier = identifier;
+            Optional<Class<?>> optional = subTypesOfRepetitiveData.stream()
+                    .filter(clazz -> clazz.getAnnotation(JDWPCommandContent.class).id() == finalIdentifier)
+                    .findFirst();
+            if (optional.isPresent()) {
+                Class<?> found = optional.get();
+                repetitiveDataArray[l] = found.getConstructors()[0].newInstance(getConstructorParameterValues(buffer, found.getConstructors()[0].getParameters()));
+            } else {
+                System.out.println("Failed to find JDWPCommandContent for superclass '" + componentType.getSimpleName() + "' with identifier '" + identifier + "'");
+                repetitiveDataArray[l] = null;
+            }
         }
         return repetitiveDataArray;
     }
 
-    private Class<?> findCommandClass(short commandSet, short command, boolean isReplyPacket) throws AmbiguousCommandException, NoCommandException {
-        Set<Class<?>> typesAnnotatedWith = new Reflections("kaap.veiko.debuggerforker.commands").getTypesAnnotatedWith(JDWPCommand.class);
-
-        Set<Class<?>> annotatedClasses = typesAnnotatedWith.stream()
-                .filter(clazz -> {
-                    JDWPCommand annotation = clazz.getAnnotation(JDWPCommand.class);
-                    return annotation.command() == command
-                            && annotation.commandSet() == commandSet
-                            && annotation.commandType().check(isReplyPacket);
-                })
-                .collect(Collectors.toSet());
-
-        if (annotatedClasses.size() > 1) {
-            throw new AmbiguousCommandException(
-                    "Ambiguous command for commandSet " + commandSet +
-                            " and command " + command +
-                            " and commandType " + isReplyPacket +
-                            ". Classes that match: " + annotatedClasses
-            );
-        } else if (annotatedClasses.isEmpty()) {
-            throw new NoCommandException("No command for commandSet " + commandSet +
-                    " and command " + command +
-                    " and commandType " + isReplyPacket
-            );
-        }
-
-        return annotatedClasses.iterator().next();
+    private boolean isNumber(Class<?> identifierClass) {
+        return Number.class.isAssignableFrom(identifierClass) ||
+                identifierClass.equals(byte.class) ||
+                identifierClass.equals(short.class) ||
+                identifierClass.equals(int.class) ||
+                identifierClass.equals(long.class);
     }
 
-    private class AmbiguousCommandException extends Exception {
-        private AmbiguousCommandException(String message) {
-            super(message);
-        }
-    }
-
-    private class NoCommandException extends Exception {
-        private NoCommandException(String message) {
-            super(message);
-        }
+    @FunctionalInterface
+    public interface TypeParser {
+        Object parse(ByteBuffer byteBuffer, Class<?> type) throws IOException, ReflectiveOperationException;
     }
 }

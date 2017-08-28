@@ -1,5 +1,6 @@
 package kaap.veiko.debuggerforker.utils;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 
 public class ByteBufferUtil {
@@ -31,5 +32,13 @@ public class ByteBufferUtil {
         byte[] bytes = new byte[]{0, 0};
         buffer.get(bytes, offset, size);
         return ByteBuffer.wrap(bytes).getShort();
+    }
+
+    public static String getString(ByteBuffer buffer) throws UnsupportedEncodingException {
+        int length = buffer.getInt();
+        byte[] bytes = new byte[length];
+        buffer.get(bytes, 0, length);
+
+        return new String(bytes, "UTF-8");
     }
 }
