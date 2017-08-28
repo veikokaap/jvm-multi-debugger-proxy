@@ -19,6 +19,14 @@ public class CompositeEventCommand implements Command {
         this.events = new ArrayList<>(Arrays.asList(events));
     }
 
+    public byte getSuspendPolicy() {
+        return suspendPolicy;
+    }
+
+    public List<VirtualMachineEvent> getEvents() {
+        return events;
+    }
+
     @Override
     public String toString() {
         return "CompositeEventCommand{" +
