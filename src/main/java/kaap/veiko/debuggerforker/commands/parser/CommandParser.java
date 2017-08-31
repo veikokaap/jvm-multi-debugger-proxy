@@ -58,8 +58,11 @@ public class CommandParser {
         ByteBuffer dataBuffer = ByteBuffer.wrap(packet.getDataBytes());
         Object command = createCommand(constructor, dataBuffer);
 
-        if (!(command instanceof Command)) {
-            log.error("'{}' isn't an instance of {}", command, Command.class.getName());
+        if (command == null) {
+            log.error("Parsed command is null. Command class '{}'. Constructor '{}'", commandClass, constructor);
+            return null;
+        } else if (!(command instanceof Command)) {
+            log.error("'{}' isn't an instance of '{}'", command, Command.class.getName());
             return null;
         }
 
