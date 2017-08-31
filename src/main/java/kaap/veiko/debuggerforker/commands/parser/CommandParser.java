@@ -5,7 +5,7 @@ import kaap.veiko.debuggerforker.commands.Command;
 import kaap.veiko.debuggerforker.commands.parser.annotations.ArrayCounter;
 import kaap.veiko.debuggerforker.commands.parser.annotations.JDWPAbstractCommandContent;
 import kaap.veiko.debuggerforker.commands.parser.annotations.JDWPCommandConstructor;
-import kaap.veiko.debuggerforker.commands.parser.annotations.JDWPCommandContent;
+import kaap.veiko.debuggerforker.commands.parser.annotations.JDWPSubCommand;
 import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IDSizesReplyCommand;
 import kaap.veiko.debuggerforker.commands.types.DataType;
 import kaap.veiko.debuggerforker.packet.Packet;
@@ -55,13 +55,6 @@ public class CommandParser {
             );
 
             return (Command) constructor.newInstance(parameterValues);
-        } catch (CommandUtil.NoCommandException e) {
-//            System.out.println("Command POJO not yet defined for " +
-//                    "commandSet " + packet.getCommandSet() +
-//                    " and command " + packet.getCommand() +
-//                    " and reply " + packet.isReply()
-//            );
-            return null;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -165,7 +158,7 @@ public class CommandParser {
 
         long finalIdentifier = identifier;
         Optional<Class<?>> any = subTypesOfRepetitiveData.stream()
-                .filter(clazz -> clazz.getAnnotation(JDWPCommandContent.class).id() == finalIdentifier)
+                .filter(clazz -> clazz.getAnnotation(JDWPSubCommand.class).id() == finalIdentifier)
                 .findFirst();
 
         return any;
