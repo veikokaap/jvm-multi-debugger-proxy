@@ -67,7 +67,7 @@ public class DebuggerForker implements AutoCloseable {
                 }
 
                 log.info("VMachine: {}", vmPacket);
-                Command command = new CommandParser(this).parse(vmPacket);
+                Command command = new CommandParser(this).parseCommand(vmPacket);
                 if (command != null) {
                     log.info("Parsed command: {}", command);
                     if (command instanceof IDSizesReplyCommand) {
@@ -86,7 +86,7 @@ public class DebuggerForker implements AutoCloseable {
                     Packet debuggerPacket = debugger.getPacketStream().read();
                     if (debuggerPacket != null) {
                         log.info("Debugger: {}", debuggerPacket);
-                        Command command = new CommandParser(this).parse(debuggerPacket);
+                        Command command = new CommandParser(this).parseCommand(debuggerPacket);
                         log.info("Parsed command: {}", command);
                         vm.getPacketStream().write(debuggerPacket);
                     }
