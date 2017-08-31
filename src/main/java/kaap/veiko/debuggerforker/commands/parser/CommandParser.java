@@ -145,8 +145,6 @@ public class CommandParser {
             if (parameter.isAnnotationPresent(ArrayCounter.class)) {
                 arrayCounterValue = Optional.of((Integer) parameterValues[i]);
             }
-
-            parameterValues[i] = "HOpsti";
         }
 
         return parameterValues;
