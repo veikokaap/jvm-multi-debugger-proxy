@@ -1,4 +1,4 @@
-package kaap.veiko.debuggerforker.commands.parser;
+package kaap.veiko.debuggerforker.commands.parser.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

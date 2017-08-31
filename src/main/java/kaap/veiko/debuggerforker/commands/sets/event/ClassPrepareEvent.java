@@ -1,7 +1,8 @@
 package kaap.veiko.debuggerforker.commands.sets.event;
 
 import kaap.veiko.debuggerforker.commands.constants.EventKindConstants;
-import kaap.veiko.debuggerforker.commands.parser.JDWPCommandContent;
+import kaap.veiko.debuggerforker.commands.parser.annotations.JDWPCommandConstructor;
+import kaap.veiko.debuggerforker.commands.parser.annotations.JDWPCommandContent;
 import kaap.veiko.debuggerforker.commands.types.ReferenceTypeID;
 import kaap.veiko.debuggerforker.commands.types.ThreadID;
 
@@ -14,6 +15,7 @@ public class ClassPrepareEvent extends VirtualMachineEvent {
     private final String signature;
     private final int status;
 
+    @JDWPCommandConstructor
     public ClassPrepareEvent(
             int requestId,
             ThreadID thread,

@@ -2,7 +2,8 @@ package kaap.veiko.debuggerforker.commands.sets.virtualmachine;
 
 import kaap.veiko.debuggerforker.commands.Command;
 import kaap.veiko.debuggerforker.commands.parser.CommandType;
-import kaap.veiko.debuggerforker.commands.parser.JDWPCommand;
+import kaap.veiko.debuggerforker.commands.parser.annotations.JDWPCommand;
+import kaap.veiko.debuggerforker.commands.parser.annotations.JDWPCommandConstructor;
 
 @JDWPCommand(commandSet = 1, command = 7, commandType = CommandType.REPLY)
 public class IDSizesReplyCommand implements Command {
@@ -13,6 +14,7 @@ public class IDSizesReplyCommand implements Command {
     private final int referenceTypeIDSize;
     private final int frameIDSize;
 
+    @JDWPCommandConstructor
     public IDSizesReplyCommand(int fieldIDSize, int methodIDSize, int objectIDSize, int referenceTypeIDSize, int frameIDSize) {
         this.fieldIDSize = fieldIDSize;
         this.methodIDSize = methodIDSize;

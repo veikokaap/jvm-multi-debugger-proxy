@@ -1,5 +1,6 @@
 package kaap.veiko.debuggerforker.commands.parser;
 
+import kaap.veiko.debuggerforker.commands.parser.annotations.JDWPCommand;
 import org.reflections.Reflections;
 
 import java.util.Set;

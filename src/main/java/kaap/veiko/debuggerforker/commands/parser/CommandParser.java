@@ -2,6 +2,10 @@ package kaap.veiko.debuggerforker.commands.parser;
 
 import kaap.veiko.debuggerforker.DebuggerForker;
 import kaap.veiko.debuggerforker.commands.Command;
+import kaap.veiko.debuggerforker.commands.parser.annotations.ArrayCounter;
+import kaap.veiko.debuggerforker.commands.parser.annotations.JDWPAbstractCommandContent;
+import kaap.veiko.debuggerforker.commands.parser.annotations.JDWPCommandConstructor;
+import kaap.veiko.debuggerforker.commands.parser.annotations.JDWPCommandContent;
 import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IDSizesReplyCommand;
 import kaap.veiko.debuggerforker.commands.types.DataType;
 import kaap.veiko.debuggerforker.packet.Packet;
@@ -42,7 +46,7 @@ public class CommandParser {
     public Command parse(Packet packet) {
         try {
             Class<?> commandClass = CommandUtil.findCommandClass(packet.getCommandSet(), packet.getCommand(), packet.isReply());
-            Constructor<?> constructor = commandClass.getConstructors()[0];
+            Constructor<?> constructor = findConstructor(commandClass);
 
             ByteBuffer dataBuffer = ByteBuffer.wrap(packet.getDataBytes());
             Object[] parameterValues = getConstructorParameterValues(
@@ -64,30 +68,47 @@ public class CommandParser {
         }
     }
 
+    private Constructor<?> findConstructor(Class<?> commandClass) throws ReflectiveOperationException {
+        Optional<Constructor<?>> constructorOptional = Arrays.stream(commandClass.getConstructors())
+                .filter(it -> it.isAnnotationPresent(JDWPCommandConstructor.class))
+                .findFirst();
+
+        if (!constructorOptional.isPresent()) {
+            throw new ReflectiveOperationException("No constructor found for '" + commandClass.getName() + "'");
+        }
+
+        return constructorOptional.get();
+    }
+
     private Object[] getConstructorParameterValues(ByteBuffer dataBuffer, Parameter[] parameters) throws ReflectiveOperationException, IOException {
         Object[] parameterValues = new Object[parameters.length];
+        Optional<Integer> arrayCounterValue = Optional.empty();
 
         for (int i = 0; i < parameters.length; i++) {
             Parameter parameter = parameters[i];
-            Object previousParameterValue = null;
-            if (i > 0) {
-                previousParameterValue = parameterValues[i - 1];
+            parameterValues[i] = getParameterValue(dataBuffer, parameter.getType(), arrayCounterValue);
+
+            if (parameter.isAnnotationPresent(ArrayCounter.class)) {
+                arrayCounterValue = Optional.of((Integer) parameterValues[i]);
             }
 
-            parameterValues[i] = getParameterValue(dataBuffer, parameter.getType(), previousParameterValue);
         }
 
         return parameterValues;
     }
 
-    private Object getParameterValue(ByteBuffer dataBuffer, Class<?> parameterType, Object previousParameterValue) throws ReflectiveOperationException, IOException {
+    private Object getParameterValue(ByteBuffer dataBuffer, Class<?> parameterType, Optional<Integer> arrayCounterValue) throws ReflectiveOperationException, IOException {
         TypeParser parser = findParser(parameterType);
 
         if (parser != null) {
             return parser.parse(dataBuffer, parameterType);
         } else if (parameterType.isArray()) {
-            int count = ((Number) previousParameterValue).intValue();
-            return parseArray(dataBuffer, parameterType, count);
+            if (arrayCounterValue.isPresent()) {
+                int count = arrayCounterValue.get();
+                return parseArray(dataBuffer, parameterType, count);
+            } else {
+                throw new ReflectiveOperationException("No array counter present");
+            }
         } else {
             return null;
         }
@@ -109,35 +130,45 @@ public class CommandParser {
 
     private Object[] parseArray(ByteBuffer buffer, Class<?> parameterType, int count) throws ReflectiveOperationException, IOException {
         Class<?> componentType = parameterType.getComponentType();
-        Set<Class<?>> subTypesOfRepetitiveData =
-                (Set<Class<?>>) new Reflections("kaap.veiko.debuggerforker.commands").getSubTypesOf(componentType);
-
-        Class<?> identifierClass = componentType.getAnnotation(JDWPAbstractCommandContent.class).identifierClass();
+        Class<?> identifierClass = findIdentifierClass(componentType);
         Object[] repetitiveDataArray = (Object[]) Array.newInstance(componentType, count);
 
         for (int l = 0; l < count; l++) {
-            long identifier = -1;
-
-            if (isNumber(identifierClass)) {
-                Object parameterValue = getParameterValue(buffer, identifierClass, null);
-                if (parameterValue != null && parameterValue instanceof Number) {
-                    identifier = ((Number) parameterValue).longValue();
-                }
-            }
-
-            long finalIdentifier = identifier;
-            Optional<Class<?>> optional = subTypesOfRepetitiveData.stream()
-                    .filter(clazz -> clazz.getAnnotation(JDWPCommandContent.class).id() == finalIdentifier)
-                    .findFirst();
-            if (optional.isPresent()) {
-                Class<?> found = optional.get();
-                repetitiveDataArray[l] = found.getConstructors()[0].newInstance(getConstructorParameterValues(buffer, found.getConstructors()[0].getParameters()));
+            Optional<Class<?>> subClass = findCorrectSubClass(buffer, componentType, identifierClass);
+            if (subClass.isPresent()) {
+                Class<?> clazz = subClass.get();
+                Constructor<?> constructor = findConstructor(clazz);
+                repetitiveDataArray[l] = constructor.newInstance(getConstructorParameterValues(buffer, constructor.getParameters()));
             } else {
-                System.out.println("Failed to find JDWPCommandContent for superclass '" + componentType.getSimpleName() + "' with identifier '" + identifier + "'");
                 repetitiveDataArray[l] = null;
             }
         }
         return repetitiveDataArray;
+    }
+
+    private Class<?> findIdentifierClass(Class<?> componentType) {
+        return componentType.getAnnotation(JDWPAbstractCommandContent.class).identifierClass();
+    }
+
+    private Optional<Class<?>> findCorrectSubClass(ByteBuffer buffer, Class<?> componentType, Class<?> identifierClass) throws ReflectiveOperationException, IOException {
+        Set<Class<?>> subTypesOfRepetitiveData =
+                (Set<Class<?>>) new Reflections("kaap.veiko.debuggerforker.commands").getSubTypesOf(componentType);
+
+        long identifier = -1;
+
+        if (isNumber(identifierClass)) {
+            Object parameterValue = getParameterValue(buffer, identifierClass, Optional.empty());
+            if (parameterValue != null && parameterValue instanceof Number) {
+                identifier = ((Number) parameterValue).longValue();
+            }
+        }
+
+        long finalIdentifier = identifier;
+        Optional<Class<?>> any = subTypesOfRepetitiveData.stream()
+                .filter(clazz -> clazz.getAnnotation(JDWPCommandContent.class).id() == finalIdentifier)
+                .findFirst();
+
+        return any;
     }
 
     private boolean isNumber(Class<?> identifierClass) {
