@@ -8,6 +8,8 @@ import kaap.veiko.debuggerforker.connections.VirtualMachineConnection;
 import kaap.veiko.debuggerforker.connections.connectors.DebuggerConnector;
 import kaap.veiko.debuggerforker.connections.connectors.VMConnector;
 import kaap.veiko.debuggerforker.packet.Packet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -15,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DebuggerForker implements AutoCloseable {
+
+    private final static Logger log = LoggerFactory.getLogger(DebuggerForker.class);
 
     private final VirtualMachineConnection vm;
     private final List<DebuggerConnection> debuggers = new ArrayList<>();
@@ -33,7 +37,7 @@ public class DebuggerForker implements AutoCloseable {
                     debuggers.notifyAll();
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("Exception while waiting for debuggers to connect", e);
             }
         });
     }
@@ -62,10 +66,10 @@ public class DebuggerForker implements AutoCloseable {
                     vmPacket.setCommand(packet.getCommand());
                 }
 
-                System.out.println("VMachine: " + vmPacket);
+                log.info("VMachine: {}", vmPacket);
                 Command command = new CommandParser(this).parse(vmPacket);
                 if (command != null) {
-                    System.out.println(command);
+                    log.info("Parsed command: {}", command);
                     if (command instanceof IDSizesReplyCommand) {
                         this.idSizes = (IDSizesReplyCommand) command;
                     }
@@ -81,8 +85,9 @@ public class DebuggerForker implements AutoCloseable {
                 for (DebuggerConnection debugger : debuggers) {
                     Packet debuggerPacket = debugger.getPacketStream().read();
                     if (debuggerPacket != null) {
-                        System.out.println("Debugger: " + debuggerPacket);
-                        System.out.println(new CommandParser(this).parse(debuggerPacket));
+                        log.info("Debugger: {}", debuggerPacket);
+                        Command command = new CommandParser(this).parse(debuggerPacket);
+                        log.info("Parsed command: {}", command);
                         vm.getPacketStream().write(debuggerPacket);
                     }
                 }

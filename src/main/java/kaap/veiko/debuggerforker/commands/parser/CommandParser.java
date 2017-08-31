@@ -11,6 +11,8 @@ import kaap.veiko.debuggerforker.commands.types.DataType;
 import kaap.veiko.debuggerforker.packet.Packet;
 import kaap.veiko.debuggerforker.utils.ByteBufferUtil;
 import org.reflections.Reflections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -24,6 +26,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 public class CommandParser {
+
+    private final static Logger log = LoggerFactory.getLogger(CommandParser.class);
 
     private final DebuggerForker forker;
     private final ConcurrentMap<Class<?>, TypeParser> parserHashMap = new ConcurrentHashMap<>();
@@ -56,7 +60,7 @@ public class CommandParser {
 
             return (Command) constructor.newInstance(parameterValues);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Exception while parsing the command", e);
             return null;
         }
     }
