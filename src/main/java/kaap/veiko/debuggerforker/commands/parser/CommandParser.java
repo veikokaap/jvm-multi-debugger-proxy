@@ -1,12 +1,19 @@
 package kaap.veiko.debuggerforker.commands.parser;
 
-import kaap.veiko.debuggerforker.DebuggerForker;
+import kaap.veiko.debuggerforker.VMInformation;
 import kaap.veiko.debuggerforker.commands.Command;
 import kaap.veiko.debuggerforker.commands.parser.annotations.*;
-import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IDSizesReplyCommand;
+import kaap.veiko.debuggerforker.commands.parser.typeparsers.BooleanParser;
+import kaap.veiko.debuggerforker.commands.parser.typeparsers.ByteBarser;
+import kaap.veiko.debuggerforker.commands.parser.typeparsers.DataTypeParser;
+import kaap.veiko.debuggerforker.commands.parser.typeparsers.IntParser;
+import kaap.veiko.debuggerforker.commands.parser.typeparsers.LongParser;
+import kaap.veiko.debuggerforker.commands.parser.typeparsers.ShortParser;
+import kaap.veiko.debuggerforker.commands.parser.typeparsers.StringParser;
+import kaap.veiko.debuggerforker.commands.parser.typeparsers.TypeParser;
 import kaap.veiko.debuggerforker.commands.types.DataType;
 import kaap.veiko.debuggerforker.packet.Packet;
-import kaap.veiko.debuggerforker.utils.ByteBufferUtil;
+
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,43 +27,40 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.stream.Collectors;
 
 public class CommandParser {
 
     private final static Logger log = LoggerFactory.getLogger(CommandParser.class);
 
-    private final DebuggerForker forker;
     private final ConcurrentMap<Class<?>, TypeParser> parserHashMap = new ConcurrentHashMap<>();
+    private final ConstructorFinder constructorFinder = new ConstructorFinder();
+    private final CommandClassFinder commandClassFinder = new CommandClassFinder();
+    private final VMInformation vmInformation;
 
-    public CommandParser(DebuggerForker forker) {
-        this.forker = forker;
-        this.parserHashMap.put(byte.class, (byteBuffer, type) -> byteBuffer.get());
-        this.parserHashMap.put(boolean.class, (byteBuffer, type) -> byteBuffer.get() != 0);
-        this.parserHashMap.put(short.class, (byteBuffer, type) -> byteBuffer.getShort());
-        this.parserHashMap.put(int.class, (byteBuffer, type) -> byteBuffer.getInt());
-        this.parserHashMap.put(long.class, (byteBuffer, type) -> byteBuffer.getLong());
-        this.parserHashMap.put(String.class, ((byteBuffer, type) -> ByteBufferUtil.getString(byteBuffer)));
-
-        this.parserHashMap.put(DataType.class, (byteBuffer, type) ->
-                type.getConstructor(ByteBuffer.class, IDSizesReplyCommand.class)
-                        .newInstance(byteBuffer, this.forker.getIdSizes())
-        );
+    public CommandParser(VMInformation vmInformation) {
+        this.vmInformation = vmInformation;
+        this.parserHashMap.put(byte.class, new ByteBarser());
+        this.parserHashMap.put(boolean.class, new BooleanParser());
+        this.parserHashMap.put(short.class, new ShortParser());
+        this.parserHashMap.put(int.class, new IntParser());
+        this.parserHashMap.put(long.class, new LongParser());
+        this.parserHashMap.put(String.class, new StringParser());
+        this.parserHashMap.put(DataType.class, new DataTypeParser(vmInformation));
     }
 
-    public Command parseCommand(Packet packet) {
-        Class<?> commandClass = findCommandClass(packet.getCommandSet(), packet.getCommand(), packet.isReply());
+    public Command parse(Packet packet) {
+        Class<?> commandClass = commandClassFinder.find(packet.getCommandSet(), packet.getCommand(), packet.isReply());
         if (commandClass == null) {
             return null;
         }
 
-        Constructor<?> constructor = findConstructor(commandClass);
+        Constructor<?> constructor = constructorFinder.find(commandClass);
         if (constructor == null) {
             return null;
         }
 
         ByteBuffer dataBuffer = ByteBuffer.wrap(packet.getDataBytes());
-        Object command = createCommand(constructor, dataBuffer);
+        Object command = newInstanceFromByteBuffer(constructor, dataBuffer);
 
         if (command == null) {
             log.error("Parsed command is null. Command class '{}'. Constructor '{}'", commandClass, constructor);
@@ -69,7 +73,7 @@ public class CommandParser {
         return (Command) command;
     }
 
-    private Object createCommand(Constructor<?> constructor, ByteBuffer dataBuffer) {
+    private Object newInstanceFromByteBuffer(Constructor<?> constructor, ByteBuffer dataBuffer) {
         Object[] parameterValues;
         try {
             parameterValues = getConstructorParameterValues(
@@ -77,7 +81,7 @@ public class CommandParser {
                     constructor.getParameters()
             );
         } catch (ReflectiveOperationException e) {
-            log.error("Exception while trying to createCommand values for a Command constructor '{}'.", constructor, e);
+            log.error("Exception while trying to newInstanceFromByteBuffer values for a Command constructor '{}'.", constructor, e);
             return null;
         }
 
@@ -87,54 +91,6 @@ public class CommandParser {
             log.error("Exception while trying to instantiate a new instance with constructor '{}' and parameters {}.", constructor, parameterValues, e);
             return null;
         }
-    }
-
-    private Class<?> findCommandClass(short commandSet, short command, boolean isReplyPacket) {
-        Set<Class<?>> matchingCommandClasses = new Reflections("kaap.veiko.debuggerforker.commands").getTypesAnnotatedWith(JDWPCommand.class)
-                .stream()
-                .filter(clazz -> {
-                    JDWPCommand annotation = clazz.getAnnotation(JDWPCommand.class);
-                    return annotation.command() == command
-                            && annotation.commandSet() == commandSet
-                            && annotation.commandType().check(isReplyPacket);
-                })
-                .collect(Collectors.toSet());
-
-        if (matchingCommandClasses.isEmpty()) {
-            log.warn("No command class found for commandSet '{}', command '{}' and isReplyPacket '{}'",
-                    commandSet, command, isReplyPacket);
-            return null;
-        } else if (matchingCommandClasses.size() > 1) {
-            log.warn("More than one command class found for commandSet '{}', command '{}' and isReplyPacket '{}'. Found classes: {}",
-                    commandSet, command, isReplyPacket, matchingCommandClasses);
-            return null;
-        }
-
-        Class<?> matchingClass = matchingCommandClasses.iterator().next();
-        log.debug("For commandSet '{}', command '{}' and isReplyPacket '{}', found the class {}",
-                commandSet, command, isReplyPacket, matchingClass.getName());
-
-        return matchingClass;
-    }
-
-    private Constructor<?> findConstructor(Class<?> commandClass) {
-        Set<Constructor<?>> matchingConstructors = Arrays.stream(commandClass.getConstructors())
-                .filter(it -> it.isAnnotationPresent(JDWPCommandConstructor.class))
-                .collect(Collectors.toSet());
-
-        if (matchingConstructors.isEmpty()) {
-            log.warn("No constructor with annotation {} found in class '{}'",
-                    JDWPCommandConstructor.class.getSimpleName(), commandClass.getName());
-            return null;
-        } else if (matchingConstructors.size() > 1) {
-            log.warn("More than one constructor with annotation {} found in class '{}'",
-                    JDWPCommandConstructor.class.getSimpleName(), commandClass.getName());
-        }
-
-        Constructor<?> matchingConstructor = matchingConstructors.iterator().next();
-        log.debug("For class '{}', found constructor '{}'", commandClass.getName(), matchingConstructor);
-
-        return matchingConstructor;
     }
 
     private Object[] getConstructorParameterValues(ByteBuffer dataBuffer, Parameter[] parameters) throws ReflectiveOperationException {
@@ -193,8 +149,8 @@ public class CommandParser {
             Optional<Class<?>> subClass = findCorrectSubClass(buffer, componentType, identifierClass);
             if (subClass.isPresent()) {
                 Class<?> clazz = subClass.get();
-                Constructor<?> constructor = findConstructor(clazz);
-                repetitiveDataArray[l] = createCommand(constructor, buffer);
+                Constructor<?> constructor = constructorFinder.find(clazz);
+                repetitiveDataArray[l] = newInstanceFromByteBuffer(constructor, buffer);
             } else {
                 repetitiveDataArray[l] = null;
             }
@@ -233,10 +189,5 @@ public class CommandParser {
                 identifierClass.equals(short.class) ||
                 identifierClass.equals(int.class) ||
                 identifierClass.equals(long.class);
-    }
-
-    @FunctionalInterface
-    public interface TypeParser {
-        Object parse(ByteBuffer byteBuffer, Class<?> type) throws ReflectiveOperationException;
     }
 }

@@ -21,10 +21,11 @@ public class DebuggerForker implements AutoCloseable {
     private final static Logger log = LoggerFactory.getLogger(DebuggerForker.class);
 
     private final VirtualMachineConnection vm;
+    private final VMInformation vmInformation = new VMInformation();
+    private final CommandParser commandParser = new CommandParser(vmInformation);
     private final List<DebuggerConnection> debuggers = new ArrayList<>();
 
     private final Thread debuggerConnectionThread;
-    private IDSizesReplyCommand idSizes = null;
 
     private DebuggerForker(VirtualMachineConnection vm, int debuggerPort) {
         this.vm = vm;
@@ -67,11 +68,11 @@ public class DebuggerForker implements AutoCloseable {
                 }
 
                 log.info("VMachine: {}", vmPacket);
-                Command command = new CommandParser(this).parseCommand(vmPacket);
+                Command command = commandParser.parse(vmPacket);
                 if (command != null) {
                     log.info("Parsed command: {}", command);
                     if (command instanceof IDSizesReplyCommand) {
-                        this.idSizes = (IDSizesReplyCommand) command;
+                        vmInformation.setIdSizes((IDSizesReplyCommand) command);
                     }
                 }
                 synchronized (debuggers) {
@@ -86,7 +87,7 @@ public class DebuggerForker implements AutoCloseable {
                     Packet debuggerPacket = debugger.getPacketStream().read();
                     if (debuggerPacket != null) {
                         log.info("Debugger: {}", debuggerPacket);
-                        Command command = new CommandParser(this).parseCommand(debuggerPacket);
+                        Command command = commandParser.parse(debuggerPacket);
                         log.info("Parsed command: {}", command);
                         vm.getPacketStream().write(debuggerPacket);
                     }
@@ -113,9 +114,5 @@ public class DebuggerForker implements AutoCloseable {
                 debugger.close();
             }
         }
-    }
-
-    public IDSizesReplyCommand getIdSizes() {
-        return idSizes;
     }
 }
