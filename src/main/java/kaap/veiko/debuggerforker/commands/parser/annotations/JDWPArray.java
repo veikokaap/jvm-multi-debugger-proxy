@@ -8,5 +8,6 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.PARAMETER})
-public @interface Array {
+public @interface JDWPArray {
+  Class<? extends Number> counterType();
 }

@@ -1,10 +1,16 @@
 package kaap.veiko.debuggerforker.commands.parser.typeparsers;
 
+import java.lang.reflect.Parameter;
 import java.nio.ByteBuffer;
 
-public class ShortParser<T> implements TypeParser<Short> {
+public class ShortParser implements TypeParser<Short> {
   @Override
-  public Short parse(ByteBuffer byteBuffer, Class<?> type) throws ReflectiveOperationException {
+  public Short parse(ByteBuffer byteBuffer, Parameter parameter) throws ReflectiveOperationException {
     return byteBuffer.getShort();
+  }
+
+  @Override
+  public boolean hasCorrectType(Class<?> type) {
+    return type == short.class || Short.class.equals(type);
   }
 }

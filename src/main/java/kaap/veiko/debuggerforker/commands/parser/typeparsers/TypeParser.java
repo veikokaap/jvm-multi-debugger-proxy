@@ -1,8 +1,9 @@
 package kaap.veiko.debuggerforker.commands.parser.typeparsers;
 
+import java.lang.reflect.Parameter;
 import java.nio.ByteBuffer;
 
-@FunctionalInterface
 public interface TypeParser<T> {
-  T parse(ByteBuffer byteBuffer, Class<?> type) throws ReflectiveOperationException;
+  boolean hasCorrectType(Class<?> type);
+  T parse(ByteBuffer byteBuffer, Parameter parameter) throws ReflectiveOperationException;
 }
