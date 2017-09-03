@@ -8,63 +8,63 @@ import kaap.veiko.debuggerforker.commands.types.ThreadID;
 
 @JDWPSubCommand(id = EventKindConstants.CLASS_PREPARE)
 public class ClassPrepareEvent extends VirtualMachineEvent {
-    private final int requestId;
-    private final long thread;
-    private final byte refTypeTag;
-    private final long typeId;
-    private final String signature;
-    private final int status;
+  private final int requestId;
+  private final long thread;
+  private final byte refTypeTag;
+  private final long typeId;
+  private final String signature;
+  private final int status;
 
-    @JDWPCommandConstructor
-    public ClassPrepareEvent(
-            int requestId,
-            ThreadID thread,
-            byte refTypeTag,
-            ReferenceTypeID typeID,
-            String signature,
-            int status
-    ) {
-        this.requestId = requestId;
-        this.thread = thread.asLong();
-        this.refTypeTag = refTypeTag;
-        this.typeId = typeID.asLong();
-        this.signature = signature;
-        this.status = status;
-    }
+  @JDWPCommandConstructor
+  public ClassPrepareEvent(
+      int requestId,
+      ThreadID thread,
+      byte refTypeTag,
+      ReferenceTypeID typeID,
+      String signature,
+      int status
+  ) {
+    this.requestId = requestId;
+    this.thread = thread.asLong();
+    this.refTypeTag = refTypeTag;
+    this.typeId = typeID.asLong();
+    this.signature = signature;
+    this.status = status;
+  }
 
-    public int getRequestId() {
-        return requestId;
-    }
+  public int getRequestId() {
+    return requestId;
+  }
 
-    public long getThread() {
-        return thread;
-    }
+  public long getThread() {
+    return thread;
+  }
 
-    public byte getRefTypeTag() {
-        return refTypeTag;
-    }
+  public byte getRefTypeTag() {
+    return refTypeTag;
+  }
 
-    public long getTypeId() {
-        return typeId;
-    }
+  public long getTypeId() {
+    return typeId;
+  }
 
-    public String getSignature() {
-        return signature;
-    }
+  public String getSignature() {
+    return signature;
+  }
 
-    public int getStatus() {
-        return status;
-    }
+  public int getStatus() {
+    return status;
+  }
 
-    @Override
-    public String toString() {
-        return "ClassPrepareEvent{" +
-                "requestId=" + requestId +
-                ", thread=" + thread +
-                ", refTypeTag=" + refTypeTag +
-                ", typeId=" + typeId +
-                ", signature='" + signature + '\'' +
-                ", status=" + status +
-                '}';
-    }
+  @Override
+  public String toString() {
+    return "ClassPrepareEvent{" +
+        "requestId=" + requestId +
+        ", thread=" + thread +
+        ", refTypeTag=" + refTypeTag +
+        ", typeId=" + typeId +
+        ", signature='" + signature + '\'' +
+        ", status=" + status +
+        '}';
+  }
 }

@@ -17,16 +17,16 @@ import kaap.veiko.debuggerforker.commands.parser.annotations.JDWPArray;
 import kaap.veiko.debuggerforker.commands.parser.annotations.JDWPSubCommand;
 
 public class ArrayParser implements TypeParser<Object[]> {
-  
+
   private final static Logger log = LoggerFactory.getLogger(ArrayParser.class);
-  
+
   private final ParameterParser parameterParser;
   private final ConstructorFinder constructorFinder = new ConstructorFinder();
-  
+
   public ArrayParser(ParameterParser parameterParser) {
     this.parameterParser = parameterParser;
   }
-  
+
   @Override
   public boolean hasCorrectType(Class<?> type) {
     return type != null && type.isArray();
@@ -118,5 +118,5 @@ public class ArrayParser implements TypeParser<Object[]> {
       return null;
     }
   }
-  
+
 }

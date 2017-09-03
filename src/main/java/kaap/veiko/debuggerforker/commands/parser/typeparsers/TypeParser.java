@@ -5,5 +5,6 @@ import java.nio.ByteBuffer;
 
 public interface TypeParser<T> {
   boolean hasCorrectType(Class<?> type);
+
   T parse(ByteBuffer byteBuffer, Parameter parameter) throws ReflectiveOperationException;
 }

@@ -8,31 +8,31 @@ import kaap.veiko.debuggerforker.commands.types.ThreadID;
 
 @JDWPSubCommand(id = EventKindConstants.VM_START)
 public class VMStartEvent extends VirtualMachineEvent {
-    private final int requestId;
-    private final long thread;
+  private final int requestId;
+  private final long thread;
 
-    @JDWPCommandConstructor
-    public VMStartEvent(
-            int requestId,
-            ThreadID thread
-    ) {
-        this.requestId = requestId;
-        this.thread = thread.asLong();
-    }
+  @JDWPCommandConstructor
+  public VMStartEvent(
+      int requestId,
+      ThreadID thread
+  ) {
+    this.requestId = requestId;
+    this.thread = thread.asLong();
+  }
 
-    public int getRequestId() {
-        return requestId;
-    }
+  public int getRequestId() {
+    return requestId;
+  }
 
-    public long getThread() {
-        return thread;
-    }
+  public long getThread() {
+    return thread;
+  }
 
-    @Override
-    public String toString() {
-        return "VMStartEvent{" +
-                "requestId=" + requestId +
-                ", thread=" + thread +
-                '}';
-    }
+  @Override
+  public String toString() {
+    return "VMStartEvent{" +
+        "requestId=" + requestId +
+        ", thread=" + thread +
+        '}';
+  }
 }
