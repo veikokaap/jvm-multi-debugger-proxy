@@ -59,15 +59,6 @@ public class DebuggerForker implements AutoCloseable {
       Packet vmPacket = vm.getPacketStream().read();
 
       if (vmPacket != null) {
-        if (vmPacket.isReply()) {
-          Packet packet = debuggers.get(0).getPacketStream().getReadPacketHistory().stream()
-              .filter(pkt -> pkt.getId() == vmPacket.getId())
-              .findFirst().get();
-
-          vmPacket.setCommandSet(packet.getCommandSet());
-          vmPacket.setCommand(packet.getCommand());
-        }
-
         log.info("VMachine: {}", vmPacket);
         Command command = commandParser.parse(vmPacket);
         if (command != null) {
