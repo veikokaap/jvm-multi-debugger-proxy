@@ -6,15 +6,23 @@ import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import kaap.veiko.debuggerforker.commands.Command;
 import kaap.veiko.debuggerforker.commands.parser.annotations.JDWPCommand;
+import kaap.veiko.debuggerforker.packet.Packet;
 
 public class CommandClassFinder {
 
   private final Logger log = LoggerFactory.getLogger(CommandClassFinder.class);
+  private Reflections reflections = new Reflections("kaap.veiko.debuggerforker.commands");;
 
-  public Class<?> find(short commandSet, short command, boolean isReplyPacket) {
-    Set<Class<?>> matchingCommandClasses = new Reflections("kaap.veiko.debuggerforker.commands").getTypesAnnotatedWith(JDWPCommand.class)
-        .stream()
+  public Class<? extends Command> find(Packet packet) {
+    return find(packet.getCommandSet(), packet.getCommand(), packet.isReply());
+  }
+
+  private Class<? extends Command> find(short commandSet, short command, boolean isReplyPacket) {
+    Set<Class<? extends Command>> matchingCommandClasses = reflections
+        .getSubTypesOf(Command.class).stream()
+        .filter(clazz -> clazz.isAnnotationPresent(JDWPCommand.class))
         .filter(clazz -> {
           JDWPCommand annotation = clazz.getAnnotation(JDWPCommand.class);
           return annotation.command() == command
@@ -34,7 +42,7 @@ public class CommandClassFinder {
       return null;
     }
 
-    Class<?> matchingClass = matchingCommandClasses.iterator().next();
+    Class<? extends Command> matchingClass = matchingCommandClasses.iterator().next();
     log.debug("For commandSet '{}', command '{}' and isReplyPacket '{}', found the class {}",
         commandSet, command, isReplyPacket, matchingClass.getName());
 

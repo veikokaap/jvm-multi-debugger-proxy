@@ -13,8 +13,9 @@ public class ConstructorFinder {
 
   private final Logger log = LoggerFactory.getLogger(ConstructorFinder.class);
 
-  public Constructor<?> find(Class<?> commandClass) {
-    Set<Constructor<?>> matchingConstructors = Arrays.stream(commandClass.getConstructors())
+  public <T> Constructor<T> find(Class<T> commandClass) {
+    Set<Constructor<T>> matchingConstructors = Arrays.stream(commandClass.getConstructors())
+        .map(constructors -> (Constructor<T>) constructors)
         .filter(it -> it.isAnnotationPresent(JDWPCommandConstructor.class))
         .collect(Collectors.toSet());
 
@@ -28,7 +29,7 @@ public class ConstructorFinder {
           JDWPCommandConstructor.class.getSimpleName(), commandClass.getName());
     }
 
-    Constructor<?> matchingConstructor = matchingConstructors.iterator().next();
+    Constructor<T> matchingConstructor = matchingConstructors.iterator().next();
     log.debug("For class '{}', found constructor '{}'", commandClass.getName(), matchingConstructor);
 
     return matchingConstructor;

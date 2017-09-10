@@ -10,6 +10,7 @@ import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import kaap.veiko.debuggerforker.commands.parser.CommandInstantiator;
 import kaap.veiko.debuggerforker.commands.parser.ConstructorFinder;
 import kaap.veiko.debuggerforker.commands.parser.ParameterParser;
 import kaap.veiko.debuggerforker.commands.parser.annotations.JDWPAbstractCommandContent;
@@ -20,11 +21,13 @@ public class ArrayParser implements TypeParser<Object[]> {
 
   private final static Logger log = LoggerFactory.getLogger(ArrayParser.class);
 
-  private final ParameterParser parameterParser;
   private final ConstructorFinder constructorFinder = new ConstructorFinder();
+  private final ParameterParser parameterParser;
+  private final CommandInstantiator commandInstantiator;
 
   public ArrayParser(ParameterParser parameterParser) {
     this.parameterParser = parameterParser;
+    this.commandInstantiator = new CommandInstantiator(parameterParser);
   }
 
   @Override
@@ -55,7 +58,7 @@ public class ArrayParser implements TypeParser<Object[]> {
       if (subClass.isPresent()) {
         Class<?> clazz = subClass.get();
         Constructor<?> constructor = constructorFinder.find(clazz);
-        repetitiveDataArray[l] = newInstanceFromByteBuffer(constructor, buffer);
+        repetitiveDataArray[l] = commandInstantiator.newInstanceFromByteBuffer(constructor, buffer);
       }
       else {
         repetitiveDataArray[l] = null;
@@ -95,28 +98,6 @@ public class ArrayParser implements TypeParser<Object[]> {
         identifierClass.equals(short.class) ||
         identifierClass.equals(int.class) ||
         identifierClass.equals(long.class);
-  }
-
-  private Object newInstanceFromByteBuffer(Constructor<?> constructor, ByteBuffer dataBuffer) {
-    Object[] parameterValues;
-    try {
-      parameterValues = parameterParser.parseMultipleValuesFromBuffer(
-          dataBuffer,
-          constructor.getParameters()
-      );
-    }
-    catch (ReflectiveOperationException e) {
-      log.error("Exception while trying to parse values for a Command constructor '{}'.", constructor, e);
-      return null;
-    }
-
-    try {
-      return constructor.newInstance(parameterValues);
-    }
-    catch (ReflectiveOperationException | IllegalArgumentException e) {
-      log.error("Exception while trying to instantiate a new instance with constructor '{}' and parameters {}.", constructor, parameterValues, e);
-      return null;
-    }
   }
 
 }
