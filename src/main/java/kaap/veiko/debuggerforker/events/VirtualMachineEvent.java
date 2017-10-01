@@ -1,7 +1,7 @@
 package kaap.veiko.debuggerforker.events;
 
-import kaap.veiko.debuggerforker.commands.parser.annotations.JDWPAbstractCommandContent;
+import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpAbstractCommandContent;
 
-@JDWPAbstractCommandContent(identifierClass = byte.class)
+@JdwpAbstractCommandContent(identifierClass = byte.class)
 public abstract class VirtualMachineEvent {
 }

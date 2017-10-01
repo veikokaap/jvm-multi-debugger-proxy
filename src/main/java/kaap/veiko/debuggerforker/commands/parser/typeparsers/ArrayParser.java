@@ -13,9 +13,9 @@ import org.slf4j.LoggerFactory;
 import kaap.veiko.debuggerforker.commands.parser.CommandInstantiator;
 import kaap.veiko.debuggerforker.commands.parser.ConstructorFinder;
 import kaap.veiko.debuggerforker.commands.parser.ParameterParser;
-import kaap.veiko.debuggerforker.commands.parser.annotations.JDWPAbstractCommandContent;
-import kaap.veiko.debuggerforker.commands.parser.annotations.JDWPArray;
-import kaap.veiko.debuggerforker.commands.parser.annotations.JDWPSubCommand;
+import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpAbstractCommandContent;
+import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpArray;
+import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpSubCommand;
 
 public class ArrayParser implements TypeParser<Object[]> {
 
@@ -37,12 +37,12 @@ public class ArrayParser implements TypeParser<Object[]> {
 
   @Override
   public Object[] parse(ByteBuffer byteBuffer, Parameter parameter) throws ReflectiveOperationException {
-    if (!parameter.isAnnotationPresent(JDWPArray.class)) {
-      log.error("Array type parameter '{}' doesn't have annotation '{}'", parameter, JDWPArray.class.getSimpleName());
+    if (!parameter.isAnnotationPresent(JdwpArray.class)) {
+      log.error("Array type parameter '{}' doesn't have annotation '{}'", parameter, JdwpArray.class.getSimpleName());
       return null;
     }
 
-    Class<? extends Number> counterType = parameter.getAnnotation(JDWPArray.class).counterType();
+    Class<? extends Number> counterType = parameter.getAnnotation(JdwpArray.class).counterType();
     int count = (int) parameterParser.getValueFromBuffer(byteBuffer, counterType);
 
     return parseArray(byteBuffer, parameter.getType(), count);
@@ -68,7 +68,7 @@ public class ArrayParser implements TypeParser<Object[]> {
   }
 
   private Class<?> findIdentifierClass(Class<?> componentType) {
-    return componentType.getAnnotation(JDWPAbstractCommandContent.class).identifierClass();
+    return componentType.getAnnotation(JdwpAbstractCommandContent.class).identifierClass();
   }
 
   private Optional<Class<?>> findCorrectSubClass(ByteBuffer buffer, Class<?> componentType, Class<?> identifierClass) throws ReflectiveOperationException {
@@ -86,7 +86,7 @@ public class ArrayParser implements TypeParser<Object[]> {
 
     long finalIdentifier = identifier;
     Optional<Class<?>> any = subTypesOfRepetitiveData.stream()
-        .filter(clazz -> clazz.getAnnotation(JDWPSubCommand.class).eventKind().getId() == finalIdentifier)
+        .filter(clazz -> clazz.getAnnotation(JdwpSubCommand.class).eventKind().getId() == finalIdentifier)
         .findFirst();
 
     return any;

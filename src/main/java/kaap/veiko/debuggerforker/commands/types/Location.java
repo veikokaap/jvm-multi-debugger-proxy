@@ -2,18 +2,18 @@ package kaap.veiko.debuggerforker.commands.types;
 
 import java.nio.ByteBuffer;
 
-import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IDSizesReply;
+import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IdSizesReply;
 
 public class Location {
   private final byte typeTag;
-  private final ClassID classID;
-  private final MethodID methodID;
+  private final ClassId classId;
+  private final MethodId methodId;
   private final long index;
 
-  public Location(ByteBuffer byteBuffer, IDSizesReply idSizes) {
+  public Location(ByteBuffer byteBuffer, IdSizesReply idSizes) {
     typeTag = byteBuffer.get();
-    classID = new ClassID(byteBuffer, idSizes);
-    methodID = new MethodID(byteBuffer, idSizes);
+    classId = new ClassId(byteBuffer, idSizes);
+    methodId = new MethodId(byteBuffer, idSizes);
     index = byteBuffer.getLong();
   }
 
@@ -21,12 +21,12 @@ public class Location {
     return typeTag;
   }
 
-  public ClassID getClassID() {
-    return classID;
+  public ClassId getClassId() {
+    return classId;
   }
 
-  public MethodID getMethodID() {
-    return methodID;
+  public MethodId getMethodId() {
+    return methodId;
   }
 
   public long getIndex() {
@@ -37,8 +37,8 @@ public class Location {
   public String toString() {
     return "Location{" +
         "typeTag=" + typeTag +
-        ", classID=" + classID +
-        ", methodID=" + methodID +
+        ", classId=" + classId +
+        ", methodId=" + methodId +
         ", index=" + index +
         '}';
   }

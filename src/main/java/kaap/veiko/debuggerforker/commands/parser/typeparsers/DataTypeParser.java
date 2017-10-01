@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import kaap.veiko.debuggerforker.VMInformation;
-import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IDSizesReply;
+import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IdSizesReply;
 import kaap.veiko.debuggerforker.commands.types.DataType;
 
 public class DataTypeParser implements TypeParser<DataType> {
@@ -25,7 +25,7 @@ public class DataTypeParser implements TypeParser<DataType> {
       log.error("Type '{}' is not a subtype of '{}'", parameter.getName(), DataType.class.getName());
     }
 
-    return (DataType) parameter.getType().getConstructor(ByteBuffer.class, IDSizesReply.class)
+    return (DataType) parameter.getType().getConstructor(ByteBuffer.class, IdSizesReply.class)
         .newInstance(byteBuffer, vmInformation.getIdSizes());
   }
 

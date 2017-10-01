@@ -5,7 +5,7 @@ import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IDSizesReply;
+import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IdSizesReply;
 import kaap.veiko.debuggerforker.utils.ByteBufferUtil;
 
 public abstract class DataTypeBase implements DataType {
@@ -13,7 +13,7 @@ public abstract class DataTypeBase implements DataType {
   private final static Logger log = LoggerFactory.getLogger(DataTypeBase.class);
   private final long value;
 
-  public DataTypeBase(ByteBuffer buffer, IDSizesReply idSizes, Function<IDSizesReply, Integer> sizeFunction) {
+  public DataTypeBase(ByteBuffer buffer, IdSizesReply idSizes, Function<IdSizesReply, Integer> sizeFunction) {
     if (idSizes != null) {
       int size = sizeFunction.apply(idSizes);
       value = ByteBufferUtil.getLong(buffer, size);

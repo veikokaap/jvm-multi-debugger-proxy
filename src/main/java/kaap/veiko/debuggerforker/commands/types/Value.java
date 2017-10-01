@@ -3,23 +3,23 @@ package kaap.veiko.debuggerforker.commands.types;
 import java.nio.ByteBuffer;
 
 import kaap.veiko.debuggerforker.commands.constants.TypeTag;
-import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IDSizesReply;
+import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IdSizesReply;
 import kaap.veiko.debuggerforker.utils.ByteBufferUtil;
 
 public class Value implements DataType {
   private final TypeTag type;
   private final Long value;
 
-  public Value(ByteBuffer byteBuffer, IDSizesReply idSizes) {
+  public Value(ByteBuffer byteBuffer, IdSizesReply idSizes) {
     this(byteBuffer, idSizes, byteBuffer.get());
   }
 
-  protected Value(ByteBuffer byteBuffer, IDSizesReply idSizes, byte typeTag) {
+  protected Value(ByteBuffer byteBuffer, IdSizesReply idSizes, byte typeTag) {
     this.type = TypeTag.findByValue(typeTag);
     Integer size = type.getSize();
 
     if (size == null) {
-      value = ByteBufferUtil.getLong(byteBuffer, idSizes.getObjectIDSize());
+      value = ByteBufferUtil.getLong(byteBuffer, idSizes.getObjectIdSize());
     }
     else if (size == 0) {
       value = null;

@@ -1,12 +1,12 @@
 package kaap.veiko.debuggerforker.events;
 
 import kaap.veiko.debuggerforker.commands.constants.EventKind;
-import kaap.veiko.debuggerforker.commands.parser.annotations.JDWPCommandConstructor;
-import kaap.veiko.debuggerforker.commands.parser.annotations.JDWPSubCommand;
-import kaap.veiko.debuggerforker.commands.types.ReferenceTypeID;
-import kaap.veiko.debuggerforker.commands.types.ThreadID;
+import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpCommandConstructor;
+import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpSubCommand;
+import kaap.veiko.debuggerforker.commands.types.ReferenceTypeId;
+import kaap.veiko.debuggerforker.commands.types.ThreadId;
 
-@JDWPSubCommand(eventKind = EventKind.CLASS_PREPARE)
+@JdwpSubCommand(eventKind = EventKind.CLASS_PREPARE)
 public class ClassPrepareEvent extends VirtualMachineEvent {
   private final int requestId;
   private final long thread;
@@ -15,19 +15,19 @@ public class ClassPrepareEvent extends VirtualMachineEvent {
   private final String signature;
   private final int status;
 
-  @JDWPCommandConstructor
+  @JdwpCommandConstructor
   public ClassPrepareEvent(
       int requestId,
-      ThreadID thread,
+      ThreadId thread,
       byte refTypeTag,
-      ReferenceTypeID typeID,
+      ReferenceTypeId typeId,
       String signature,
       int status
   ) {
     this.requestId = requestId;
     this.thread = thread.asLong();
     this.refTypeTag = refTypeTag;
-    this.typeId = typeID.asLong();
+    this.typeId = typeId.asLong();
     this.signature = signature;
     this.status = status;
   }
