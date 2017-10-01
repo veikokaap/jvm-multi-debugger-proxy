@@ -9,6 +9,7 @@ import kaap.veiko.debuggerforker.commands.parser.CommandType;
 import kaap.veiko.debuggerforker.commands.parser.annotations.JDWPArray;
 import kaap.veiko.debuggerforker.commands.parser.annotations.JDWPCommand;
 import kaap.veiko.debuggerforker.commands.parser.annotations.JDWPCommandConstructor;
+import kaap.veiko.debuggerforker.events.VirtualMachineEvent;
 
 @JDWPCommand(commandSet = 64, command = 100, commandType = CommandType.COMMAND)
 public class CompositeEventCommand implements Command {

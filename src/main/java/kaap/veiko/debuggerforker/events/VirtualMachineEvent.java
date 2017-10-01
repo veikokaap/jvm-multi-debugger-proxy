@@ -1,4 +1,4 @@
-package kaap.veiko.debuggerforker.commands.sets.event;
+package kaap.veiko.debuggerforker.events;
 
 import kaap.veiko.debuggerforker.commands.parser.annotations.JDWPAbstractCommandContent;
 
