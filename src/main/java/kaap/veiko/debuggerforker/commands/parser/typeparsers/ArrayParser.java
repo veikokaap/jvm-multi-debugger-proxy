@@ -86,7 +86,7 @@ public class ArrayParser implements TypeParser<Object[]> {
 
     long finalIdentifier = identifier;
     Optional<Class<?>> any = subTypesOfRepetitiveData.stream()
-        .filter(clazz -> clazz.getAnnotation(JDWPSubCommand.class).id() == finalIdentifier)
+        .filter(clazz -> clazz.getAnnotation(JDWPSubCommand.class).eventKind().getId() == finalIdentifier)
         .findFirst();
 
     return any;
