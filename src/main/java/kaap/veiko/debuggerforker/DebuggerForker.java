@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import kaap.veiko.debuggerforker.commands.Command;
 import kaap.veiko.debuggerforker.commands.parser.CommandParser;
-import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IDSizesReplyCommand;
+import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IDSizesReply;
 import kaap.veiko.debuggerforker.connections.DebuggerConnection;
 import kaap.veiko.debuggerforker.connections.VirtualMachineConnection;
 import kaap.veiko.debuggerforker.connections.connectors.DebuggerConnector;
@@ -63,8 +63,8 @@ public class DebuggerForker implements AutoCloseable {
         Command command = commandParser.parse(vmPacket);
         if (command != null) {
           log.info("Parsed command: {}", command);
-          if (command instanceof IDSizesReplyCommand) {
-            vmInformation.setIdSizes((IDSizesReplyCommand) command);
+          if (command instanceof IDSizesReply) {
+            vmInformation.setIdSizes((IDSizesReply) command);
           }
         }
         synchronized (debuggers) {

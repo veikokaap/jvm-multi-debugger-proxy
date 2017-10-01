@@ -3,18 +3,18 @@ package kaap.veiko.debuggerforker.commands.types;
 import java.nio.ByteBuffer;
 
 import kaap.veiko.debuggerforker.commands.constants.TypeTag;
-import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IDSizesReplyCommand;
+import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IDSizesReply;
 import kaap.veiko.debuggerforker.utils.ByteBufferUtil;
 
 public class Value implements DataType {
   private final TypeTag type;
   private final Long value;
 
-  public Value(ByteBuffer byteBuffer, IDSizesReplyCommand idSizes) {
+  public Value(ByteBuffer byteBuffer, IDSizesReply idSizes) {
     this(byteBuffer, idSizes, byteBuffer.get());
   }
 
-  protected Value(ByteBuffer byteBuffer, IDSizesReplyCommand idSizes, byte typeTag) {
+  protected Value(ByteBuffer byteBuffer, IDSizesReply idSizes, byte typeTag) {
     this.type = TypeTag.findByValue(typeTag);
     Integer size = type.getSize();
 

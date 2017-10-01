@@ -2,10 +2,10 @@ package kaap.veiko.debuggerforker.commands.types;
 
 import java.nio.ByteBuffer;
 
-import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IDSizesReplyCommand;
+import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IDSizesReply;
 
 public class InterfaceID extends ReferenceTypeID {
-  public InterfaceID(ByteBuffer buffer, IDSizesReplyCommand idSizes) {
+  public InterfaceID(ByteBuffer buffer, IDSizesReply idSizes) {
     super(buffer, idSizes);
   }
 }

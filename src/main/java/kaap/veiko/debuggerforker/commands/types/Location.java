@@ -2,7 +2,7 @@ package kaap.veiko.debuggerforker.commands.types;
 
 import java.nio.ByteBuffer;
 
-import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IDSizesReplyCommand;
+import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IDSizesReply;
 
 public class Location {
   private final byte typeTag;
@@ -10,7 +10,7 @@ public class Location {
   private final MethodID methodID;
   private final long index;
 
-  public Location(ByteBuffer byteBuffer, IDSizesReplyCommand idSizes) {
+  public Location(ByteBuffer byteBuffer, IDSizesReply idSizes) {
     typeTag = byteBuffer.get();
     classID = new ClassID(byteBuffer, idSizes);
     methodID = new MethodID(byteBuffer, idSizes);

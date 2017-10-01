@@ -5,14 +5,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import kaap.veiko.debuggerforker.commands.parser.CommandType;
+import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 public @interface JDWPCommand {
-  short commandSet();
-
-  short command();
-
-  CommandType commandType();
+  CommandIdentifier value();
 }
