@@ -2,10 +2,10 @@ package kaap.veiko.debuggerforker.commands.types;
 
 import java.nio.ByteBuffer;
 
-import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IdSizesReply;
+import kaap.veiko.debuggerforker.commands.IdSizes;
 
 public class ObjectId extends DataTypeBase {
-  public ObjectId(ByteBuffer buffer, IdSizesReply idSizes) {
-    super(buffer, idSizes, IdSizesReply::getObjectIdSize);
+  public ObjectId(ByteBuffer buffer, IdSizes idSizes) {
+    super(buffer, idSizes, IdSizes::getObjectIdSize);
   }
 }

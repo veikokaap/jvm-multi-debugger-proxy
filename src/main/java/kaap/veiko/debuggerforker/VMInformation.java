@@ -1,15 +1,15 @@
 package kaap.veiko.debuggerforker;
 
-import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IdSizesReply;
+import kaap.veiko.debuggerforker.commands.IdSizes;
 
 public class VMInformation {
-  private IdSizesReply idSizes;
+  private IdSizes idSizes;
 
-  public IdSizesReply getIdSizes() {
+  public IdSizes getIdSizes() {
     return idSizes;
   }
 
-  public void setIdSizes(IdSizesReply idSizes) {
+  public void setIdSizes(IdSizes idSizes) {
     this.idSizes = idSizes;
   }
 }

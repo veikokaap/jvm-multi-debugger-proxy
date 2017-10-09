@@ -12,13 +12,13 @@ import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;
 import kaap.veiko.debuggerforker.events.VirtualMachineEvent;
 
 @JdwpCommand(CommandIdentifier.COMPOSITE_EVENT_COMMAND)
-public class CompositeEvent implements Command {
+public class CompositeEventCommand implements Command {
 
   private final byte suspendPolicy;
   private final List<VirtualMachineEvent> events;
 
   @JdwpCommandConstructor
-  public CompositeEvent(byte suspendPolicy, @JdwpArray(counterType = Integer.class) VirtualMachineEvent[] events) {
+  public CompositeEventCommand(byte suspendPolicy, @JdwpArray(counterType = Integer.class) VirtualMachineEvent[] events) {
     this.suspendPolicy = suspendPolicy;
     this.events = new ArrayList<>(Arrays.asList(events));
   }
@@ -33,7 +33,7 @@ public class CompositeEvent implements Command {
 
   @Override
   public String toString() {
-    return "CompositeEvent{" +
+    return "CompositeEventCommand{" +
         "suspendPolicy=" + suspendPolicy +
         ", events=" + events +
         '}';

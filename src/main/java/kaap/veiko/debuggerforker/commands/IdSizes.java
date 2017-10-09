@@ -1,21 +1,13 @@
-package kaap.veiko.debuggerforker.commands.sets.virtualmachine;
+package kaap.veiko.debuggerforker.commands;
 
-import kaap.veiko.debuggerforker.commands.Command;
-import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpCommand;
-import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpCommandConstructor;
-import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;
-
-@JdwpCommand(CommandIdentifier.ID_SIZES_REPLY)
-public class IdSizesReply implements Command {
-
+public class IdSizes {
   private final int fieldIdSize;
   private final int methodIdSize;
   private final int objectIdSize;
   private final int referenceTypeIdSize;
   private final int frameIdSize;
 
-  @JdwpCommandConstructor
-  public IdSizesReply(int fieldIdSize, int methodIdSize, int objectIdSize, int referenceTypeIdSize, int frameIdSize) {
+  public IdSizes(int fieldIdSize, int methodIdSize, int objectIdSize, int referenceTypeIdSize, int frameIdSize) {
     this.fieldIdSize = fieldIdSize;
     this.methodIdSize = methodIdSize;
     this.objectIdSize = objectIdSize;
@@ -45,7 +37,7 @@ public class IdSizesReply implements Command {
 
   @Override
   public String toString() {
-    return "ID_SIZES_REPLY{" +
+    return "IdSizes{" +
         "fieldIdSize=" + fieldIdSize +
         ", methodIdSize=" + methodIdSize +
         ", objectIdSize=" + objectIdSize +
