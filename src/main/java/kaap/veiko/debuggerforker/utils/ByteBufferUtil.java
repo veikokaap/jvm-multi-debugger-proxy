@@ -2,6 +2,7 @@ package kaap.veiko.debuggerforker.utils;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 public class ByteBufferUtil {
   public static Long getLong(ByteBuffer buffer, int size) {
@@ -12,6 +13,20 @@ public class ByteBufferUtil {
     byte[] bytes = new byte[]{0, 0, 0, 0, 0, 0, 0, 0};
     buffer.get(bytes, offset, size);
     return ByteBuffer.wrap(bytes).getLong();
+  }
+
+  public static void putLong(ByteBuffer buffer, long value, int size) {
+    ByteBuffer tmpBuffer = ByteBuffer.allocate(8);
+    tmpBuffer.putLong(value);
+    tmpBuffer.flip();
+
+    byte[] bytes = new byte[size];
+    for (int i = 0; i < (8 - size); i++) {
+      tmpBuffer.get();
+    }
+    tmpBuffer.get(bytes, 0, size);
+
+    buffer.put(bytes);
   }
 
   public static Integer getInt(ByteBuffer buffer, int size) {
@@ -40,5 +55,13 @@ public class ByteBufferUtil {
     buffer.get(bytes, 0, length);
 
     return new String(bytes, StandardCharsets.UTF_8);
+  }
+
+  public static void putString(ByteBuffer buffer, String string) {
+    int length = string.length();
+    byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
+
+    buffer.putInt(length);
+    buffer.put(bytes);
   }
 }

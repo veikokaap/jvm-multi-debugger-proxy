@@ -20,6 +20,11 @@ public class LocationParser implements TypeParser<Location> {
   }
 
   @Override
+  public void putToBuffer(ByteBuffer buffer, Location value) {
+    value.putToBuffer(buffer);
+  }
+
+  @Override
   public Location parse(ByteBuffer byteBuffer, Parameter parameter) throws ReflectiveOperationException {
     return new Location(byteBuffer, vmInformation.getIdSizes());
   }

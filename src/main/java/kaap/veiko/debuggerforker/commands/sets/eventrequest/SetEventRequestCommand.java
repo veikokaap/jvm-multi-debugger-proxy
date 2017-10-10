@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import kaap.veiko.debuggerforker.commands.Command;
+import kaap.veiko.debuggerforker.commands.CommandBase;
 import kaap.veiko.debuggerforker.commands.constants.EventKind;
 import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpArray;
 import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpCommand;
@@ -13,7 +13,7 @@ import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;
 import kaap.veiko.debuggerforker.commands.sets.eventrequest.filters.EventRequestFilter;
 
 @JdwpCommand(CommandIdentifier.SET_EVENT_REQUEST_COMMAND)
-public class SetEventRequestCommand implements Command {
+public class SetEventRequestCommand extends CommandBase {
   private final EventKind eventKind;
   private final byte suspendPolicy;
   private final List<EventRequestFilter> eventRequestFilters;
@@ -21,7 +21,7 @@ public class SetEventRequestCommand implements Command {
   private SetEventRequestReply eventRequestReply;
 
   @JdwpCommandConstructor
-  public SetEventRequestCommand(EventKind eventKind, byte suspendPolicy, @JdwpArray(counterType = int.class) EventRequestFilter[] eventRequestFilters) {
+  public SetEventRequestCommand(EventKind eventKind, byte suspendPolicy, EventRequestFilter[] eventRequestFilters) {
     this.eventKind = eventKind;
     this.suspendPolicy = suspendPolicy;
     this.eventRequestFilters = new ArrayList<>(Arrays.asList(eventRequestFilters));
@@ -45,6 +45,11 @@ public class SetEventRequestCommand implements Command {
 
   public void setEventRequestReply(SetEventRequestReply eventRequestReply) {
     this.eventRequestReply = eventRequestReply;
+  }
+
+  @Override
+  public List<Object> getPacketValues() {
+    return Arrays.asList(eventKind, suspendPolicy, eventRequestFilters.toArray(new EventRequestFilter[0]));
   }
 
   @Override

@@ -38,8 +38,9 @@ public class Value implements DataType {
   }
 
   @Override
-  public long asLong() {
-    return getValue();
+  public void putToBuffer(ByteBuffer buffer) {
+    buffer.put(type.getId());
+    buffer.putLong(value);
   }
 
   @Override

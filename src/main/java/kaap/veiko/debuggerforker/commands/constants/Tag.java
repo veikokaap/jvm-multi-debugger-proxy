@@ -20,11 +20,11 @@ public enum Tag {
   CLASS_LOADER(108, null),
   CLASS_OBJECT(99, null);
 
-  private final int id;
+  private final byte id;
   private final Integer size;
 
   Tag(int value, Integer size) {
-    this.id = value;
+    this.id = (byte) value;
     this.size = size;
   }
 
@@ -32,6 +32,10 @@ public enum Tag {
     return Arrays.stream(Tag.values())
         .filter(tag -> tag.id == value)
         .findFirst().get();
+  }
+
+  public byte getId() {
+    return id;
   }
 
   public Integer getSize() {

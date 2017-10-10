@@ -13,4 +13,9 @@ public class ShortParser implements TypeParser<Short> {
   public boolean hasCorrectType(Class<?> type) {
     return type == short.class || Short.class.equals(type);
   }
+
+  @Override
+  public void putToBuffer(ByteBuffer buffer, Short value) {
+    buffer.putShort(value);
+  }
 }

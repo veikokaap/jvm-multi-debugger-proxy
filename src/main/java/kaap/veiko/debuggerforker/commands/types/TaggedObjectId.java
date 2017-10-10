@@ -22,10 +22,16 @@ public class TaggedObjectId implements DataType {
     return objectId;
   }
 
-  @Override
   public long asLong() {
     return getObjectId().asLong();
   }
+
+  @Override
+  public void putToBuffer(ByteBuffer buffer) {
+    buffer.put(tag);
+    objectId.putToBuffer(buffer);
+  }
+
 
   @Override
   public boolean equals(Object o) {

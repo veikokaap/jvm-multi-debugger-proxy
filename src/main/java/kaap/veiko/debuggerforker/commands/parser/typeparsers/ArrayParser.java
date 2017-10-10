@@ -17,8 +17,9 @@ import kaap.veiko.debuggerforker.commands.parser.ParameterParser;
 import kaap.veiko.debuggerforker.commands.parser.annotations.IdentifierType;
 import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpSubType;
 import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpArray;
+import kaap.veiko.debuggerforker.commands.types.DataType;
 
-public class ArrayParser implements TypeParser<Object[]> {
+public class ArrayParser implements TypeParser<DataType[]> {
 
   private final static Logger log = LoggerFactory.getLogger(ArrayParser.class);
 
@@ -33,32 +34,44 @@ public class ArrayParser implements TypeParser<Object[]> {
 
   @Override
   public boolean hasCorrectType(Class<?> type) {
-    return type != null && type.isArray();
+    return type != null && type.isArray() && DataType.class.isAssignableFrom(type.getComponentType());
   }
 
   @Override
-  public Object[] parse(ByteBuffer byteBuffer, Parameter parameter) throws ReflectiveOperationException {
-    if (!parameter.isAnnotationPresent(JdwpArray.class)) {
+  public void putToBuffer(ByteBuffer buffer, DataType[] array) {
+    JdwpArray arrayAnnotation = array.getClass().getComponentType().getAnnotation(JdwpArray.class);
+    Class<? extends Number> counterType = arrayAnnotation.counterType();
+
+    parameterParser.valueOfTypeToByteBuffer(buffer, counterType, array.length);
+
+    for (DataType value : array) {
+      value.putToBuffer(buffer);
+    }
+  }
+
+  @Override
+  public DataType[] parse(ByteBuffer byteBuffer, Parameter parameter) throws ReflectiveOperationException {
+    if (!parameter.getType().getComponentType().isAnnotationPresent(JdwpArray.class)) {
       log.error("Array type parameter '{}' doesn't have annotation '{}'", parameter, JdwpArray.class.getSimpleName());
       return null;
     }
 
-    Class<? extends Number> counterType = parameter.getAnnotation(JdwpArray.class).counterType();
+    Class<? extends Number> counterType = parameter.getType().getComponentType().getAnnotation(JdwpArray.class).counterType();
     int count = (int) parameterParser.getValueFromBuffer(byteBuffer, counterType);
 
     return parseArray(byteBuffer, parameter.getType(), count);
   }
 
-  private Object[] parseArray(ByteBuffer buffer, Class<?> parameterType, int count) throws ReflectiveOperationException {
-    Class<?> componentType = parameterType.getComponentType();
+  private DataType[] parseArray(ByteBuffer buffer, Class<?> parameterType, int count) throws ReflectiveOperationException {
+    Class<DataType> componentType = (Class<DataType>) parameterType.getComponentType();
     Class<? extends Annotation> identifierAnnotationClass = findIdentifierAnnotationClass(componentType);
-    Object[] repetitiveDataArray = (Object[]) Array.newInstance(componentType, count);
+    DataType[] repetitiveDataArray = (DataType[]) Array.newInstance(componentType, count);
 
     for (int l = 0; l < count; l++) {
-      Optional<Class<?>> subClass = findCorrectSubClass(buffer, componentType, identifierAnnotationClass);
+      Optional<Class<? extends DataType>> subClass = findCorrectSubClass(buffer, componentType, identifierAnnotationClass);
       if (subClass.isPresent()) {
-        Class<?> clazz = subClass.get();
-        Constructor<?> constructor = constructorFinder.find(clazz);
+        Class<? extends DataType> clazz = subClass.get();
+        Constructor<? extends DataType> constructor = constructorFinder.find(clazz);
         repetitiveDataArray[l] = commandInstantiator.newInstanceFromByteBuffer(constructor, buffer);
       }
       else {
@@ -72,12 +85,12 @@ public class ArrayParser implements TypeParser<Object[]> {
     return componentType.getAnnotation(JdwpSubType.class).identifierAnnotation();
   }
 
-  private Optional<Class<?>> findCorrectSubClass(ByteBuffer buffer, Class<?> componentType, Class<? extends Annotation> identifierAnnotationClass) throws ReflectiveOperationException {
-    Set<Class<?>> subTypesOfRepetitiveData = (Set<Class<?>>) new Reflections("kaap.veiko.debuggerforker").getSubTypesOf(componentType);
+  private Optional<Class<? extends DataType>> findCorrectSubClass(ByteBuffer buffer, Class<DataType> componentType, Class<? extends Annotation> identifierAnnotationClass) throws ReflectiveOperationException {
+    Set<Class<? extends DataType>> subTypesOfRepetitiveData = new Reflections("kaap.veiko.debuggerforker").getSubTypesOf(componentType);
 
     Object identifier = parameterParser.getValueFromBuffer(buffer, identifierAnnotationClass.getAnnotation(IdentifierType.class).value());
 
-    for (Class<?> clazz : subTypesOfRepetitiveData) {
+    for (Class<? extends DataType> clazz : subTypesOfRepetitiveData) {
       if (annotationValue(clazz, identifierAnnotationClass).equals(identifier)) {
         return Optional.of(clazz);
       }

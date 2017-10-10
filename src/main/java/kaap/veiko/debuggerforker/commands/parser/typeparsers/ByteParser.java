@@ -13,4 +13,10 @@ public class ByteParser implements TypeParser<Byte> {
   public boolean hasCorrectType(Class<?> type) {
     return type == byte.class || Byte.class.equals(type);
   }
+
+  @Override
+  public void putToBuffer(ByteBuffer buffer, Byte value) {
+    buffer.put(value);
+  }
+
 }

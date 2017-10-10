@@ -6,12 +6,12 @@ public class Packet {
 
   static final int HEADER_LENGTH = 11;
 
-  private int length;
-  private int id;
-  private short flags;
-  private short commandSet;
-  private short command;
-  private short errorCode;
+  private int length = 0;
+  private int id = 0;
+  private short flags = 0;
+  private short commandSet = 0;
+  private short command = 0;
+  private short errorCode = 0;
   private byte[] data = new byte[]{};
   private boolean fromVirtualMachine;
 

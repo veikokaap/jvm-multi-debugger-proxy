@@ -13,4 +13,9 @@ public class IntParser implements TypeParser<Integer> {
   public boolean hasCorrectType(Class<?> type) {
     return type == int.class || Integer.class.equals(type);
   }
+
+  @Override
+  public void putToBuffer(ByteBuffer buffer, Integer value) {
+    buffer.putInt(value);
+  }
 }

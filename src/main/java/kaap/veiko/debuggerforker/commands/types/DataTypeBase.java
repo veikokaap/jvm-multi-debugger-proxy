@@ -12,16 +12,23 @@ public abstract class DataTypeBase implements DataType {
 
   private final static Logger log = LoggerFactory.getLogger(DataTypeBase.class);
   private final long value;
+  private final int size;
 
   public DataTypeBase(ByteBuffer buffer, IdSizes idSizes, Function<IdSizes, Integer> sizeFunction) {
     if (idSizes != null) {
-      int size = sizeFunction.apply(idSizes);
-      value = ByteBufferUtil.getLong(buffer, size);
+      size = sizeFunction.apply(idSizes);
     }
     else {
+      size = 8;
       log.warn("Parsing value without knowing its size in bytes. Assuming size is 8 bytes.");
-      value = buffer.getLong();
     }
+
+    value = ByteBufferUtil.getLong(buffer, size);
+  }
+
+  @Override
+  public void putToBuffer(ByteBuffer buffer) {
+    ByteBufferUtil.putLong(buffer, value, size);
   }
 
   @Override
@@ -43,7 +50,6 @@ public abstract class DataTypeBase implements DataType {
     return (int) (value ^ (value >>> 32));
   }
 
-  @Override
   public long asLong() {
     return value;
   }

@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentMap;
 public class VirtualMachinePacketStream extends PacketStreamBase {
 
   private final ConcurrentMap<Integer, Packet> writtenPackets = new ConcurrentHashMap<>();
+  private final PacketIdTransformer packetIdTransformer = new PacketIdTransformer();
 
   public VirtualMachinePacketStream(SocketChannel socketChannel) throws IOException {
     super(socketChannel, true);

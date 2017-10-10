@@ -1,14 +1,17 @@
 package kaap.veiko.debuggerforker.commands.sets.eventrequest;
 
 
-import kaap.veiko.debuggerforker.commands.Command;
+import java.util.Arrays;
+import java.util.List;
+
+import kaap.veiko.debuggerforker.commands.CommandBase;
 import kaap.veiko.debuggerforker.commands.constants.EventKind;
 import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpCommand;
 import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpCommandConstructor;
 import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;
 
 @JdwpCommand(CommandIdentifier.CLEAR_EVENT_REQUEST_COMMAND)
-public class ClearEventRequestCommand implements Command {
+public class ClearEventRequestCommand extends CommandBase {
   private final EventKind eventKind;
   private final int requestId;
 
@@ -16,6 +19,11 @@ public class ClearEventRequestCommand implements Command {
   public ClearEventRequestCommand(EventKind eventKind, int requestId) {
     this.eventKind = eventKind;
     this.requestId = requestId;
+  }
+
+  @Override
+  public List<Object> getPacketValues() {
+    return Arrays.asList(eventKind, requestId);
   }
 
   @Override

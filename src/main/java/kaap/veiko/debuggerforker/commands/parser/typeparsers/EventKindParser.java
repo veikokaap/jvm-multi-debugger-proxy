@@ -27,4 +27,9 @@ public class EventKindParser implements TypeParser<EventKind> {
 
     return first.get();
   }
+
+  @Override
+  public void putToBuffer(ByteBuffer buffer, EventKind value) {
+    buffer.put(value.getId());
+  }
 }

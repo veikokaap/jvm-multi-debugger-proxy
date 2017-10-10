@@ -1,16 +1,19 @@
 package kaap.veiko.debuggerforker.events;
 
+import java.nio.ByteBuffer;
+
 import kaap.veiko.debuggerforker.commands.constants.EventKind;
 import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpCommandConstructor;
 import kaap.veiko.debuggerforker.commands.types.ReferenceTypeId;
 import kaap.veiko.debuggerforker.commands.types.ThreadId;
+import kaap.veiko.debuggerforker.utils.ByteBufferUtil;
 
 @JdwpEvent(EventKind.CLASS_PREPARE)
 public class ClassPrepareEvent extends VirtualMachineEvent {
   private final int requestId;
-  private final long thread;
+  private final ThreadId thread;
   private final byte refTypeTag;
-  private final long typeId;
+  private final ReferenceTypeId typeId;
   private final String signature;
   private final int status;
 
@@ -24,9 +27,9 @@ public class ClassPrepareEvent extends VirtualMachineEvent {
       int status
   ) {
     this.requestId = requestId;
-    this.thread = thread.asLong();
+    this.thread = thread;
     this.refTypeTag = refTypeTag;
-    this.typeId = typeId.asLong();
+    this.typeId = typeId;
     this.signature = signature;
     this.status = status;
   }
@@ -35,7 +38,7 @@ public class ClassPrepareEvent extends VirtualMachineEvent {
     return requestId;
   }
 
-  public long getThread() {
+  public ThreadId getThread() {
     return thread;
   }
 
@@ -43,7 +46,7 @@ public class ClassPrepareEvent extends VirtualMachineEvent {
     return refTypeTag;
   }
 
-  public long getTypeId() {
+  public ReferenceTypeId getTypeId() {
     return typeId;
   }
 
@@ -53,6 +56,16 @@ public class ClassPrepareEvent extends VirtualMachineEvent {
 
   public int getStatus() {
     return status;
+  }
+
+  @Override
+  public void putToBuffer(ByteBuffer buffer) {
+    buffer.putInt(requestId);
+    thread.putToBuffer(buffer);
+    buffer.put(refTypeTag);
+    typeId.putToBuffer(buffer);
+    ByteBufferUtil.putString(buffer, signature);
+    buffer.putInt(status);
   }
 
   @Override

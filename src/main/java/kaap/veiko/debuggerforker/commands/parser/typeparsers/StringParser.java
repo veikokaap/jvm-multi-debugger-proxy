@@ -11,6 +11,10 @@ public class StringParser implements TypeParser<String> {
     return ByteBufferUtil.getString(byteBuffer);
   }
 
+  public void putToBuffer(ByteBuffer buffer, String value) {
+    ByteBufferUtil.putString(buffer, value);
+  }
+
   @Override
   public boolean hasCorrectType(Class<?> type) {
     return String.class.equals(type);

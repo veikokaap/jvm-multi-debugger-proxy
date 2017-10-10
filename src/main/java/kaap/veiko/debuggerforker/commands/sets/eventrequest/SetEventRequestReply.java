@@ -1,13 +1,16 @@
 package kaap.veiko.debuggerforker.commands.sets.eventrequest;
 
 
-import kaap.veiko.debuggerforker.commands.Command;
+import java.util.Collections;
+import java.util.List;
+
+import kaap.veiko.debuggerforker.commands.CommandBase;
 import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpCommand;
 import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpCommandConstructor;
 import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;
 
 @JdwpCommand(CommandIdentifier.SET_EVENT_REQUEST_REPLY)
-public class SetEventRequestReply implements Command {
+public class SetEventRequestReply extends CommandBase {
   private final int requestId;
 
   @JdwpCommandConstructor
@@ -31,6 +34,11 @@ public class SetEventRequestReply implements Command {
     SetEventRequestReply that = (SetEventRequestReply) o;
 
     return requestId == that.requestId;
+  }
+
+  @Override
+  public List<Object> getPacketValues() {
+    return Collections.singletonList(requestId);
   }
 
   @Override

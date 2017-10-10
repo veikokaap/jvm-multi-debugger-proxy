@@ -13,4 +13,9 @@ public class LongParser implements TypeParser<Long> {
   public boolean hasCorrectType(Class<?> type) {
     return type == long.class || Long.class.equals(type);
   }
+
+  @Override
+  public void putToBuffer(ByteBuffer buffer, Long value) {
+    buffer.putLong(value);
+  }
 }

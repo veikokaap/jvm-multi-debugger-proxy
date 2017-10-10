@@ -10,11 +10,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import kaap.veiko.debuggerforker.VMInformation;
+import kaap.veiko.debuggerforker.commands.Command;
 import kaap.veiko.debuggerforker.commands.parser.typeparsers.ArrayParser;
 import kaap.veiko.debuggerforker.commands.parser.typeparsers.BooleanParser;
 import kaap.veiko.debuggerforker.commands.parser.typeparsers.ByteParser;
 import kaap.veiko.debuggerforker.commands.parser.typeparsers.DataTypeParser;
 import kaap.veiko.debuggerforker.commands.parser.typeparsers.EventKindParser;
+import kaap.veiko.debuggerforker.commands.parser.typeparsers.IdSizesParser;
 import kaap.veiko.debuggerforker.commands.parser.typeparsers.IntParser;
 import kaap.veiko.debuggerforker.commands.parser.typeparsers.LocationParser;
 import kaap.veiko.debuggerforker.commands.parser.typeparsers.LongParser;
@@ -36,12 +38,14 @@ public class ParameterParser {
         new IntParser(),
         new LongParser(),
         new StringParser(),
+        new IdSizesParser(),
         new DataTypeParser(vmInformation),
         new ArrayParser(this),
         new EventKindParser(),
         new LocationParser(vmInformation)
     ));
   }
+
 
   public Object[] parseMultipleValuesFromBuffer(ByteBuffer dataBuffer, Parameter[] parameters) throws ReflectiveOperationException {
     Object[] parameterValues = new Object[parameters.length];
@@ -88,4 +92,27 @@ public class ParameterParser {
     return matchingParsers.iterator().next();
   }
 
+  public byte[] commandToByteArray(Command command) {
+    int initialBufferSize = 8192;
+
+    ByteBuffer byteBuffer = ByteBuffer.allocate(initialBufferSize);
+    for (Object value : command.getPacketValues()) {
+      TypeParser parser = findParser(value.getClass());
+      parser.putToBuffer(byteBuffer, value);
+    }
+
+    int size = initialBufferSize - byteBuffer.remaining();
+    byte[] bytes = new byte[size];
+    byteBuffer.get(bytes, 0, size);
+
+    return bytes;
+  }
+
+  public void valueOfTypeToByteBuffer(ByteBuffer byteBuffer, Class<?> type, Object value) {
+    if (!type.isAssignableFrom(value.getClass())) {
+      throw new ClassCastException("Can't cast " + value.getClass().getName() + " to " + type);
+    }
+
+    findParser(type).putToBuffer(byteBuffer, value);
+  }
 }

@@ -33,6 +33,13 @@ public class Location {
     return index;
   }
 
+  public void putToBuffer(ByteBuffer buffer) {
+    buffer.put(typeTag);
+    classId.putToBuffer(buffer);
+    methodId.putToBuffer(buffer);
+    buffer.putLong(index);
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {

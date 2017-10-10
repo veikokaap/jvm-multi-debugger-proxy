@@ -1,5 +1,7 @@
 package kaap.veiko.debuggerforker.commands.sets.eventrequest.filters;
 
+import java.nio.ByteBuffer;
+
 import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpCommandConstructor;
 import kaap.veiko.debuggerforker.commands.types.Location;
 
@@ -14,6 +16,11 @@ public class EventRequestLocationFilter extends EventRequestFilter {
 
   public Location getLocation() {
     return location;
+  }
+
+  @Override
+  public void putToBuffer(ByteBuffer buffer) {
+    location.putToBuffer(buffer);
   }
 
   @Override

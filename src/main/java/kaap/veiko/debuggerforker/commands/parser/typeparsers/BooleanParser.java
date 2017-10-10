@@ -13,4 +13,14 @@ public class BooleanParser implements TypeParser<Boolean> {
   public boolean hasCorrectType(Class<?> type) {
     return type == boolean.class || Boolean.class.equals(type);
   }
+
+  @Override
+  public void putToBuffer(ByteBuffer buffer, Boolean value) {
+    if (value) {
+      buffer.put((byte) 1);
+    }
+    else {
+      buffer.put((byte) 0);
+    }
+  }
 }

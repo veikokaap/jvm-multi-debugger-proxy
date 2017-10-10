@@ -4,18 +4,15 @@ import java.io.IOException;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class DebuggerPacketStream extends PacketStreamBase {
 
-  private static final ConcurrentMap<Integer, Integer> idMap = new ConcurrentHashMap<>();
-  private static final AtomicInteger idCounter = new AtomicInteger(Integer.MIN_VALUE);
-  private final List<Integer> thisNewIds = new ArrayList<>();
+  private final List<Integer> myNewIds = new ArrayList<>();
+  private final PacketIdTransformer packetIdTransformer;
 
-  public DebuggerPacketStream(SocketChannel socketChannel) throws IOException {
+  public DebuggerPacketStream(SocketChannel socketChannel, PacketIdTransformer packetIdTransformer) throws IOException {
     super(socketChannel, false);
+    this.packetIdTransformer = packetIdTransformer;
   }
 
   @Override
@@ -26,11 +23,9 @@ public class DebuggerPacketStream extends PacketStreamBase {
     }
 
     int originalId = packet.getId();
-    int newId = idCounter.getAndIncrement();
+    int newId = packetIdTransformer.getNewId(originalId);
 
-    thisNewIds.add(newId);
-    idMap.put(newId, originalId);
-
+    myNewIds.add(newId);
     packet.setId(newId);
 
     return packet;
@@ -39,7 +34,7 @@ public class DebuggerPacketStream extends PacketStreamBase {
   @Override
   public void write(Packet packet) throws IOException {
     if (packet.isReply()) {
-      int originalId = idMap.get(packet.getId());
+      int originalId = packetIdTransformer.getOriginalId(packet.getId());
       packet.setId(originalId);
     }
 
@@ -47,6 +42,9 @@ public class DebuggerPacketStream extends PacketStreamBase {
   }
 
   public boolean isMyReply(Packet packet) {
-    return thisNewIds.contains(packet.getId());
+    if (!packet.isReply()) {
+      throw new UnsupportedOperationException("Passed command packet as a reply packet");
+    }
+    return myNewIds.contains(packet.getId());
   }
 }

@@ -1,5 +1,7 @@
 package kaap.veiko.debuggerforker.commands.types;
 
+import java.nio.ByteBuffer;
+
 public interface DataType {
-  long asLong();
+  void putToBuffer(ByteBuffer buffer);
 }

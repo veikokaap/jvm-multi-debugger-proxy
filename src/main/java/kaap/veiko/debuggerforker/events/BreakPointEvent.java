@@ -1,5 +1,7 @@
 package kaap.veiko.debuggerforker.events;
 
+import java.nio.ByteBuffer;
+
 import kaap.veiko.debuggerforker.commands.constants.EventKind;
 import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpCommandConstructor;
 import kaap.veiko.debuggerforker.commands.types.Location;
@@ -28,6 +30,13 @@ public class BreakPointEvent extends VirtualMachineEvent {
 
   public Location getLocation() {
     return location;
+  }
+
+  @Override
+  public void putToBuffer(ByteBuffer buffer) {
+    buffer.putInt(requestId);
+    threadId.putToBuffer(buffer);
+    location.putToBuffer(buffer);
   }
 
   @Override

@@ -7,13 +7,13 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.Arrays;
 
-import kaap.veiko.debuggerforker.connections.VirtualMachineConnection;
+import kaap.veiko.debuggerforker.connections.VirtualMachineManager;
 
 public class VMConnector {
 
-  public static VirtualMachineConnection connectToVM(InetSocketAddress address) throws InterruptedException, IOException {
+  public static VirtualMachineManager connectToVM(InetSocketAddress address) throws InterruptedException, IOException {
     SocketChannel socketChannel = new VMConnector().connectAndHandshake(address);
-    return new VirtualMachineConnection(socketChannel);
+    return new VirtualMachineManager(socketChannel);
   }
 
   private SocketChannel connectAndHandshake(InetSocketAddress address) throws InterruptedException, IOException {

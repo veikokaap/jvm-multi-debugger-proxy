@@ -8,17 +8,19 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Arrays;
 
-import kaap.veiko.debuggerforker.connections.DebuggerConnection;
+import kaap.veiko.debuggerforker.connections.DebuggerManager;
+import kaap.veiko.debuggerforker.packet.PacketIdTransformer;
 
 public class DebuggerConnector {
   private final ServerSocketChannel serverChannel;
+  private final PacketIdTransformer packetIdTransformer = new PacketIdTransformer();
 
   private DebuggerConnector(int port) throws IOException {
     this.serverChannel = ServerSocketChannel.open();
     serverChannel.socket().bind(new InetSocketAddress("127.0.0.1", port));
   }
 
-  public static DebuggerConnection waitForConnectionFromDebugger(int port) throws IOException {
+  public static DebuggerManager waitForConnectionFromDebugger(int port) throws IOException {
     try {
       DebuggerConnector connector = new DebuggerConnector(port);
       return connector.waitForConnection();
@@ -28,10 +30,10 @@ public class DebuggerConnector {
     }
   }
 
-  private DebuggerConnection waitForConnection() throws IOException {
+  private DebuggerManager waitForConnection() throws IOException {
     SocketChannel socketChannel = serverChannel.accept();
     handshake(socketChannel);
-    return new DebuggerConnection(socketChannel);
+    return new DebuggerManager(socketChannel, packetIdTransformer);
   }
 
   private void handshake(SocketChannel socketChannel) throws IOException {

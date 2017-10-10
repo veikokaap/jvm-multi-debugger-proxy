@@ -4,21 +4,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import kaap.veiko.debuggerforker.commands.Command;
-import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpArray;
+import kaap.veiko.debuggerforker.commands.CommandBase;
 import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpCommand;
 import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpCommandConstructor;
 import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;
 import kaap.veiko.debuggerforker.events.VirtualMachineEvent;
 
 @JdwpCommand(CommandIdentifier.COMPOSITE_EVENT_COMMAND)
-public class CompositeEventCommand implements Command {
+public class CompositeEventCommand extends CommandBase {
 
   private final byte suspendPolicy;
   private final List<VirtualMachineEvent> events;
 
   @JdwpCommandConstructor
-  public CompositeEventCommand(byte suspendPolicy, @JdwpArray(counterType = Integer.class) VirtualMachineEvent[] events) {
+  public CompositeEventCommand(byte suspendPolicy, VirtualMachineEvent[] events) {
     this.suspendPolicy = suspendPolicy;
     this.events = new ArrayList<>(Arrays.asList(events));
   }
@@ -29,6 +28,11 @@ public class CompositeEventCommand implements Command {
 
   public List<VirtualMachineEvent> getEvents() {
     return events;
+  }
+
+  @Override
+  public List<Object> getPacketValues() {
+    return Arrays.asList(suspendPolicy, events.toArray(new VirtualMachineEvent[0]));
   }
 
   @Override

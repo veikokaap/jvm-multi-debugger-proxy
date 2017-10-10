@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import kaap.veiko.debuggerforker.commands.Command;
+import kaap.veiko.debuggerforker.commands.CommandBase;
 import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpCommand;
 import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;
 import kaap.veiko.debuggerforker.packet.Packet;
@@ -28,7 +29,7 @@ public class CommandClassFinder {
 
   private Class<? extends Command> find(short commandSet, short command, CommandType commandType) {
     Set<Class<? extends Command>> matchingCommandClasses = reflections
-        .getSubTypesOf(Command.class).stream()
+        .getSubTypesOf(CommandBase.class).stream()
         .filter(clazz -> clazz.isAnnotationPresent(JdwpCommand.class))
         .filter(clazz -> {
           JdwpCommand annotation = clazz.getAnnotation(JdwpCommand.class);

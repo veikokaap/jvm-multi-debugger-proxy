@@ -1,23 +1,31 @@
 package kaap.veiko.debuggerforker.commands.sets.virtualmachine;
 
-import kaap.veiko.debuggerforker.commands.Command;
+import java.util.Collections;
+import java.util.List;
+
+import kaap.veiko.debuggerforker.commands.CommandBase;
 import kaap.veiko.debuggerforker.commands.IdSizes;
 import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpCommand;
 import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpCommandConstructor;
 import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;
 
 @JdwpCommand(CommandIdentifier.ID_SIZES_REPLY)
-public class IdSizesReplyCommand implements Command {
+public class IdSizesReplyCommand extends CommandBase {
 
   private final IdSizes idSizes;
 
   @JdwpCommandConstructor
-  public IdSizesReplyCommand(int fieldIdSize, int methodIdSize, int objectIdSize, int referenceTypeIdSize, int frameIdSize) {
-    this.idSizes = new IdSizes(fieldIdSize, methodIdSize, objectIdSize, referenceTypeIdSize, frameIdSize);
+  public IdSizesReplyCommand(IdSizes idSizes) {
+    this.idSizes = idSizes;
   }
 
   public IdSizes getIdSizes() {
     return idSizes;
+  }
+
+  @Override
+  public List<Object> getPacketValues() {
+    return Collections.singletonList(idSizes);
   }
 
   @Override

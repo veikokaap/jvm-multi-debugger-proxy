@@ -33,4 +33,9 @@ public class DataTypeParser implements TypeParser<DataType> {
   public boolean hasCorrectType(Class<?> type) {
     return DataType.class.isAssignableFrom(type);
   }
+
+  @Override
+  public void putToBuffer(ByteBuffer buffer, DataType value) {
+    value.putToBuffer(buffer);
+  }
 }

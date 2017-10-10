@@ -1,5 +1,7 @@
 package kaap.veiko.debuggerforker.commands;
 
+import java.nio.ByteBuffer;
+
 public class IdSizes {
   private final int fieldIdSize;
   private final int methodIdSize;
