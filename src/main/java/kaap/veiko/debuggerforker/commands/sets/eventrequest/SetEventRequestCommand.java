@@ -18,6 +18,8 @@ public class SetEventRequestCommand implements Command {
   private final byte suspendPolicy;
   private final List<EventRequestFilter> eventRequestFilters;
 
+  private SetEventRequestReply eventRequestReply;
+
   @JdwpCommandConstructor
   public SetEventRequestCommand(EventKind eventKind, byte suspendPolicy, @JdwpArray(counterType = int.class) EventRequestFilter[] eventRequestFilters) {
     this.eventKind = eventKind;
@@ -35,6 +37,14 @@ public class SetEventRequestCommand implements Command {
 
   public List<EventRequestFilter> getEventRequestFilters() {
     return eventRequestFilters;
+  }
+
+  public SetEventRequestReply getEventRequestReply() {
+    return eventRequestReply;
+  }
+
+  public void setEventRequestReply(SetEventRequestReply eventRequestReply) {
+    this.eventRequestReply = eventRequestReply;
   }
 
   @Override
