@@ -25,6 +25,25 @@ public abstract class DataTypeBase implements DataType {
   }
 
   @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof DataTypeBase)) {
+      return false;
+    }
+
+    DataTypeBase that = (DataTypeBase) o;
+
+    return value == that.value;
+  }
+
+  @Override
+  public int hashCode() {
+    return (int) (value ^ (value >>> 32));
+  }
+
+  @Override
   public long asLong() {
     return value;
   }

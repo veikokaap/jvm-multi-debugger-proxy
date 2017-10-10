@@ -41,4 +41,36 @@ public class Value implements DataType {
   public long asLong() {
     return getValue();
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    Value value1 = (Value) o;
+
+    if (type != value1.type) {
+      return false;
+    }
+    return value != null ? value.equals(value1.value) : value1.value == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = type != null ? type.hashCode() : 0;
+    result = 31 * result + (value != null ? value.hashCode() : 0);
+    return result;
+  }
+
+  @Override
+  public String toString() {
+    return "Value{" +
+        "type=" + type +
+        ", value=" + value +
+        '}';
+  }
 }
