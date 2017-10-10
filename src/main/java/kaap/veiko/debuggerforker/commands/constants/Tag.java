@@ -2,7 +2,7 @@ package kaap.veiko.debuggerforker.commands.constants;
 
 import java.util.Arrays;
 
-public enum TypeTag {
+public enum Tag {
   ARRAY(91, null),
   BYTE(66, 1),
   CHAR(67, 2),
@@ -23,14 +23,14 @@ public enum TypeTag {
   private final int id;
   private final Integer size;
 
-  TypeTag(int value, Integer size) {
+  Tag(int value, Integer size) {
     this.id = value;
     this.size = size;
   }
 
-  public static TypeTag findByValue(byte value) {
-    return Arrays.stream(TypeTag.values())
-        .filter(typeTag -> typeTag.id == value)
+  public static Tag findByValue(byte value) {
+    return Arrays.stream(Tag.values())
+        .filter(tag -> tag.id == value)
         .findFirst().get();
   }
 

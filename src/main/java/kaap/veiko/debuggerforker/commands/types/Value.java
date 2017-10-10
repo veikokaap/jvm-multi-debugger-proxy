@@ -3,11 +3,11 @@ package kaap.veiko.debuggerforker.commands.types;
 import java.nio.ByteBuffer;
 
 import kaap.veiko.debuggerforker.commands.IdSizes;
-import kaap.veiko.debuggerforker.commands.constants.TypeTag;
+import kaap.veiko.debuggerforker.commands.constants.Tag;
 import kaap.veiko.debuggerforker.utils.ByteBufferUtil;
 
 public class Value implements DataType {
-  private final TypeTag type;
+  private final Tag type;
   private final Long value;
 
   public Value(ByteBuffer byteBuffer, IdSizes idSizes) {
@@ -15,7 +15,7 @@ public class Value implements DataType {
   }
 
   protected Value(ByteBuffer byteBuffer, IdSizes idSizes, byte typeTag) {
-    this.type = TypeTag.findByValue(typeTag);
+    this.type = Tag.findByValue(typeTag);
     Integer size = type.getSize();
 
     if (size == null) {
@@ -29,7 +29,7 @@ public class Value implements DataType {
     }
   }
 
-  public TypeTag getType() {
+  public Tag getType() {
     return type;
   }
 
