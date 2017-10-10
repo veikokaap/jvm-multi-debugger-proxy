@@ -31,7 +31,7 @@ public abstract class DataTypeBase implements DataType {
 
   @Override
   public String toString() {
-    return "DataTypeBase{" +
+    return this.getClass().getSimpleName() + "{" +
         "value=" + value +
         '}';
   }

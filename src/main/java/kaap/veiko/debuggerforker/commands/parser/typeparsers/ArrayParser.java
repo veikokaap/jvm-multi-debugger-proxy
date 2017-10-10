@@ -90,12 +90,4 @@ public class ArrayParser implements TypeParser<Object[]> {
     return identifierAnnotationClass.getMethod("value").invoke(clazz.getAnnotation(identifierAnnotationClass));
   }
 
-  private boolean isNumber(Class<?> identifierClass) {
-    return Number.class.isAssignableFrom(identifierClass) ||
-        identifierClass.equals(byte.class) ||
-        identifierClass.equals(short.class) ||
-        identifierClass.equals(int.class) ||
-        identifierClass.equals(long.class);
-  }
-
 }

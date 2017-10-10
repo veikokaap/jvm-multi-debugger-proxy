@@ -16,6 +16,7 @@ import kaap.veiko.debuggerforker.commands.parser.typeparsers.ByteParser;
 import kaap.veiko.debuggerforker.commands.parser.typeparsers.DataTypeParser;
 import kaap.veiko.debuggerforker.commands.parser.typeparsers.EventKindParser;
 import kaap.veiko.debuggerforker.commands.parser.typeparsers.IntParser;
+import kaap.veiko.debuggerforker.commands.parser.typeparsers.LocationParser;
 import kaap.veiko.debuggerforker.commands.parser.typeparsers.LongParser;
 import kaap.veiko.debuggerforker.commands.parser.typeparsers.ShortParser;
 import kaap.veiko.debuggerforker.commands.parser.typeparsers.StringParser;
@@ -37,7 +38,8 @@ public class ParameterParser {
         new StringParser(),
         new DataTypeParser(vmInformation),
         new ArrayParser(this),
-        new EventKindParser()
+        new EventKindParser(),
+        new LocationParser(vmInformation)
     ));
   }
 
