@@ -2,10 +2,9 @@ package kaap.veiko.debuggerforker.events;
 
 import kaap.veiko.debuggerforker.commands.constants.EventKind;
 import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpCommandConstructor;
-import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpSubCommand;
 import kaap.veiko.debuggerforker.commands.types.ThreadId;
 
-@JdwpSubCommand(eventKind = EventKind.THREAD_START)
+@JdwpEvent(EventKind.THREAD_START)
 public class ThreadStartEvent extends VirtualMachineEvent {
   private final int requestId;
   private final long thread;

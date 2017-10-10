@@ -25,13 +25,14 @@ public enum EventKind {
   VM_DEATH(99),
   VM_DISCONNECTED(100);
 
-  private final int id;
+  public final byte id;
 
   EventKind(int id) {
-    this.id = id;
+    this.id = (byte) id;
   }
 
-  public int getId() {
+  public final byte getId() {
     return id;
   }
+
 }

@@ -1,5 +1,6 @@
 package kaap.veiko.debuggerforker.commands.parser.typeparsers;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Parameter;
@@ -13,9 +14,9 @@ import org.slf4j.LoggerFactory;
 import kaap.veiko.debuggerforker.commands.parser.CommandInstantiator;
 import kaap.veiko.debuggerforker.commands.parser.ConstructorFinder;
 import kaap.veiko.debuggerforker.commands.parser.ParameterParser;
-import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpAbstractCommandContent;
+import kaap.veiko.debuggerforker.commands.parser.annotations.IdentifierType;
+import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpSubType;
 import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpArray;
-import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpSubCommand;
 
 public class ArrayParser implements TypeParser<Object[]> {
 
@@ -50,11 +51,11 @@ public class ArrayParser implements TypeParser<Object[]> {
 
   private Object[] parseArray(ByteBuffer buffer, Class<?> parameterType, int count) throws ReflectiveOperationException {
     Class<?> componentType = parameterType.getComponentType();
-    Class<?> identifierClass = findIdentifierClass(componentType);
+    Class<? extends Annotation> identifierAnnotationClass = findIdentifierAnnotationClass(componentType);
     Object[] repetitiveDataArray = (Object[]) Array.newInstance(componentType, count);
 
     for (int l = 0; l < count; l++) {
-      Optional<Class<?>> subClass = findCorrectSubClass(buffer, componentType, identifierClass);
+      Optional<Class<?>> subClass = findCorrectSubClass(buffer, componentType, identifierAnnotationClass);
       if (subClass.isPresent()) {
         Class<?> clazz = subClass.get();
         Constructor<?> constructor = constructorFinder.find(clazz);
@@ -67,29 +68,26 @@ public class ArrayParser implements TypeParser<Object[]> {
     return repetitiveDataArray;
   }
 
-  private Class<?> findIdentifierClass(Class<?> componentType) {
-    return componentType.getAnnotation(JdwpAbstractCommandContent.class).identifierClass();
+  private Class<? extends Annotation> findIdentifierAnnotationClass(Class<?> componentType) {
+    return componentType.getAnnotation(JdwpSubType.class).identifierAnnotation();
   }
 
-  private Optional<Class<?>> findCorrectSubClass(ByteBuffer buffer, Class<?> componentType, Class<?> identifierClass) throws ReflectiveOperationException {
-    Set<Class<?>> subTypesOfRepetitiveData =
-        (Set<Class<?>>) new Reflections("kaap.veiko.debuggerforker.commands").getSubTypesOf(componentType);
+  private Optional<Class<?>> findCorrectSubClass(ByteBuffer buffer, Class<?> componentType, Class<? extends Annotation> identifierAnnotationClass) throws ReflectiveOperationException {
+    Set<Class<?>> subTypesOfRepetitiveData = (Set<Class<?>>) new Reflections("kaap.veiko.debuggerforker.commands").getSubTypesOf(componentType);
 
-    long identifier = -1;
+    Object identifier = parameterParser.getValueFromBuffer(buffer, identifierAnnotationClass.getAnnotation(IdentifierType.class).value());
 
-    if (isNumber(identifierClass)) {
-      Object parameterValue = parameterParser.getValueFromBuffer(buffer, identifierClass);
-      if (parameterValue != null && parameterValue instanceof Number) {
-        identifier = ((Number) parameterValue).longValue();
+    for (Class<?> clazz : subTypesOfRepetitiveData) {
+      if (annotationValue(clazz, identifierAnnotationClass).equals(identifier)) {
+        return Optional.of(clazz);
       }
     }
 
-    long finalIdentifier = identifier;
-    Optional<Class<?>> any = subTypesOfRepetitiveData.stream()
-        .filter(clazz -> clazz.getAnnotation(JdwpSubCommand.class).eventKind().getId() == finalIdentifier)
-        .findFirst();
+    return Optional.empty();
+  }
 
-    return any;
+  private Object annotationValue(Class<?> clazz, Class<? extends Annotation> identifierAnnotationClass) throws ReflectiveOperationException {
+    return identifierAnnotationClass.getMethod("value").invoke(clazz);
   }
 
   private boolean isNumber(Class<?> identifierClass) {

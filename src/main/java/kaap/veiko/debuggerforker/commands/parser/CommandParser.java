@@ -27,7 +27,7 @@ public class CommandParser {
         .map(constructor -> commandInstantiator.newInstanceFromBytes(constructor, packet.getDataBytes()));
 
     if (!command.isPresent()) {
-      log.error("Failed to parse the command from packet '{}'", packet);
+      log.warn("Failed to parse the command from packet '{}'", packet);
       return null;
     }
 
