@@ -6,7 +6,7 @@ import kaap.veiko.debuggerforker.commands.types.Location;
 import kaap.veiko.debuggerforker.commands.types.ThreadId;
 
 @JdwpEvent(EventKind.BREAKPOINT)
-public class BreakPointEvent {
+public class BreakPointEvent extends VirtualMachineEvent {
   private int requestId;
   private ThreadId threadId;
   private Location location;
