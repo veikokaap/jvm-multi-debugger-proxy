@@ -73,7 +73,7 @@ public class ArrayParser implements TypeParser<Object[]> {
   }
 
   private Optional<Class<?>> findCorrectSubClass(ByteBuffer buffer, Class<?> componentType, Class<? extends Annotation> identifierAnnotationClass) throws ReflectiveOperationException {
-    Set<Class<?>> subTypesOfRepetitiveData = (Set<Class<?>>) new Reflections("kaap.veiko.debuggerforker.commands").getSubTypesOf(componentType);
+    Set<Class<?>> subTypesOfRepetitiveData = (Set<Class<?>>) new Reflections("kaap.veiko.debuggerforker").getSubTypesOf(componentType);
 
     Object identifier = parameterParser.getValueFromBuffer(buffer, identifierAnnotationClass.getAnnotation(IdentifierType.class).value());
 
@@ -87,7 +87,7 @@ public class ArrayParser implements TypeParser<Object[]> {
   }
 
   private Object annotationValue(Class<?> clazz, Class<? extends Annotation> identifierAnnotationClass) throws ReflectiveOperationException {
-    return identifierAnnotationClass.getMethod("value").invoke(clazz);
+    return identifierAnnotationClass.getMethod("value").invoke(clazz.getAnnotation(identifierAnnotationClass));
   }
 
   private boolean isNumber(Class<?> identifierClass) {
