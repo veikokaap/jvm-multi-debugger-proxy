@@ -2,8 +2,6 @@ package kaap.veiko.debuggerforker.packet;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Parameter;
-import java.nio.ByteBuffer;
-import java.util.Arrays;
 
 import kaap.veiko.debuggerforker.VMInformation;
 import kaap.veiko.debuggerforker.commands.Command;

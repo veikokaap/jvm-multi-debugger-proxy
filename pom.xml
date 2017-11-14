@@ -6,7 +6,13 @@
 
   <groupId>kaap.veiko</groupId>
   <artifactId>jvm-debugger-forker</artifactId>
+  <packaging>pom</packaging>
   <version>0.1-SNAPSHOT</version>
+
+  <modules>
+    <module>logic</module>
+  </modules>
+
   <build>
     <plugins>
       <plugin>
