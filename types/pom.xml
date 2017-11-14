@@ -11,5 +11,13 @@
 
   <artifactId>types</artifactId>
 
+  <dependencies>
+    <dependency>
+      <groupId>kaap.veiko</groupId>
+      <artifactId>utils</artifactId>
+      <version>${parent.version}</version>
+    </dependency>
+  </dependencies>
+
 
 </project>

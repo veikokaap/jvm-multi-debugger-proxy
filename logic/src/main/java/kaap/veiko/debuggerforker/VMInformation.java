@@ -1,6 +1,6 @@
 package kaap.veiko.debuggerforker;
 
-import kaap.veiko.debuggerforker.commands.IdSizes;
+import kaap.veiko.debuggerforker.types.IdSizes;
 
 public class VMInformation {
   private IdSizes idSizes;

@@ -3,7 +3,7 @@ package kaap.veiko.debuggerforker.commands.parser.typeparsers;
 import java.lang.reflect.Parameter;
 import java.nio.ByteBuffer;
 
-import kaap.veiko.debuggerforker.commands.IdSizes;
+import kaap.veiko.debuggerforker.types.IdSizes;
 
 public class IdSizesParser implements TypeParser<IdSizes> {
   @Override

@@ -1,11 +1,11 @@
-package kaap.veiko.debuggerforker.commands.types;
+package kaap.veiko.debuggerforker.types;
 
 import java.nio.ByteBuffer;
 import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import kaap.veiko.debuggerforker.commands.IdSizes;
+import kaap.veiko.debuggerforker.types.IdSizes;
 import kaap.veiko.debuggerforker.utils.ByteBufferUtil;
 
 public abstract class DataTypeBase implements DataType {

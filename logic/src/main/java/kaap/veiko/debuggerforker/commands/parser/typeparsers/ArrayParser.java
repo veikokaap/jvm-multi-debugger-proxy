@@ -17,7 +17,7 @@ import kaap.veiko.debuggerforker.commands.parser.ParameterParser;
 import kaap.veiko.debuggerforker.commands.parser.annotations.IdentifierType;
 import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpSubType;
 import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpArray;
-import kaap.veiko.debuggerforker.commands.types.DataType;
+import kaap.veiko.debuggerforker.types.DataType;
 
 public class ArrayParser implements TypeParser<DataType[]> {
 

@@ -6,8 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import kaap.veiko.debuggerforker.VMInformation;
-import kaap.veiko.debuggerforker.commands.IdSizes;
-import kaap.veiko.debuggerforker.commands.types.DataType;
+import kaap.veiko.debuggerforker.types.IdSizes;
+import kaap.veiko.debuggerforker.types.DataType;
 
 public class DataTypeParser implements TypeParser<DataType> {
 

@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 
 import kaap.veiko.debuggerforker.commands.constants.EventKind;
 import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpCommandConstructor;
-import kaap.veiko.debuggerforker.commands.types.ThreadId;
+import kaap.veiko.debuggerforker.types.ThreadId;
 
 
 @JdwpEvent(EventKind.VM_START)

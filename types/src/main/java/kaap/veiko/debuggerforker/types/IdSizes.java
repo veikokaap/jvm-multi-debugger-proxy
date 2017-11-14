@@ -1,6 +1,4 @@
-package kaap.veiko.debuggerforker.commands;
-
-import java.nio.ByteBuffer;
+package kaap.veiko.debuggerforker.types;
 
 public class IdSizes {
   private final int fieldIdSize;

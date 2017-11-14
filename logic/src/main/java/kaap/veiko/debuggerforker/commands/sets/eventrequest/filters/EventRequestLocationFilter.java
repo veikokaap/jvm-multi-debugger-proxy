@@ -3,7 +3,7 @@ package kaap.veiko.debuggerforker.commands.sets.eventrequest.filters;
 import java.nio.ByteBuffer;
 
 import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpCommandConstructor;
-import kaap.veiko.debuggerforker.commands.types.Location;
+import kaap.veiko.debuggerforker.types.Location;
 
 @EventFilterKind(value = 7)
 public class EventRequestLocationFilter extends EventRequestFilter {

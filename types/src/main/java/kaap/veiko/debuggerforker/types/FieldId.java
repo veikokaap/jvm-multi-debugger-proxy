@@ -1,8 +1,8 @@
-package kaap.veiko.debuggerforker.commands.types;
+package kaap.veiko.debuggerforker.types;
 
 import java.nio.ByteBuffer;
 
-import kaap.veiko.debuggerforker.commands.IdSizes;
+import kaap.veiko.debuggerforker.types.IdSizes;
 
 public class FieldId extends DataTypeBase {
   public FieldId(ByteBuffer buffer, IdSizes idSizes) {

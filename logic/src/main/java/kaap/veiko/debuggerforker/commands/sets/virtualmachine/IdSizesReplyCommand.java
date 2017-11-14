@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import kaap.veiko.debuggerforker.commands.CommandBase;
-import kaap.veiko.debuggerforker.commands.IdSizes;
+import kaap.veiko.debuggerforker.types.IdSizes;
 import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpCommand;
 import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpCommandConstructor;
 import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;

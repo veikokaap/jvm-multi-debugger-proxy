@@ -1,8 +1,8 @@
-package kaap.veiko.debuggerforker.commands.constants;
+package kaap.veiko.debuggerforker.types;
 
 import java.util.Arrays;
 
-public enum Tag {
+public enum Type {
   ARRAY(91, null),
   BYTE(66, 1),
   CHAR(67, 2),
@@ -23,14 +23,14 @@ public enum Tag {
   private final byte id;
   private final Integer size;
 
-  Tag(int value, Integer size) {
+  Type(int value, Integer size) {
     this.id = (byte) value;
     this.size = size;
   }
 
-  public static Tag findByValue(byte value) {
-    return Arrays.stream(Tag.values())
-        .filter(tag -> tag.id == value)
+  public static Type findByValue(byte value) {
+    return Arrays.stream(Type.values())
+        .filter(type -> type.id == value)
         .findFirst().get();
   }
 
