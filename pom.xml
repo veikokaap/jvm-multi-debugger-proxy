@@ -11,6 +11,7 @@
 
   <modules>
     <module>logic</module>
+    <module>types</module>
   </modules>
 
   <build>
