@@ -9,20 +9,19 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import kaap.veiko.debuggerforker.VMInformation;
+import kaap.veiko.debuggerforker.types.VMInformation;
 import kaap.veiko.debuggerforker.commands.Command;
-import kaap.veiko.debuggerforker.commands.parser.typeparsers.ArrayParser;
-import kaap.veiko.debuggerforker.commands.parser.typeparsers.BooleanParser;
-import kaap.veiko.debuggerforker.commands.parser.typeparsers.ByteParser;
-import kaap.veiko.debuggerforker.commands.parser.typeparsers.DataTypeParser;
-import kaap.veiko.debuggerforker.commands.parser.typeparsers.EventKindParser;
-import kaap.veiko.debuggerforker.commands.parser.typeparsers.IdSizesParser;
-import kaap.veiko.debuggerforker.commands.parser.typeparsers.IntParser;
-import kaap.veiko.debuggerforker.commands.parser.typeparsers.LocationParser;
-import kaap.veiko.debuggerforker.commands.parser.typeparsers.LongParser;
-import kaap.veiko.debuggerforker.commands.parser.typeparsers.ShortParser;
-import kaap.veiko.debuggerforker.commands.parser.typeparsers.StringParser;
-import kaap.veiko.debuggerforker.commands.parser.typeparsers.TypeParser;
+import kaap.veiko.debuggerforker.types.parsers.BooleanParser;
+import kaap.veiko.debuggerforker.types.parsers.ByteParser;
+import kaap.veiko.debuggerforker.types.parsers.DataTypeParser;
+import kaap.veiko.debuggerforker.types.parsers.EventKindParser;
+import kaap.veiko.debuggerforker.types.parsers.IdSizesParser;
+import kaap.veiko.debuggerforker.types.parsers.IntParser;
+import kaap.veiko.debuggerforker.types.parsers.LocationParser;
+import kaap.veiko.debuggerforker.types.parsers.LongParser;
+import kaap.veiko.debuggerforker.types.parsers.ShortParser;
+import kaap.veiko.debuggerforker.types.parsers.StringParser;
+import kaap.veiko.debuggerforker.types.parsers.TypeParser;
 
 public class ParameterParser {
 

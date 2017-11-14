@@ -5,7 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import kaap.veiko.debuggerforker.commands.constants.EventKind;
+import kaap.veiko.debuggerforker.types.EventKind;
 import kaap.veiko.debuggerforker.commands.parser.annotations.IdentifierType;
 
 @Retention(RetentionPolicy.RUNTIME)

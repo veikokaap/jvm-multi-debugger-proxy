@@ -1,4 +1,4 @@
-package kaap.veiko.debuggerforker.commands.constants;
+package kaap.veiko.debuggerforker.types;
 
 public enum EventKind {
   SINGLE_STEP(1),

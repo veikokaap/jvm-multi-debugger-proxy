@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import kaap.veiko.debuggerforker.commands.CommandBase;
-import kaap.veiko.debuggerforker.commands.constants.EventKind;
+import kaap.veiko.debuggerforker.types.EventKind;
 import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpCommand;
 import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpCommandConstructor;
 import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;

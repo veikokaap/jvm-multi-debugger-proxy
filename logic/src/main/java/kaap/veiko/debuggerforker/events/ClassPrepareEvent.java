@@ -2,7 +2,7 @@ package kaap.veiko.debuggerforker.events;
 
 import java.nio.ByteBuffer;
 
-import kaap.veiko.debuggerforker.commands.constants.EventKind;
+import kaap.veiko.debuggerforker.types.EventKind;
 import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpCommandConstructor;
 import kaap.veiko.debuggerforker.types.ReferenceTypeId;
 import kaap.veiko.debuggerforker.types.ThreadId;

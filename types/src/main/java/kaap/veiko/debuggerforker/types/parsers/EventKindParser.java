@@ -1,11 +1,11 @@
-package kaap.veiko.debuggerforker.commands.parser.typeparsers;
+package kaap.veiko.debuggerforker.types.parsers;
 
 import java.lang.reflect.Parameter;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Optional;
 
-import kaap.veiko.debuggerforker.commands.constants.EventKind;
+import kaap.veiko.debuggerforker.types.EventKind;
 
 public class EventKindParser implements TypeParser<EventKind> {
   @Override

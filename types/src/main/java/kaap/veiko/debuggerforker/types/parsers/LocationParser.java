@@ -1,9 +1,9 @@
-package kaap.veiko.debuggerforker.commands.parser.typeparsers;
+package kaap.veiko.debuggerforker.types.parsers;
 
 import java.lang.reflect.Parameter;
 import java.nio.ByteBuffer;
 
-import kaap.veiko.debuggerforker.VMInformation;
+import kaap.veiko.debuggerforker.types.VMInformation;
 import kaap.veiko.debuggerforker.types.Location;
 
 public class LocationParser implements TypeParser<Location> {

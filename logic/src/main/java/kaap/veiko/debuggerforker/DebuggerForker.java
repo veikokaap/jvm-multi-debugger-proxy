@@ -15,6 +15,7 @@ import kaap.veiko.debuggerforker.connections.VirtualMachineManager;
 import kaap.veiko.debuggerforker.connections.connectors.DebuggerConnector;
 import kaap.veiko.debuggerforker.connections.connectors.VMConnector;
 import kaap.veiko.debuggerforker.packet.Packet;
+import kaap.veiko.debuggerforker.types.VMInformation;
 
 public class DebuggerForker implements AutoCloseable {
 

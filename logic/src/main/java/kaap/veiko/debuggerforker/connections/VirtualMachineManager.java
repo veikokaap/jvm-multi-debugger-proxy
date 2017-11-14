@@ -3,8 +3,8 @@ package kaap.veiko.debuggerforker.connections;
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
 
-import kaap.veiko.debuggerforker.VMInformation;
-import kaap.veiko.debuggerforker.commands.constants.EventKind;
+import kaap.veiko.debuggerforker.types.VMInformation;
+import kaap.veiko.debuggerforker.types.EventKind;
 import kaap.veiko.debuggerforker.commands.sets.eventrequest.ClearEventRequestCommand;
 import kaap.veiko.debuggerforker.packet.Packet;
 import kaap.veiko.debuggerforker.packet.PacketCreator;

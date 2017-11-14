@@ -1,4 +1,4 @@
-package kaap.veiko.debuggerforker.commands.parser.typeparsers;
+package kaap.veiko.debuggerforker.commands.parser;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
@@ -11,13 +11,11 @@ import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import kaap.veiko.debuggerforker.commands.parser.CommandInstantiator;
-import kaap.veiko.debuggerforker.commands.parser.ConstructorFinder;
-import kaap.veiko.debuggerforker.commands.parser.ParameterParser;
 import kaap.veiko.debuggerforker.commands.parser.annotations.IdentifierType;
 import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpSubType;
 import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpArray;
 import kaap.veiko.debuggerforker.types.DataType;
+import kaap.veiko.debuggerforker.types.parsers.TypeParser;
 
 public class ArrayParser implements TypeParser<DataType[]> {
 

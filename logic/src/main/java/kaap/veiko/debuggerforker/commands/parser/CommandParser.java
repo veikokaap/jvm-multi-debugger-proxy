@@ -4,7 +4,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import kaap.veiko.debuggerforker.VMInformation;
+import kaap.veiko.debuggerforker.types.VMInformation;
 import kaap.veiko.debuggerforker.commands.Command;
 import kaap.veiko.debuggerforker.packet.Packet;
 

@@ -3,7 +3,7 @@ package kaap.veiko.debuggerforker.packet;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Parameter;
 
-import kaap.veiko.debuggerforker.VMInformation;
+import kaap.veiko.debuggerforker.types.VMInformation;
 import kaap.veiko.debuggerforker.commands.Command;
 import kaap.veiko.debuggerforker.commands.parser.ConstructorFinder;
 import kaap.veiko.debuggerforker.commands.parser.ParameterParser;

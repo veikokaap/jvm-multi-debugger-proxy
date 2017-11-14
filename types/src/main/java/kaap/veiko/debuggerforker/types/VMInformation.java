@@ -1,4 +1,4 @@
-package kaap.veiko.debuggerforker;
+package kaap.veiko.debuggerforker.types;
 
 import kaap.veiko.debuggerforker.types.IdSizes;
 
