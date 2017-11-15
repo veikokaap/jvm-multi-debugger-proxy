@@ -5,7 +5,7 @@ import java.nio.ByteBuffer;
 import kaap.veiko.debuggerforker.types.IdSizes;
 
 public class ArrayTypeId extends ReferenceTypeId {
-  public ArrayTypeId(ByteBuffer buffer, IdSizes idSizes) {
-    super(buffer, idSizes);
+  public ArrayTypeId(PacketDataReader reader) {
+    super(reader);
   }
 }

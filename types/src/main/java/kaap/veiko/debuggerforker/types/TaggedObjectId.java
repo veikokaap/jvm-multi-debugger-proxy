@@ -2,16 +2,14 @@ package kaap.veiko.debuggerforker.types;
 
 import java.nio.ByteBuffer;
 
-import kaap.veiko.debuggerforker.types.IdSizes;
-
 public class TaggedObjectId implements DataType {
 
   private final byte tag;
   private final ObjectId objectId;
 
-  public TaggedObjectId(ByteBuffer byteBuffer, IdSizes idSizes) {
-    tag = byteBuffer.get();
-    objectId = new ObjectId(byteBuffer, idSizes);
+  public TaggedObjectId(PacketDataReader reader) {
+    tag = reader.readByte();
+    objectId = reader.readType(ObjectId.class);
   }
 
   public byte getTag() {
@@ -27,11 +25,10 @@ public class TaggedObjectId implements DataType {
   }
 
   @Override
-  public void putToBuffer(ByteBuffer buffer) {
-    buffer.put(tag);
-    objectId.putToBuffer(buffer);
+  public void write(PacketDataWriter writer) {
+    writer.writeByte(tag);
+    writer.writeType(objectId);
   }
-
 
   @Override
   public boolean equals(Object o) {

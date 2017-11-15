@@ -1,18 +1,27 @@
 package kaap.veiko.debuggerforker.types;
 
-public class IdSizes {
+public class IdSizes implements DataType {
   private final int fieldIdSize;
   private final int methodIdSize;
   private final int objectIdSize;
   private final int referenceTypeIdSize;
   private final int frameIdSize;
 
-  public IdSizes(int fieldIdSize, int methodIdSize, int objectIdSize, int referenceTypeIdSize, int frameIdSize) {
-    this.fieldIdSize = fieldIdSize;
-    this.methodIdSize = methodIdSize;
-    this.objectIdSize = objectIdSize;
-    this.referenceTypeIdSize = referenceTypeIdSize;
-    this.frameIdSize = frameIdSize;
+  public IdSizes(PacketDataReader reader) {
+    this.fieldIdSize = reader.readInt();
+    this.methodIdSize = reader.readInt();
+    this.objectIdSize = reader.readInt();
+    this.referenceTypeIdSize = reader.readInt();
+    this.frameIdSize = reader.readInt();
+  }
+
+  @Override
+  public void write(PacketDataWriter writer) {
+    writer.writeInt(this.getFieldIdSize());
+    writer.writeInt(this.getMethodIdSize());
+    writer.writeInt(this.getObjectIdSize());
+    writer.writeInt(this.getReferenceTypeIdSize());
+    writer.writeInt(this.getFrameIdSize());
   }
 
   public int getFieldIdSize() {

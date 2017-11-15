@@ -1,6 +1,9 @@
 package kaap.veiko.debuggerforker.types;
 
-public enum EventKind {
+import java.nio.ByteBuffer;
+import java.util.Arrays;
+
+public enum EventKind implements DataType{
   SINGLE_STEP(1),
   BREAKPOINT(2),
   FRAME_POP(3),
@@ -31,8 +34,18 @@ public enum EventKind {
     this.id = (byte) id;
   }
 
+  public static EventKind findByValue(byte value) {
+    return Arrays.stream(EventKind.values())
+        .filter(eventKind -> eventKind.id == value)
+        .findFirst().get();
+  }
+
   public final byte getId() {
     return id;
   }
 
+  @Override
+  public void write(PacketDataWriter writer) {
+    writer.writeByte(id);
+  }
 }

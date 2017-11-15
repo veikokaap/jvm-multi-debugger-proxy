@@ -1,20 +1,16 @@
 package kaap.veiko.debuggerforker.types;
 
-import java.nio.ByteBuffer;
-
-import kaap.veiko.debuggerforker.types.IdSizes;
-
-public class Location {
+public class Location implements DataType {
   private final byte typeTag;
   private final ClassId classId;
   private final MethodId methodId;
   private final long index;
 
-  public Location(ByteBuffer byteBuffer, IdSizes idSizes) {
-    typeTag = byteBuffer.get();
-    classId = new ClassId(byteBuffer, idSizes);
-    methodId = new MethodId(byteBuffer, idSizes);
-    index = byteBuffer.getLong();
+  public Location(PacketDataReader reader) {
+    typeTag = reader.readByte();
+    classId = reader.readType(ClassId.class);
+    methodId = reader.readType(MethodId.class);
+    index = reader.readLong();
   }
 
   public byte getTypeTag() {
@@ -33,11 +29,12 @@ public class Location {
     return index;
   }
 
-  public void putToBuffer(ByteBuffer buffer) {
-    buffer.put(typeTag);
-    classId.putToBuffer(buffer);
-    methodId.putToBuffer(buffer);
-    buffer.putLong(index);
+  @Override
+  public void write(PacketDataWriter writer) {
+    writer.writeByte(typeTag);
+    writer.writeType(classId);
+    writer.writeType(methodId);
+    writer.writeLong(index);
   }
 
   @Override

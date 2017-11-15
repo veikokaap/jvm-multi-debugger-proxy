@@ -8,22 +8,23 @@ public class Value implements DataType {
   private final Type type;
   private final Long value;
 
-  public Value(ByteBuffer byteBuffer, IdSizes idSizes) {
-    this(byteBuffer, idSizes, byteBuffer.get());
+  public Value(PacketDataReader reader) {
+    this(reader, reader.readByte());
   }
 
-  protected Value(ByteBuffer byteBuffer, IdSizes idSizes, byte typeTag) {
+  protected Value(PacketDataReader reader, byte typeTag) {
     this.type = Type.findByValue(typeTag);
     Integer size = type.getSize();
+    IdSizes idSizes = reader.getIdSizes();
 
     if (size == null) {
-      value = ByteBufferUtil.getLong(byteBuffer, idSizes.getObjectIdSize());
+      value = reader.readLongOfSize(idSizes.getObjectIdSize());
     }
     else if (size == 0) {
       value = null;
     }
     else {
-      value = ByteBufferUtil.getLong(byteBuffer, size);
+      value = reader.readLongOfSize(size);
     }
   }
 
@@ -36,9 +37,9 @@ public class Value implements DataType {
   }
 
   @Override
-  public void putToBuffer(ByteBuffer buffer) {
-    buffer.put(type.getId());
-    buffer.putLong(value);
+  public void write(PacketDataWriter writer) {
+    writer.writeByte(type.getId());
+    writer.writeLong(value);
   }
 
   @Override

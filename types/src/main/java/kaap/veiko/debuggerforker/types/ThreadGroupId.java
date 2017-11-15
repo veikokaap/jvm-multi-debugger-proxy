@@ -5,7 +5,7 @@ import java.nio.ByteBuffer;
 import kaap.veiko.debuggerforker.types.IdSizes;
 
 public class ThreadGroupId extends ObjectId {
-  public ThreadGroupId(ByteBuffer buffer, IdSizes idSizes) {
-    super(buffer, idSizes);
+  public ThreadGroupId(PacketDataReader reader) {
+    super(reader);
   }
 }

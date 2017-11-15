@@ -1,12 +1,8 @@
 package kaap.veiko.debuggerforker.types;
 
-import java.nio.ByteBuffer;
 import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import kaap.veiko.debuggerforker.types.IdSizes;
-import kaap.veiko.debuggerforker.utils.ByteBufferUtil;
 
 public abstract class DataTypeBase implements DataType {
 
@@ -14,7 +10,14 @@ public abstract class DataTypeBase implements DataType {
   private final long value;
   private final int size;
 
-  public DataTypeBase(ByteBuffer buffer, IdSizes idSizes, Function<IdSizes, Integer> sizeFunction) {
+  DataTypeBase(long value, int size) {
+    this.value = value;
+    this.size = size;
+  }
+
+  DataTypeBase(PacketDataReader reader, Function<IdSizes, Integer> sizeFunction) {
+    IdSizes idSizes = reader.getIdSizes();
+
     if (idSizes != null) {
       size = sizeFunction.apply(idSizes);
     }
@@ -23,12 +26,12 @@ public abstract class DataTypeBase implements DataType {
       log.warn("Parsing value without knowing its size in bytes. Assuming size is 8 bytes.");
     }
 
-    value = ByteBufferUtil.getLong(buffer, size);
+    value = reader.readLongOfSize(size);
   }
 
   @Override
-  public void putToBuffer(ByteBuffer buffer) {
-    ByteBufferUtil.putLong(buffer, value, size);
+  public void write(PacketDataWriter writer) {
+    writer.writeLongOfSize(value, size);
   }
 
   @Override
@@ -36,7 +39,7 @@ public abstract class DataTypeBase implements DataType {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof DataTypeBase)) {
+    if (o == null || getClass() != o.getClass()) {
       return false;
     }
 

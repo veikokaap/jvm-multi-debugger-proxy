@@ -2,7 +2,7 @@ package kaap.veiko.debuggerforker.types;
 
 import java.util.Arrays;
 
-public enum Type {
+public enum Type implements DataType {
   ARRAY(91, null),
   BYTE(66, 1),
   CHAR(67, 2),
@@ -32,6 +32,11 @@ public enum Type {
     return Arrays.stream(Type.values())
         .filter(type -> type.id == value)
         .findFirst().get();
+  }
+
+  @Override
+  public void write(PacketDataWriter writer) {
+    writer.writeByte(id);
   }
 
   public byte getId() {

@@ -4,14 +4,15 @@ import java.nio.ByteBuffer;
 
 import kaap.veiko.debuggerforker.commands.parser.annotations.JdwpCommandConstructor;
 import kaap.veiko.debuggerforker.types.Location;
+import kaap.veiko.debuggerforker.types.PacketDataReader;
 
 @EventFilterKind(value = 7)
 public class EventRequestLocationFilter extends EventRequestFilter {
   private final Location location;
 
   @JdwpCommandConstructor
-  public EventRequestLocationFilter(Location location) {
-    this.location = location;
+  public EventRequestLocationFilter(PacketDataReader packetDataReader) {
+    this.location = packetDataReader.readLocation();
   }
 
   public Location getLocation() {
