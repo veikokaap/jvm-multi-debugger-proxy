@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
     <artifactId>jvm-debugger-forker</artifactId>
@@ -11,10 +11,50 @@
 
   <artifactId>logic</artifactId>
 
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.1.0</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.0.2</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>kaap.veiko.debuggerforker.Main</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
   <dependencies>
     <dependency>
       <groupId>kaap.veiko</groupId>
-      <artifactId>utils</artifactId>
+      <artifactId>commands</artifactId>
+      <version>${parent.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>kaap.veiko</groupId>
+      <artifactId>packet</artifactId>
+      <version>${parent.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>kaap.veiko</groupId>
+      <artifactId>connections</artifactId>
       <version>${parent.version}</version>
     </dependency>
     <dependency>

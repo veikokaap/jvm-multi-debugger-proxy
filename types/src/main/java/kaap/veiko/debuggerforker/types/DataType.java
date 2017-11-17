@@ -1,5 +1,5 @@
 package kaap.veiko.debuggerforker.types;
 
 public interface DataType {
-  void write(PacketDataWriter writer);
+  void write(DataWriter writer);
 }
