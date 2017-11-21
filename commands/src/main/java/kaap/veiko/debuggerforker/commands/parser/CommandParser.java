@@ -22,7 +22,7 @@ public class CommandParser {
     CommandDataReader commandDataReader = new CommandDataReader(ByteBuffer.wrap(packet.getDataBytes()), vmInformation);
     CommandIdentifier identifier = null;
     try {
-      identifier = CommandIdentifier.of(packet.getCommandSet(), packet.getCommand(), packet.isReply());
+      identifier = CommandIdentifier.of(packet.getCommandSetId(), packet.getCommandId(), packet.isReply());
     }
     catch (Exception e) {
       log.error("Failed to find CommandIdentifier", e);

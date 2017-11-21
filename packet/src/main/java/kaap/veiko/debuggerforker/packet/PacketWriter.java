@@ -27,8 +27,8 @@ class PacketWriter {
       byteBuffer.putShort(packet.getErrorCode());
     }
     else {
-      byteBuffer.put((byte) packet.getCommandSet());
-      byteBuffer.put((byte) packet.getCommand());
+      byteBuffer.put((byte) packet.getCommandSetId());
+      byteBuffer.put((byte) packet.getCommandId());
     }
 
     if (packet.hasData()) {

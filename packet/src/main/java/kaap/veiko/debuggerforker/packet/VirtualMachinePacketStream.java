@@ -24,8 +24,8 @@ public class VirtualMachinePacketStream extends PacketStreamBase {
     if (readPacket.isReply()) {
       Packet commandPacket = writtenPackets.get(readPacket.getId());
 
-      readPacket.setCommandSet(commandPacket.getCommandSet());
-      readPacket.setCommand(commandPacket.getCommand());
+      readPacket.setCommandSetId(commandPacket.getCommandSetId());
+      readPacket.setCommandId(commandPacket.getCommandId());
     }
 
     return readPacket;

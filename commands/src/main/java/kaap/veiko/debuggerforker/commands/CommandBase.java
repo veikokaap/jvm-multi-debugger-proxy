@@ -6,6 +6,7 @@ import kaap.veiko.debuggerforker.commands.parser.CommandDataWriter;
 import kaap.veiko.debuggerforker.commands.parser.CommandType;
 import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;
 import kaap.veiko.debuggerforker.packet.Packet;
+import kaap.veiko.debuggerforker.packet.PacketImpl;
 import kaap.veiko.debuggerforker.types.VMInformation;
 
 public abstract class CommandBase implements Command {
@@ -28,11 +29,11 @@ public abstract class CommandBase implements Command {
 
   @Override
   public Packet asPacket(int id, VMInformation vmInformation) {
-    Packet packet = new Packet();
+    Packet packet = new PacketImpl();
 
     packet.setId(id);
-    packet.setCommandSet((short) getCommandSetId());
-    packet.setCommand((short) getCommandId());
+    packet.setCommandSetId((short) getCommandSetId());
+    packet.setCommandId((short) getCommandId());
 
     if (isReply()) {
       packet.setFlags((short) -128);

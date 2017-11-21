@@ -1,108 +1,37 @@
 package kaap.veiko.debuggerforker.packet;
 
-import java.util.Arrays;
+public interface Packet {
+  int HEADER_LENGTH = 11;
 
-public class Packet {
+  int getLength();
 
-  public static final int HEADER_LENGTH = 11;
+  void setLength(int length);
 
-  private int length = 0;
-  private int id = 0;
-  private short flags = 0;
-  private short commandSet = 0;
-  private short command = 0;
-  private short errorCode = 0;
-  private byte[] data = new byte[]{};
+  int getId();
 
-  public Packet() {
-  }
+  void setId(int id);
 
-  public int getLength() {
-    return length;
-  }
+  short getFlags();
 
-  public void setLength(int length) {
-    this.length = length;
-  }
+  void setFlags(short flags);
 
-  public int getId() {
-    return id;
-  }
+  short getCommandSetId();
 
-  public void setId(int id) {
-    this.id = id;
-  }
+  void setCommandSetId(short commandSetId);
 
-  public short getFlags() {
-    return flags;
-  }
+  short getCommandId();
 
-  public void setFlags(short flags) {
-    this.flags = flags;
-  }
+  void setCommandId(short commandId);
 
-  public short getCommandSet() {
-    return commandSet;
-  }
+  short getErrorCode();
 
-  public void setCommandSet(short commandSet) {
-    this.commandSet = commandSet;
-  }
+  void setErrorCode(short errorCode);
 
-  public short getCommand() {
-    return command;
-  }
+  byte[] getDataBytes();
 
-  public void setCommand(short command) {
-    this.command = command;
-  }
+  void setDataBytes(byte[] dataBytes);
 
-  public short getErrorCode() {
-    return errorCode;
-  }
+  boolean isReply();
 
-  public void setErrorCode(short errorCode) {
-    this.errorCode = errorCode;
-  }
-
-  public byte[] getDataBytes() {
-    return data;
-  }
-
-  public void setDataBytes(byte[] dataBytes) {
-    this.data = dataBytes;
-  }
-
-  public boolean isReply() {
-    return getFlags() == -128;
-  }
-
-  public boolean hasData() {
-    return getLength() > HEADER_LENGTH;
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder stringBuilder = new StringBuilder();
-
-    if (isReply()) {
-      stringBuilder.append("Reply {")
-          .append("id=").append(id)
-          .append(", commandSet=").append(commandSet)
-          .append(", command=").append(command)
-          .append(", errorCode=").append(errorCode);
-    }
-    else {
-      stringBuilder.append("Packet{")
-          .append("id=").append(id)
-          .append(", commandSet=").append(commandSet)
-          .append(", command=").append(command);
-    }
-
-    if (hasData()) {
-      stringBuilder.append(", data=").append(Arrays.toString(data));
-    }
-
-    return stringBuilder.append("}").toString();
-  }
+  boolean hasData();
 }

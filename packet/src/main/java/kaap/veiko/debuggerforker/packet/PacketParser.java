@@ -19,7 +19,7 @@ class PacketParser {
   }
 
   private Packet internalParse() {
-    Packet packet = new Packet();
+    Packet packet = new PacketImpl();
     packet.setLength(length);
 
     packet.setId(readInt());
@@ -29,8 +29,8 @@ class PacketParser {
       packet.setErrorCode(readShort());
     }
     else {
-      packet.setCommandSet(readByte());
-      packet.setCommand(readByte());
+      packet.setCommandSetId(readByte());
+      packet.setCommandId(readByte());
     }
 
     if (packet.hasData()) {
