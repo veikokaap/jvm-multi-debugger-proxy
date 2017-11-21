@@ -20,15 +20,13 @@ public class CommandParser {
 
   public Command parse(Packet packet) {
     CommandDataReader commandDataReader = new CommandDataReader(ByteBuffer.wrap(packet.getDataBytes()), vmInformation);
-    CommandIdentifier identifier = null;
     try {
-      identifier = CommandIdentifier.of(packet.getCommandSetId(), packet.getCommandId(), packet.isReply());
+      CommandIdentifier identifier = CommandIdentifier.of(packet.getCommandSetId(), packet.getCommandId(), packet.isReply());
+      return commandDataReader.readCommand(identifier);
     }
     catch (Exception e) {
       log.error("Failed to find CommandIdentifier", e);
       return null;
     }
-
-    return commandDataReader.readCommand(identifier);
   }
 }
