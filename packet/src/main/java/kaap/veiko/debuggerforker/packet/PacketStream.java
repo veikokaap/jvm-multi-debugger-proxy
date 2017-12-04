@@ -7,4 +7,6 @@ public interface PacketStream extends Closeable {
   Packet read() throws IOException;
 
   void write(Packet packet) throws IOException;
+
+  PacketSource getPacketSource();
 }

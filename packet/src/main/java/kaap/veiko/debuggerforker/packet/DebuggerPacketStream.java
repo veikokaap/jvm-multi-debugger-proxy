@@ -47,4 +47,9 @@ public class DebuggerPacketStream extends PacketStreamBase {
     }
     return myNewIds.contains(packet.getId());
   }
+
+  @Override
+  public PacketSource getPacketSource() {
+    return PacketSource.DEBUGGER;
+  }
 }

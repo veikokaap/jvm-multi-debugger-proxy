@@ -3,7 +3,7 @@ package kaap.veiko.debuggerforker.packet;
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
 
-public class PacketStreamBase implements PacketStream {
+public abstract class PacketStreamBase implements PacketStream {
 
   private final SocketChannel socketChannel;
   private final PacketReader packetReader;

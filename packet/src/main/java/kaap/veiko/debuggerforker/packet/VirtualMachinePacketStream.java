@@ -37,4 +37,9 @@ public class VirtualMachinePacketStream extends PacketStreamBase {
 
     super.write(packet);
   }
+
+  @Override
+  public PacketSource getPacketSource() {
+    return PacketSource.VIRTUAL_MACHINE;
+  }
 }
