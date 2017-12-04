@@ -1,14 +1,19 @@
 package kaap.veiko.debuggerforker.commands;
 
+import java.util.Objects;
+
 import kaap.veiko.debuggerforker.packet.Packet;
+import kaap.veiko.debuggerforker.packet.PacketSource;
 
 public class CommandPacket implements Packet {
   private final Packet packet;
   private final Command command;
+  private final PacketSource source;
 
-  public CommandPacket(Packet packet, Command command) {
+  public CommandPacket(Packet packet, Command command, PacketSource source) {
     this.packet = packet;
     this.command = command;
+    this.source = source;
   }
 
   public Command getCommand() {
@@ -93,5 +98,35 @@ public class CommandPacket implements Packet {
   @Override
   public boolean hasData() {
     return packet.hasData();
+  }
+
+  public PacketSource getSource() {
+    return source;
+  }
+
+  @Override
+  public String toString() {
+    return "CommandPacket{" +
+        "packet=" + packet +
+        ", command=" + command +
+        '}';
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    CommandPacket that = (CommandPacket) o;
+    return Objects.equals(packet, that.packet);
+  }
+
+  @Override
+  public int hashCode() {
+
+    return Objects.hash(packet);
   }
 }

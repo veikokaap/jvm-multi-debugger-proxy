@@ -20,17 +20,12 @@ public class CommandPacketStream implements AutoCloseable{
 
   public CommandPacket read() throws IOException {
     return Optional.ofNullable(packetStream.read())
-        .map(p -> new CommandPacket(p, commandParser.parse(p)))
+        .map(p -> new CommandPacket(p, commandParser.parse(p), packetStream.getPacketSource()))
         .orElse(null);
   }
 
   public void write(CommandPacket packet) throws IOException {
-    Command command = packet.getCommand();
-    if (command == null) {
-      packetStream.write(packet);
-    } else {
-      command.asPacket(packet.getId(), vmInformation);
-    }
+    packetStream.write(packet);
   }
 
   @Override
