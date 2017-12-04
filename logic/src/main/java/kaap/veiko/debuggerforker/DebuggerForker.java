@@ -2,19 +2,23 @@ package kaap.veiko.debuggerforker;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import kaap.veiko.debuggerforker.commands.Command;
-import kaap.veiko.debuggerforker.commands.parser.CommandParser;
-import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IdSizesReplyCommand;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.Single;
+import io.reactivex.SingleEmitter;
+import io.reactivex.schedulers.Schedulers;
+import kaap.veiko.debuggerforker.commands.CommandPacket;
+import kaap.veiko.debuggerforker.commands.CommandPacketStream;
 import kaap.veiko.debuggerforker.connections.DebuggerManager;
 import kaap.veiko.debuggerforker.connections.VirtualMachineManager;
 import kaap.veiko.debuggerforker.connections.connectors.DebuggerConnector;
 import kaap.veiko.debuggerforker.connections.connectors.VMConnector;
-import kaap.veiko.debuggerforker.packet.Packet;
 import kaap.veiko.debuggerforker.types.VMInformation;
 
 public class DebuggerForker implements AutoCloseable {
@@ -23,26 +27,22 @@ public class DebuggerForker implements AutoCloseable {
 
   private final VirtualMachineManager vm;
   private final VMInformation vmInformation = new VMInformation();
-  private final CommandParser commandParser = new CommandParser(vmInformation);
-  private final List<DebuggerManager> debuggers = new ArrayList<>();
+  private final List<DebuggerManager> debuggers = new CopyOnWriteArrayList<>();
+  private final Observable<DebuggerManager> debuggerConnections;
 
-  private final Thread debuggerConnectionThread;
-
-  private DebuggerForker(VirtualMachineManager vm, int debuggerPort) {
+  private DebuggerForker(VirtualMachineManager vm, int debuggerPort) throws IOException {
     this.vm = vm;
 
-    debuggerConnectionThread = new Thread(() -> {
+    DebuggerConnector debuggerConnector = new DebuggerConnector(debuggerPort);
+    debuggerConnections = Single.create((SingleEmitter<DebuggerManager> subscriber) -> {
       try {
-        DebuggerManager debugger = DebuggerConnector.waitForConnectionFromDebugger(debuggerPort);
-        synchronized (debuggers) {
-          debuggers.add(debugger);
-          debuggers.notifyAll();
-        }
+        subscriber.onSuccess(debuggerConnector.getConnectionBlocking());
       }
       catch (IOException e) {
-        log.error("Exception while waiting for debuggers to connect", e);
+        subscriber.onError(e);
       }
-    });
+    }).repeat().toObservable();
+    debuggerConnections.doOnDispose(debuggerConnector::close);
   }
 
   public static void start(InetSocketAddress virtualMachineAddress, int debuggerPort) throws IOException, InterruptedException {
@@ -53,59 +53,55 @@ public class DebuggerForker implements AutoCloseable {
   }
 
   private void start() throws IOException, InterruptedException {
-    debuggerConnectionThread.start();
-    waitForFirstDebuggerConnection();
+    debuggerConnections
+        .subscribeOn(Schedulers.newThread())
+        .subscribe(debuggers::add, error -> log.error("Error when debugger connecting", error));
 
-    while (true) {
-      Packet vmPacket = vm.getPacketStream().read();
+    Observable<CommandPacketStream> debuggerPacketStreams =
+        Observable.create((ObservableEmitter<DebuggerManager> subscriber) -> {
+          debuggers.forEach(subscriber::onNext);
+          subscriber.onComplete();
+        })
+            .repeat()
+            .map(DebuggerManager::getPacketStream)
+            .map(ps -> new CommandPacketStream(ps, vmInformation));
 
-      if (vmPacket != null) {
-        log.info("VMachine: {}", vmPacket);
-        Command command = commandParser.parse(vmPacket);
-        if (command != null) {
-          log.info("Parsed command: {}", command);
-          if (command instanceof IdSizesReplyCommand) {
-            vmInformation.setIdSizes(((IdSizesReplyCommand) command).getIdSizes());
-          }
-        }
-        synchronized (debuggers) {
-          for (DebuggerManager debugger : debuggers) {
-            debugger.getPacketStream().write(vmPacket);
-          }
-        }
-      }
+    Observable<CommandPacket> vmPackets =
+        Single.just(new CommandPacketStream(vm.getPacketStream(), vmInformation))
+            .repeat()
+            .map(ps -> Optional.ofNullable(ps.read()))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .toObservable();
 
-      synchronized (debuggers) {
-        for (DebuggerManager debugger : debuggers) {
-          Packet debuggerPacket = debugger.getPacketStream().read();
-          if (debuggerPacket != null) {
-            log.info("Debugger: {}", debuggerPacket);
-            Command command = commandParser.parse(debuggerPacket);
-            log.info("Parsed command: {}", command);
-            vm.getPacketStream().write(debuggerPacket);
-          }
-        }
-      }
-    }
+    vmPackets
+        .subscribeOn(Schedulers.newThread())
+        .subscribe(packet -> {
+              log.info("Packet from VM: {}", packet);
+              for (DebuggerManager debugger : debuggers) {
+                debugger.getPacketStream().write(packet);
+              }
+            },
+            error -> log.error("Error when reading vm packets {}", error.getMessage())
+        );
+
+    Observable<CommandPacket> debuggerPackets = debuggerPacketStreams
+        .map(ps -> Optional.ofNullable(ps.read()))
+        .filter(Optional::isPresent)
+        .map(Optional::get);
+
+    debuggerPackets
+        .subscribe(
+            packet -> {
+              log.info("Packet from debugger: {}", packet);
+              vm.getPacketStream().write(packet);
+            },
+            error -> log.error("Error when reading debugger packets {}", error.getMessage())
+        );
+
   }
-
-  private void waitForFirstDebuggerConnection() throws InterruptedException {
-    synchronized (debuggers) {
-      while (debuggers.isEmpty()) {
-        debuggers.wait();
-      }
-    }
-  }
-
 
   @Override
   public void close() throws Exception {
-    debuggerConnectionThread.interrupt();
-    vm.close();
-    synchronized (debuggers) {
-      for (DebuggerManager debugger : debuggers) {
-        debugger.close();
-      }
-    }
   }
 }

@@ -1,7 +1,6 @@
 package kaap.veiko.debuggerforker.connections.connectors;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.ServerSocketChannel;
@@ -11,26 +10,16 @@ import java.util.Arrays;
 import kaap.veiko.debuggerforker.connections.DebuggerManager;
 import kaap.veiko.debuggerforker.packet.PacketIdTransformer;
 
-public class DebuggerConnector {
+public class DebuggerConnector implements AutoCloseable {
   private final ServerSocketChannel serverChannel;
   private final PacketIdTransformer packetIdTransformer = new PacketIdTransformer();
 
-  private DebuggerConnector(int port) throws IOException {
+  public DebuggerConnector(int port) throws IOException {
     this.serverChannel = ServerSocketChannel.open();
     serverChannel.socket().bind(new InetSocketAddress("127.0.0.1", port));
   }
 
-  public static DebuggerManager waitForConnectionFromDebugger(int port) throws IOException {
-    try {
-      DebuggerConnector connector = new DebuggerConnector(port);
-      return connector.waitForConnection();
-    }
-    catch (IOException e) {
-      throw new UncheckedIOException(e);
-    }
-  }
-
-  private DebuggerManager waitForConnection() throws IOException {
+  public DebuggerManager getConnectionBlocking() throws IOException {
     SocketChannel socketChannel = serverChannel.accept();
     handshake(socketChannel);
     return new DebuggerManager(socketChannel, packetIdTransformer);
@@ -54,5 +43,10 @@ public class DebuggerConnector {
     while (outBuffer.hasRemaining()) {
       socketChannel.write(outBuffer);
     }
+  }
+
+  @Override
+  public void close() throws IOException {
+    serverChannel.close();
   }
 }
