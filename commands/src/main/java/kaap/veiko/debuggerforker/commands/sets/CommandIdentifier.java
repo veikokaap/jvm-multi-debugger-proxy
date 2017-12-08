@@ -13,6 +13,7 @@ import kaap.veiko.debuggerforker.commands.parser.CommandType;
 public enum CommandIdentifier {
 
   ID_SIZES_REPLY(1, 7, REPLY),
+  DISPOSE_COMMAND(1, 6, COMMAND),
 
   COMPOSITE_EVENT_COMMAND(64, 100, COMMAND),
 
