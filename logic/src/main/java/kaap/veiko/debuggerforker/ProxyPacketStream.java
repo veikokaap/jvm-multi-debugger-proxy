@@ -17,38 +17,35 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import kaap.veiko.debuggerforker.commands.Command;
-import kaap.veiko.debuggerforker.commands.CommandPacket;
-import kaap.veiko.debuggerforker.commands.CommandPacketStream;
-import kaap.veiko.debuggerforker.commands.sets.virtualmachine.DisposeCommand;
-import kaap.veiko.debuggerforker.packet.PacketImpl;
+import kaap.veiko.debuggerforker.commands.CommandStream;
 
 public class ProxyPacketStream implements AutoCloseable {
 
   private final Logger log = LoggerFactory.getLogger(ProxyPacketStream.class);
 
-  private final Map<CommandPacketStream, List<Disposable>> packetStreamDisposables = new HashMap<>();
-  private final Deque<CommandPacket> packets = new ConcurrentLinkedDeque<>();
-  private final PublishSubject<CommandPacket> writtenPackets = PublishSubject.create();
+  private final Map<CommandStream, List<Disposable>> packetStreamDisposables = new HashMap<>();
+  private final Deque<Command> packets = new ConcurrentLinkedDeque<>();
+  private final PublishSubject<Command> writtenPackets = PublishSubject.create();
 
-  public void addPacketStream(CommandPacketStream stream) {
+  public void addPacketStream(CommandStream stream) {
     observePackets(stream);
   }
 
-  public void removePacketStream(CommandPacketStream stream) {
+  public void removePacketStream(CommandStream stream) {
     packetStreamDisposables.remove(stream).forEach(Disposable::dispose);
   }
 
-  public CommandPacket read() {
-    CommandPacket packet = packets.pollFirst();
-    if (packet == null) {
+  public Command read() {
+    Command command = packets.pollFirst();
+    if (command == null) {
       return null;
     }
 
-    return packet;
+    return command;
   }
 
-  public void write(CommandPacket packet) {
-    writtenPackets.onNext(packet);
+  public void write(Command command) {
+    writtenPackets.onNext(command);
   }
 
   public void close() {
@@ -57,13 +54,13 @@ public class ProxyPacketStream implements AutoCloseable {
         .forEach(Disposable::dispose);
   }
 
-  private void observePackets(CommandPacketStream stream) {
-    Disposable readDisposable = Observable.<CommandPacket>create(subscriber -> {
+  private void observePackets(CommandStream stream) {
+    Disposable readDisposable = Observable.<Command>create(subscriber -> {
       try {
         while (!subscriber.isDisposed()) {
-          CommandPacket packet = stream.read();
-          if (packet != null) {
-            subscriber.onNext(packet);
+          Command command = stream.read();
+          if (command != null) {
+            subscriber.onNext(command);
           }
         }
         subscriber.onComplete();
@@ -74,7 +71,7 @@ public class ProxyPacketStream implements AutoCloseable {
     }).subscribeOn(Schedulers.newThread()).subscribe(
         packets::addLast,
         error -> {
-          log.error("Exception thrown when reading packets from a packet stream {}.", stream, error);
+          log.error("Exception thrown when reading packets from a getPacket stream {}.", stream, error);
           try {
             stream.close();
           }

@@ -2,8 +2,10 @@ package kaap.veiko.debuggerforker.commands.sets.eventrequest;
 
 
 import kaap.veiko.debuggerforker.commands.CommandBase;
+import kaap.veiko.debuggerforker.commands.CommandVisitor;
 import kaap.veiko.debuggerforker.commands.parser.CommandDataWriter;
 import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;
+import kaap.veiko.debuggerforker.packet.Packet;
 import kaap.veiko.debuggerforker.types.DataReader;
 import kaap.veiko.debuggerforker.types.jdwp.EventKind;
 
@@ -13,14 +15,10 @@ public class ClearEventRequestCommand extends CommandBase {
   private final EventKind eventKind;
   private final int requestId;
 
-  public ClearEventRequestCommand(DataReader reader) {
+  public ClearEventRequestCommand(DataReader reader, Packet packet) {
+    super(packet);
     this.eventKind = reader.readType(EventKind.class);
     this.requestId = reader.readInt();
-  }
-
-  public ClearEventRequestCommand(EventKind eventKind, int requestId) {
-    this.eventKind = eventKind;
-    this.requestId = requestId;
   }
 
   @Override
@@ -32,6 +30,11 @@ public class ClearEventRequestCommand extends CommandBase {
   @Override
   protected CommandIdentifier getCommandIdentifier() {
     return COMMAND_IDENTIFIER;
+  }
+
+  @Override
+  public <T> T visit(CommandVisitor<T> visitor) {
+    return visitor.visit(this);
   }
 
   @Override

@@ -3,10 +3,12 @@ package kaap.veiko.debuggerforker.commands.sets.event;
 import java.util.List;
 
 import kaap.veiko.debuggerforker.commands.CommandBase;
+import kaap.veiko.debuggerforker.commands.CommandVisitor;
 import kaap.veiko.debuggerforker.commands.events.VirtualMachineEvent;
 import kaap.veiko.debuggerforker.commands.parser.CommandDataReader;
 import kaap.veiko.debuggerforker.commands.parser.CommandDataWriter;
 import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;
+import kaap.veiko.debuggerforker.packet.Packet;
 
 public class CompositeEventCommand extends CommandBase {
   public static final CommandIdentifier COMMAND_IDENTIFIER = CommandIdentifier.COMPOSITE_EVENT_COMMAND;
@@ -14,7 +16,8 @@ public class CompositeEventCommand extends CommandBase {
   private final byte suspendPolicy;
   private final List<VirtualMachineEvent> events;
 
-  public CompositeEventCommand(CommandDataReader reader) {
+  public CompositeEventCommand(CommandDataReader reader, Packet packet) {
+    super(packet);
     this.suspendPolicy = reader.readByte();
     this.events = reader.readList(VirtualMachineEvent.PARSER);
   }
@@ -39,10 +42,16 @@ public class CompositeEventCommand extends CommandBase {
   }
 
   @Override
+  public <T> T visit(CommandVisitor<T> visitor) {
+    return visitor.visit(this);
+  }
+
+  @Override
   public String toString() {
     return "CompositeEventCommand{" +
         "suspendPolicy=" + suspendPolicy +
         ", events=" + events +
         '}';
   }
+
 }

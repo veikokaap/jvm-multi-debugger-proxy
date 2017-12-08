@@ -1,6 +1,5 @@
 package kaap.veiko.debuggerforker.commands.sets;
 
-
 import static kaap.veiko.debuggerforker.commands.parser.CommandType.COMMAND;
 import static kaap.veiko.debuggerforker.commands.parser.CommandType.REPLY;
 

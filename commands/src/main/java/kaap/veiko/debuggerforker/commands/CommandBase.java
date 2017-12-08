@@ -10,6 +10,18 @@ import kaap.veiko.debuggerforker.packet.PacketImpl;
 import kaap.veiko.debuggerforker.types.VMInformation;
 
 public abstract class CommandBase implements Command {
+
+  private final Packet packet;
+
+  protected CommandBase(Packet packet) {
+    this.packet = packet;
+  }
+
+  @Override
+  public Packet getPacket() {
+    return packet;
+  }
+
   @Override
   public int getCommandSetId() {
     return getCommandIdentifier().getCommandSetId();

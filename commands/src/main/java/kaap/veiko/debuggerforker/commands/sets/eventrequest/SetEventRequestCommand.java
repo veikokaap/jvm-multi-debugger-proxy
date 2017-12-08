@@ -3,10 +3,12 @@ package kaap.veiko.debuggerforker.commands.sets.eventrequest;
 import java.util.List;
 
 import kaap.veiko.debuggerforker.commands.CommandBase;
+import kaap.veiko.debuggerforker.commands.CommandVisitor;
 import kaap.veiko.debuggerforker.commands.parser.CommandDataReader;
 import kaap.veiko.debuggerforker.commands.parser.CommandDataWriter;
 import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;
 import kaap.veiko.debuggerforker.commands.sets.eventrequest.filters.EventRequestFilter;
+import kaap.veiko.debuggerforker.packet.Packet;
 import kaap.veiko.debuggerforker.types.jdwp.EventKind;
 
 public class SetEventRequestCommand extends CommandBase {
@@ -18,7 +20,8 @@ public class SetEventRequestCommand extends CommandBase {
 
   private SetEventRequestReply eventRequestReply;
 
-  public SetEventRequestCommand(CommandDataReader reader) {
+  public SetEventRequestCommand(CommandDataReader reader, Packet packet) {
+    super(packet);
     this.eventKind = reader.readType(EventKind.class);
     this.suspendPolicy = reader.readByte();
     this.eventRequestFilters = reader.readList(EventRequestFilter.PARSER);
@@ -54,6 +57,11 @@ public class SetEventRequestCommand extends CommandBase {
 
   public void setEventRequestReply(SetEventRequestReply eventRequestReply) {
     this.eventRequestReply = eventRequestReply;
+  }
+
+  @Override
+  public <T> T visit(CommandVisitor<T> visitor) {
+    return visitor.visit(this);
   }
 
   @Override

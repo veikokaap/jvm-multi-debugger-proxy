@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +18,7 @@ import kaap.veiko.debuggerforker.commands.sets.eventrequest.SetEventRequestComma
 import kaap.veiko.debuggerforker.commands.sets.eventrequest.SetEventRequestReply;
 import kaap.veiko.debuggerforker.commands.sets.virtualmachine.DisposeCommand;
 import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IdSizesReplyCommand;
+import kaap.veiko.debuggerforker.packet.Packet;
 import kaap.veiko.debuggerforker.packet.PacketDataReader;
 import kaap.veiko.debuggerforker.types.DataType;
 import kaap.veiko.debuggerforker.types.VMInformation;
@@ -26,7 +27,7 @@ public class CommandDataReader extends PacketDataReader {
 
   private final static Logger log = LoggerFactory.getLogger(CommandDataReader.class);
 
-  private final Map<CommandIdentifier, Function<CommandDataReader, Command>> parseMap = new HashMap<>();
+  private final Map<CommandIdentifier, BiFunction<CommandDataReader, Packet, Command>> parseMap = new HashMap<>();
 
   public CommandDataReader(ByteBuffer packetByteBuffer, VMInformation vmInformation) {
     super(packetByteBuffer, vmInformation);
@@ -36,7 +37,7 @@ public class CommandDataReader extends PacketDataReader {
     parseMap.put(SetEventRequestCommand.COMMAND_IDENTIFIER, SetEventRequestCommand::new);
     parseMap.put(SetEventRequestReply.COMMAND_IDENTIFIER, SetEventRequestReply::new);
     parseMap.put(IdSizesReplyCommand.COMMAND_IDENTIFIER, IdSizesReplyCommand::new);
-    parseMap.put(DisposeCommand.COMMAND_IDENTIFIER, reader -> new DisposeCommand());
+    parseMap.put(DisposeCommand.COMMAND_IDENTIFIER, (reader, packet) -> new DisposeCommand(packet));
   }
 
   public <T extends DataType> List<T> readList(DataTypeArrayParser<T> parser) {
@@ -49,7 +50,7 @@ public class CommandDataReader extends PacketDataReader {
     }
   }
 
-  public Command readCommand(CommandIdentifier identifier) {
-    return parseMap.get(identifier).apply(this);
+  public Command readCommand(CommandIdentifier identifier, Packet packet) {
+    return parseMap.get(identifier).apply(this, packet);
   }
 }

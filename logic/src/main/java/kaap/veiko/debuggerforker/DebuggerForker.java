@@ -2,7 +2,6 @@ package kaap.veiko.debuggerforker;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,13 +9,12 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.SingleEmitter;
 import io.reactivex.schedulers.Schedulers;
-import kaap.veiko.debuggerforker.commands.CommandPacket;
-import kaap.veiko.debuggerforker.commands.CommandPacketStream;
+import kaap.veiko.debuggerforker.commands.Command;
+import kaap.veiko.debuggerforker.commands.CommandStream;
 import kaap.veiko.debuggerforker.connections.DebuggerManager;
 import kaap.veiko.debuggerforker.connections.VirtualMachineManager;
 import kaap.veiko.debuggerforker.connections.connectors.DebuggerConnector;
 import kaap.veiko.debuggerforker.connections.connectors.VMConnector;
-import kaap.veiko.debuggerforker.packet.Packet;
 import kaap.veiko.debuggerforker.types.VMInformation;
 
 public class DebuggerForker implements AutoCloseable {
@@ -38,7 +36,7 @@ public class DebuggerForker implements AutoCloseable {
       catch (IOException e) {
         subscriber.onError(e);
       }
-    }).repeat().toObservable().map(DebuggerManager::getPacketStream).map(ps -> new CommandPacketStream(ps, vmInformation)).subscribeOn(Schedulers.newThread()).subscribe(
+    }).repeat().toObservable().map(DebuggerManager::getPacketStream).map(ps -> new CommandStream(ps, vmInformation)).subscribeOn(Schedulers.newThread()).subscribe(
         proxyPacketStream::addPacketStream,
         error -> log.error("Error during debugger connection", error)
     );
@@ -52,30 +50,30 @@ public class DebuggerForker implements AutoCloseable {
   }
 
   private void start() throws IOException, InterruptedException {
-    CommandPacketStream vmPacketStream = new CommandPacketStream(vm.getPacketStream(), vmInformation);
+    CommandStream vmCommandStream = new CommandStream(vm.getPacketStream(), vmInformation);
 
-    Observable.<CommandPacket>create(subscriber -> {
+    Observable.<Command>create(subscriber -> {
       while (!subscriber.isDisposed()) {
-        CommandPacket packet = proxyPacketStream.read();
-        if (packet != null) {
-          log.info("Packet from debugger {}", packet);
-          subscriber.onNext(packet);
+        Command command = proxyPacketStream.read();
+        if (command != null) {
+          log.info("Packet from debugger {}", command);
+          subscriber.onNext(command);
         }
       }
       subscriber.onComplete();
     }).subscribeOn(Schedulers.newThread()).subscribe(
-        packet -> {
-          vmPacketStream.write(packet);
+        command -> {
+          vmCommandStream.write(command);
         },
         error -> {},
         () -> log.info("ProxyPacketStream has finished work")
     );
 
     while (!Thread.interrupted()) {
-      CommandPacket packet = vmPacketStream.read();
-      if (packet != null) {
-        log.info("Packet from VM {}", packet);
-        proxyPacketStream.write(packet);
+      Command command = vmCommandStream.read();
+      if (command != null) {
+        log.info("Packet from VM {}", command);
+        proxyPacketStream.write(command);
       }
     }
   }

@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import kaap.veiko.debuggerforker.commands.Command;
+import kaap.veiko.debuggerforker.commands.PacketCommand;
 import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;
 import kaap.veiko.debuggerforker.packet.Packet;
 import kaap.veiko.debuggerforker.types.VMInformation;
@@ -22,11 +23,11 @@ public class CommandParser {
     CommandDataReader commandDataReader = new CommandDataReader(ByteBuffer.wrap(packet.getDataBytes()), vmInformation);
     try {
       CommandIdentifier identifier = CommandIdentifier.of(packet.getCommandSetId(), packet.getCommandId(), packet.isReply());
-      return commandDataReader.readCommand(identifier);
+      return commandDataReader.readCommand(identifier, packet);
     }
     catch (Exception e) {
       log.error("Failed to find CommandIdentifier", e);
-      return null;
+      return new PacketCommand(packet, packet.getCommandSetId(), packet.getCommandId(), packet.isReply());
     }
   }
 }

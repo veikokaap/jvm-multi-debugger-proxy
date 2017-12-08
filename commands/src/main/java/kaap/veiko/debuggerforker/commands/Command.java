@@ -11,4 +11,8 @@ public interface Command {
   boolean isReply();
 
   Packet asPacket(int id, VMInformation vmInformation);
+
+  <T> T visit(CommandVisitor<T> visitor);
+
+  Packet getPacket();
 }
