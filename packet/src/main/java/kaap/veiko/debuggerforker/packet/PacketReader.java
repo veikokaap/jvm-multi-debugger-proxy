@@ -3,66 +3,76 @@ package kaap.veiko.debuggerforker.packet;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.util.concurrent.TimeoutException;
-import java.util.function.Function;
 
 class PacketReader {
 
   private final SocketChannel socketChannel;
 
+  private boolean readingLength = true;
+  private boolean readingData = false;
+  private boolean doneReading = false;
+  private int length;
+  private ByteBuffer lengthBuffer = ByteBuffer.allocate(4);
+  private ByteBuffer dataBuffer = null;
+
   PacketReader(SocketChannel socketChannel) {
     this.socketChannel = socketChannel;
   }
 
-  Packet read() throws IOException {
-    Integer length = readLength();
-
-    if (length == null) {
-      return null;
+  public Packet read() throws IOException {
+    if (readingLength) {
+      readLength();
+    }
+    if (readingData) {
+      readData();
     }
 
-    try {
-      byte[] packetBytes = readBytes(length - 4, 100, ByteBuffer::array);
-      return PacketParser.parse(length, packetBytes);
+    if (doneReading) {
+      doneReading = false;
+      readingLength = true;
+      dataBuffer.flip();
+      byte[] array;
+      if (dataBuffer.hasArray()) {
+        array = dataBuffer.array();
+      } else {
+        array = new byte[length];
+        dataBuffer.get(array);
+      }
+
+      return PacketParser.parse(length, array);
     }
-    catch (TimeoutException e) {
-      throw new IOException("Timeout while reading packet", e);
-    }
+    return null;
   }
 
-  private Integer readLength() throws IOException {
-    ByteBuffer buf = ByteBuffer.allocate(4);
-    while (buf.hasRemaining()) {
-      socketChannel.read(buf);
-      if (buf.remaining() == 4) {
-        return null;
+  private void readLength() throws IOException {
+    while (lengthBuffer.hasRemaining()) {
+      int read = socketChannel.read(lengthBuffer);
+      if (read == 0) {
+        break;
       }
     }
-    buf.flip();
 
-    return buf.getInt();
+    if (!lengthBuffer.hasRemaining()) {
+      lengthBuffer.flip();
+      length = lengthBuffer.getInt();
+      dataBuffer = ByteBuffer.allocate(length - 4);
+      lengthBuffer.clear();
+      readingLength = false;
+      readingData = true;
+    }
   }
 
-  private <T> T readBytes(int nrOfBytes, long timeoutInMilliseconds, Function<ByteBuffer, T> function) throws IOException, TimeoutException {
-    ByteBuffer buf = ByteBuffer.allocate(nrOfBytes);
-    long start = System.currentTimeMillis();
-    while (buf.hasRemaining()) {
-      socketChannel.read(buf);
-      if (timeoutExceeded(start, timeoutInMilliseconds)) {
-        if (buf.remaining() == nrOfBytes) {
-          throw new TimeoutException();
-        }
-        else {
-          throw new IOException("Timeout while reading packet");
-        }
+  private void readData() throws IOException {
+    while (dataBuffer.hasRemaining()) {
+      int read = socketChannel.read(dataBuffer);
+      if (read == 0) {
+        break;
       }
     }
-    buf.flip();
 
-    return function.apply(buf);
-  }
-
-  private boolean timeoutExceeded(long start, long timeoutInMilliseconds) {
-    return (System.currentTimeMillis() - start) >= timeoutInMilliseconds;
+    if (!dataBuffer.hasRemaining()) {
+      readingData = false;
+      doneReading = true;
+    }
   }
 }
