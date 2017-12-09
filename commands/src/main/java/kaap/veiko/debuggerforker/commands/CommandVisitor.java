@@ -25,4 +25,6 @@ public interface CommandVisitor<T> {
   T visit(IdSizesReplyCommand command);
 
   T visit(DisposeReply disposeReply);
+
+  T visit(PacketCommand packetCommand);
 }

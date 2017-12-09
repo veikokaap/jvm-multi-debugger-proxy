@@ -34,7 +34,7 @@ public class PacketCommand implements Command {
 
   @Override
   public <T> T visit(CommandVisitor<T> visitor) {
-    return null;
+    return visitor.visit(this);
   }
 
   @Override
@@ -47,5 +47,12 @@ public class PacketCommand implements Command {
     for (byte b : packet.getDataBytes()) {
       writer.writeByte(b);
     }
+  }
+
+  @Override
+  public String toString() {
+    return "PacketCommand{" +
+        "packet=" + packet +
+        '}';
   }
 }

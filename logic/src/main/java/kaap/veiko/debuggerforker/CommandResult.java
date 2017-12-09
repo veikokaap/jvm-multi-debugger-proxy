@@ -1,7 +1,6 @@
 package kaap.veiko.debuggerforker;
 
 import kaap.veiko.debuggerforker.commands.Command;
-import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IdSizesReplyCommand;
 
 public class CommandResult {
   public static final CommandResult NO_PACKETS_SENT = new CommandResult(false, null);
@@ -24,5 +23,13 @@ public class CommandResult {
 
   public Command getCommand() {
     return command;
+  }
+
+  @Override
+  public String toString() {
+    return "CommandResult{" +
+        "sendPacket=" + sendPacket +
+        ", command=" + command +
+        '}';
   }
 }

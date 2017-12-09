@@ -61,25 +61,30 @@ public class DebuggerForker implements AutoCloseable {
         Command command = proxyPacketStream.read();
         if (command != null) {
           log.info("Packet from debugger {}", command);
-          subscriber.onNext(command);
+          CommandResult result = command.visit(commandHandler);
+          log.info("Visited. {}", result);
+          if (result.sendPacket()) {
+            subscriber.onNext(result.getCommand());
+          }
         }
       }
       subscriber.onComplete();
     }).subscribeOn(Schedulers.newThread()).subscribe(
-        command -> {
-          command.visit(commandHandler);
-          vmCommandStream.write(command);
+        vmCommandStream::write,
+        error -> {
         },
-        error -> {},
         () -> log.info("ProxyPacketStream has finished work")
     );
 
     while (!Thread.interrupted()) {
       Command command = vmCommandStream.read();
       if (command != null) {
-        command.visit(commandHandler);
         log.info("Packet from VM {}", command);
-        proxyPacketStream.write(command);
+        CommandResult result = command.visit(commandHandler);
+        log.info("Visited. {}", result);
+        if (result.sendPacket()) {
+          proxyPacketStream.write(result.getCommand());
+        }
       }
     }
   }

@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import kaap.veiko.debuggerforker.commands.CommandStream;
 import kaap.veiko.debuggerforker.commands.CommandVisitor;
 import kaap.veiko.debuggerforker.commands.PacketBuilder;
+import kaap.veiko.debuggerforker.commands.PacketCommand;
 import kaap.veiko.debuggerforker.commands.sets.event.CompositeEventCommand;
 import kaap.veiko.debuggerforker.commands.sets.eventrequest.ClearAllBreakpointsCommand;
 import kaap.veiko.debuggerforker.commands.sets.eventrequest.ClearEventRequestCommand;
@@ -74,6 +75,13 @@ public class CommandHandler implements CommandVisitor<CommandResult> {
       stream.write(packetBuilder.build(disposeReply, id));
     } catch (IOException error) {
       log.error("Failed to build packet from command {}", disposeReply, error);
+    } finally {
+      try {
+        stream.close();
+      }
+      catch (IOException error) {
+        log.error("Exception when trying to close stream.", error);
+      }
     }
 
     return CommandResult.NO_PACKETS_SENT;
@@ -91,5 +99,10 @@ public class CommandHandler implements CommandVisitor<CommandResult> {
   @Override
   public CommandResult visit(DisposeReply command) {
     return CommandResult.NO_PACKETS_SENT;
+  }
+
+  @Override
+  public CommandResult visit(PacketCommand command) {
+    return CommandResult.forwardPacket(command);
   }
 }
