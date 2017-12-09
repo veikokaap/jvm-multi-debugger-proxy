@@ -27,6 +27,10 @@ public class ProxyPacketStream implements AutoCloseable {
   private final Deque<Command> packets = new ConcurrentLinkedDeque<>();
   private final PublishSubject<Command> writtenPackets = PublishSubject.create();
 
+  public int size() {
+    return packetStreamDisposables.size();
+  }
+
   public void addPacketStream(CommandStream stream) {
     observePackets(stream);
   }

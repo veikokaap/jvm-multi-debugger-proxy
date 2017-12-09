@@ -28,7 +28,7 @@ public class SetEventRequestCommand extends CommandBase {
   }
 
   @Override
-  protected void writeCommand(CommandDataWriter writer) {
+  public void writeCommand(CommandDataWriter writer) {
     writer.writeType(eventKind);
     writer.writeByte(suspendPolicy);
     writer.writeList(EventRequestFilter.PARSER, eventRequestFilters);

@@ -22,7 +22,7 @@ public class ClearEventRequestCommand extends CommandBase {
   }
 
   @Override
-  protected void writeCommand(CommandDataWriter writer) {
+  public void writeCommand(CommandDataWriter writer) {
     writer.writeType(eventKind);
     writer.writeInt(requestId);
   }

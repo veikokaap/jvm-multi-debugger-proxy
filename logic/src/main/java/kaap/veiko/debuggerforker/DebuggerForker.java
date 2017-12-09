@@ -22,11 +22,16 @@ public class DebuggerForker implements AutoCloseable {
   private final static Logger log = LoggerFactory.getLogger(DebuggerForker.class);
 
   private final VirtualMachineManager vm;
+  private final CommandStream vmCommandStream;
   private final VMInformation vmInformation = new VMInformation();
   private final ProxyPacketStream proxyPacketStream = new ProxyPacketStream();
 
+  private final CommandHandler commandHandler;
+
   private DebuggerForker(VirtualMachineManager vm, int debuggerPort) throws IOException {
     this.vm = vm;
+    this.vmCommandStream = new CommandStream(vm.getPacketStream(), vmInformation);
+    this.commandHandler = new CommandHandler(vmInformation, proxyPacketStream, vmCommandStream);
 
     DebuggerConnector debuggerConnector = new DebuggerConnector(debuggerPort);
     Single.create((SingleEmitter<DebuggerManager> subscriber) -> {
@@ -40,6 +45,7 @@ public class DebuggerForker implements AutoCloseable {
         proxyPacketStream::addPacketStream,
         error -> log.error("Error during debugger connection", error)
     );
+
   }
 
   public static void start(InetSocketAddress virtualMachineAddress, int debuggerPort) throws IOException, InterruptedException {
@@ -49,9 +55,7 @@ public class DebuggerForker implements AutoCloseable {
     debuggerForker.start();
   }
 
-  private void start() throws IOException, InterruptedException {
-    CommandStream vmCommandStream = new CommandStream(vm.getPacketStream(), vmInformation);
-
+  private void start() throws IOException {
     Observable.<Command>create(subscriber -> {
       while (!subscriber.isDisposed()) {
         Command command = proxyPacketStream.read();
@@ -63,6 +67,7 @@ public class DebuggerForker implements AutoCloseable {
       subscriber.onComplete();
     }).subscribeOn(Schedulers.newThread()).subscribe(
         command -> {
+          command.visit(commandHandler);
           vmCommandStream.write(command);
         },
         error -> {},
@@ -72,12 +77,12 @@ public class DebuggerForker implements AutoCloseable {
     while (!Thread.interrupted()) {
       Command command = vmCommandStream.read();
       if (command != null) {
+        command.visit(commandHandler);
         log.info("Packet from VM {}", command);
         proxyPacketStream.write(command);
       }
     }
   }
-
 
   @Override
   public void close() throws Exception {

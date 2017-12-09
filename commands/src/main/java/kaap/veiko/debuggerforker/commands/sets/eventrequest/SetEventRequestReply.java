@@ -19,7 +19,7 @@ public class SetEventRequestReply extends CommandBase {
   }
 
   @Override
-  protected void writeCommand(CommandDataWriter writer) {
+  public void writeCommand(CommandDataWriter writer) {
     writer.writeInt(requestId);
   }
 

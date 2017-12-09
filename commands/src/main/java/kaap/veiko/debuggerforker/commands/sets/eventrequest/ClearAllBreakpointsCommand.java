@@ -16,7 +16,7 @@ public class ClearAllBreakpointsCommand extends CommandBase {
   }
 
   @Override
-  protected void writeCommand(CommandDataWriter writer) {
+  public void writeCommand(CommandDataWriter writer) {
   }
 
   @Override

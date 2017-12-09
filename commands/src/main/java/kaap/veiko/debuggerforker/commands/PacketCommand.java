@@ -1,7 +1,7 @@
 package kaap.veiko.debuggerforker.commands;
 
+import kaap.veiko.debuggerforker.commands.parser.CommandDataWriter;
 import kaap.veiko.debuggerforker.packet.Packet;
-import kaap.veiko.debuggerforker.types.VMInformation;
 
 public class PacketCommand implements Command {
 
@@ -33,11 +33,6 @@ public class PacketCommand implements Command {
   }
 
   @Override
-  public Packet asPacket(int id, VMInformation vmInformation) {
-    return packet;
-  }
-
-  @Override
   public <T> T visit(CommandVisitor<T> visitor) {
     return null;
   }
@@ -45,5 +40,12 @@ public class PacketCommand implements Command {
   @Override
   public Packet getPacket() {
     return packet;
+  }
+
+  @Override
+  public void writeCommand(CommandDataWriter writer) {
+    for (byte b : packet.getDataBytes()) {
+      writer.writeByte(b);
+    }
   }
 }
