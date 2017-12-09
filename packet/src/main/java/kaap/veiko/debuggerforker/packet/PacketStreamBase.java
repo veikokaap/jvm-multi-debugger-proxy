@@ -18,7 +18,9 @@ public abstract class PacketStreamBase implements PacketStream {
 
   public Packet read() throws IOException {
     Packet packet = packetReader.read();
-    packet.setSource(this);
+    if (packet != null) {
+      packet.setSource(this);
+    }
     return packet;
   }
 
