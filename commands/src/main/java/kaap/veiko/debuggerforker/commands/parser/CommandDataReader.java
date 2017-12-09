@@ -17,6 +17,7 @@ import kaap.veiko.debuggerforker.commands.sets.eventrequest.ClearEventRequestCom
 import kaap.veiko.debuggerforker.commands.sets.eventrequest.SetEventRequestCommand;
 import kaap.veiko.debuggerforker.commands.sets.eventrequest.SetEventRequestReply;
 import kaap.veiko.debuggerforker.commands.sets.virtualmachine.DisposeCommand;
+import kaap.veiko.debuggerforker.commands.sets.virtualmachine.DisposeReply;
 import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IdSizesReplyCommand;
 import kaap.veiko.debuggerforker.packet.Packet;
 import kaap.veiko.debuggerforker.packet.PacketDataReader;
@@ -38,6 +39,7 @@ public class CommandDataReader extends PacketDataReader {
     parseMap.put(SetEventRequestReply.COMMAND_IDENTIFIER, SetEventRequestReply::new);
     parseMap.put(IdSizesReplyCommand.COMMAND_IDENTIFIER, IdSizesReplyCommand::new);
     parseMap.put(DisposeCommand.COMMAND_IDENTIFIER, (reader, packet) -> new DisposeCommand(packet));
+    parseMap.put(DisposeReply.COMMAND_IDENTIFIER, (reader, packet) -> new DisposeReply());
   }
 
   public <T extends DataType> List<T> readList(DataTypeArrayParser<T> parser) {
