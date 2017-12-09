@@ -8,7 +8,5 @@ public interface PacketStream extends Closeable {
 
   void write(Packet packet) throws IOException;
 
-  PacketSource getPacketSource();
-
   boolean isClosed();
 }

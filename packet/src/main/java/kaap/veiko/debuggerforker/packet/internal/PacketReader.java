@@ -1,12 +1,16 @@
-package kaap.veiko.debuggerforker.packet;
+package kaap.veiko.debuggerforker.packet.internal;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
+import kaap.veiko.debuggerforker.packet.Packet;
+import kaap.veiko.debuggerforker.packet.PacketStream;
+
 class PacketReader {
 
   private final SocketChannel socketChannel;
+  private final PacketStream stream;
 
   private boolean readingLength = true;
   private boolean readingData = false;
@@ -15,8 +19,9 @@ class PacketReader {
   private ByteBuffer lengthBuffer = ByteBuffer.allocate(4);
   private ByteBuffer dataBuffer = null;
 
-  PacketReader(SocketChannel socketChannel) {
+  PacketReader(SocketChannel socketChannel, PacketStream stream) {
     this.socketChannel = socketChannel;
+    this.stream = stream;
   }
 
   public Packet read() throws IOException {
@@ -39,7 +44,7 @@ class PacketReader {
         dataBuffer.get(array);
       }
 
-      return PacketParser.parse(length, array);
+      return PacketParser.parse(length, array, stream);
     }
     return null;
   }

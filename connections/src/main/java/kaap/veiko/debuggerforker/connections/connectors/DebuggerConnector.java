@@ -8,11 +8,11 @@ import java.nio.channels.SocketChannel;
 import java.util.Arrays;
 
 import kaap.veiko.debuggerforker.connections.DebuggerManager;
-import kaap.veiko.debuggerforker.packet.PacketIdTransformer;
+import kaap.veiko.debuggerforker.packet.internal.PacketTransformer;
 
 public class DebuggerConnector implements AutoCloseable {
   private final ServerSocketChannel serverChannel;
-  private final PacketIdTransformer packetIdTransformer = new PacketIdTransformer();
+  private final PacketTransformer packetTransformer = new PacketTransformer();
 
   public DebuggerConnector(int port) throws IOException {
     this.serverChannel = ServerSocketChannel.open();
@@ -22,7 +22,7 @@ public class DebuggerConnector implements AutoCloseable {
   public DebuggerManager getConnectionBlocking() throws IOException {
     SocketChannel socketChannel = serverChannel.accept();
     handshake(socketChannel);
-    return new DebuggerManager(socketChannel, packetIdTransformer);
+    return new DebuggerManager(socketChannel, packetTransformer);
   }
 
   private void handshake(SocketChannel socketChannel) throws IOException {

@@ -5,15 +5,15 @@ import java.nio.channels.SocketChannel;
 
 import kaap.veiko.debuggerforker.packet.DebuggerPacketStream;
 import kaap.veiko.debuggerforker.packet.Packet;
-import kaap.veiko.debuggerforker.packet.PacketIdTransformer;
+import kaap.veiko.debuggerforker.packet.internal.PacketTransformer;
 import kaap.veiko.debuggerforker.packet.PacketStream;
 
 public class DebuggerManager implements Connection {
 
   private final DebuggerPacketStream packetStream;
 
-  public DebuggerManager(SocketChannel socketChannel, PacketIdTransformer packetIdTransformer) throws IOException {
-    packetStream = new DebuggerPacketStream(socketChannel, packetIdTransformer);
+  public DebuggerManager(SocketChannel socketChannel, PacketTransformer packetTransformer) throws IOException {
+    packetStream = new DebuggerPacketStream(socketChannel, packetTransformer);
   }
 
   @Override
@@ -24,13 +24,5 @@ public class DebuggerManager implements Connection {
   @Override
   public void close() throws Exception {
     packetStream.close();
-  }
-
-  public boolean isMyReply(Packet packet) {
-    return packetStream.isMyReply(packet);
-  }
-
-  public void sendPacket(Packet packet) throws IOException {
-    packetStream.write(packet);
   }
 }

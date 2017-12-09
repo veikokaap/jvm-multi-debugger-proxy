@@ -5,14 +5,17 @@ import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.List;
 
+import kaap.veiko.debuggerforker.packet.internal.PacketTransformer;
+import kaap.veiko.debuggerforker.packet.internal.PacketStreamBase;
+
 public class DebuggerPacketStream extends PacketStreamBase {
 
   private final List<Integer> myNewIds = new ArrayList<>();
-  private final PacketIdTransformer packetIdTransformer;
+  private final PacketTransformer packetTransformer;
 
-  public DebuggerPacketStream(SocketChannel socketChannel, PacketIdTransformer packetIdTransformer) throws IOException {
+  public DebuggerPacketStream(SocketChannel socketChannel, PacketTransformer packetTransformer) throws IOException {
     super(socketChannel);
-    this.packetIdTransformer = packetIdTransformer;
+    this.packetTransformer = packetTransformer;
   }
 
   @Override
@@ -22,34 +25,12 @@ public class DebuggerPacketStream extends PacketStreamBase {
       return null;
     }
 
-    int originalId = packet.getId();
-    int newId = packetIdTransformer.getNewId(originalId);
-
-    myNewIds.add(newId);
-    packet.setId(newId);
-
-    return packet;
+    return packetTransformer.transformReadPacket(packet);
   }
 
   @Override
   public void write(Packet packet) throws IOException {
-    if (packet.isReply()) {
-      int originalId = packetIdTransformer.getOriginalId(packet.getId());
-      packet.setId(originalId);
-    }
-
-    super.write(packet);
-  }
-
-  public boolean isMyReply(Packet packet) {
-    if (!packet.isReply()) {
-      throw new UnsupportedOperationException("Passed command packet as a reply packet");
-    }
-    return myNewIds.contains(packet.getId());
-  }
-
-  @Override
-  public PacketSource getPacketSource() {
-    return PacketSource.DEBUGGER;
+    Packet transformed = packetTransformer.transformWritePacket(packet);
+    super.write(transformed);
   }
 }

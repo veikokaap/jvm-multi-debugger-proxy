@@ -17,9 +17,10 @@ public class CompositeEventCommand extends CommandBase {
   private final List<VirtualMachineEvent> events;
 
   public CompositeEventCommand(CommandDataReader reader, Packet packet) {
-    super(packet);
+    super();
     this.suspendPolicy = reader.readByte();
     this.events = reader.readList(VirtualMachineEvent.PARSER);
+    setPacket(packet);
   }
 
   @Override

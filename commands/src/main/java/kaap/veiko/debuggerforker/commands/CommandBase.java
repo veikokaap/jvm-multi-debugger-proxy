@@ -6,10 +6,9 @@ import kaap.veiko.debuggerforker.packet.Packet;
 
 public abstract class CommandBase implements Command {
 
-  private final Packet packet;
+  private Packet packet;
 
-  protected CommandBase(Packet packet) {
-    this.packet = packet;
+  protected CommandBase() {
   }
 
   @Override
@@ -30,6 +29,14 @@ public abstract class CommandBase implements Command {
   @Override
   public boolean isReply() {
     return getCommandIdentifier().getType() == CommandType.REPLY;
+  }
+
+  protected void setPacket(Packet packet) {
+    this.packet = packet;
+  }
+
+  protected void createSyntheticPacket(PacketBuilder packetBuilder) {
+    this.packet = packetBuilder.build(this);
   }
 
   protected abstract CommandIdentifier getCommandIdentifier();

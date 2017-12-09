@@ -14,8 +14,9 @@ public class IdSizesReplyCommand extends CommandBase {
   private final IdSizes idSizes;
 
   public IdSizesReplyCommand(DataReader reader, Packet packet) {
-    super(packet);
+    super();
     this.idSizes = reader.readType(IdSizes.class);
+    setPacket(packet);
   }
 
   @Override

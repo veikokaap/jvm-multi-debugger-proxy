@@ -10,7 +10,8 @@ public class DisposeCommand extends CommandBase {
   public static final CommandIdentifier COMMAND_IDENTIFIER = CommandIdentifier.DISPOSE_COMMAND;
 
   public DisposeCommand(Packet packet) {
-    super(packet);
+    super();
+    setPacket(packet);
   }
 
   @Override

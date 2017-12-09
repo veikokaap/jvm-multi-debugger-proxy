@@ -14,8 +14,9 @@ public class SetEventRequestReply extends CommandBase {
   private final int requestId;
 
   public SetEventRequestReply(DataReader reader, Packet packet) {
-    super(packet);
+    super();
     this.requestId = reader.readInt();
+    setPacket(packet);
   }
 
   @Override

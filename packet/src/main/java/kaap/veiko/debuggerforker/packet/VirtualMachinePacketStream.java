@@ -5,10 +5,13 @@ import java.nio.channels.SocketChannel;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import kaap.veiko.debuggerforker.packet.internal.PacketTransformer;
+import kaap.veiko.debuggerforker.packet.internal.PacketStreamBase;
+
 public class VirtualMachinePacketStream extends PacketStreamBase {
 
-  private final ConcurrentMap<Integer, Packet> writtenPackets = new ConcurrentHashMap<>();
-  private final PacketIdTransformer packetIdTransformer = new PacketIdTransformer();
+  private final ConcurrentMap<Integer, CommandPacket> writtenPackets = new ConcurrentHashMap<>();
+  private final PacketTransformer packetTransformer = new PacketTransformer();
 
   public VirtualMachinePacketStream(SocketChannel socketChannel) throws IOException {
     super(socketChannel);
@@ -22,10 +25,11 @@ public class VirtualMachinePacketStream extends PacketStreamBase {
     }
 
     if (readPacket.isReply()) {
-      Packet commandPacket = writtenPackets.get(readPacket.getId());
+      CommandPacket commandPacket = writtenPackets.get(readPacket.getId());
+      ReplyPacket replyPacket = (ReplyPacket) readPacket;
 
-      readPacket.setCommandSetId(commandPacket.getCommandSetId());
-      readPacket.setCommandId(commandPacket.getCommandId());
+      commandPacket.setReplyPacket(replyPacket);
+      replyPacket.setCommandPacket(commandPacket);
     }
 
     return readPacket;
@@ -33,13 +37,7 @@ public class VirtualMachinePacketStream extends PacketStreamBase {
 
   @Override
   public void write(Packet packet) throws IOException {
-    writtenPackets.put(packet.getId(), packet);
-
+    writtenPackets.put(packet.getId(), (CommandPacket) packet);
     super.write(packet);
-  }
-
-  @Override
-  public PacketSource getPacketSource() {
-    return PacketSource.VIRTUAL_MACHINE;
   }
 }

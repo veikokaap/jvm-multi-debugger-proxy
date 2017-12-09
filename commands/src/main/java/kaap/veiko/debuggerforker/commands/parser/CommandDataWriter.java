@@ -3,7 +3,7 @@ package kaap.veiko.debuggerforker.commands.parser;
 import java.nio.ByteBuffer;
 import java.util.List;
 
-import kaap.veiko.debuggerforker.packet.ByteBufferDataWriter;
+import kaap.veiko.debuggerforker.packet.internal.ByteBufferDataWriter;
 import kaap.veiko.debuggerforker.types.DataType;
 import kaap.veiko.debuggerforker.types.VMInformation;
 

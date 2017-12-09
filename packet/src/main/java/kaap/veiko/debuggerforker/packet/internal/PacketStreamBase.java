@@ -1,10 +1,13 @@
-package kaap.veiko.debuggerforker.packet;
+package kaap.veiko.debuggerforker.packet.internal;
 
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import kaap.veiko.debuggerforker.packet.Packet;
+import kaap.veiko.debuggerforker.packet.PacketStream;
 
 public abstract class PacketStreamBase implements PacketStream {
 
@@ -18,7 +21,7 @@ public abstract class PacketStreamBase implements PacketStream {
   public PacketStreamBase(SocketChannel socketChannel) throws IOException {
     socketChannel.configureBlocking(false);
     this.socketChannel = socketChannel;
-    this.packetReader = new PacketReader(socketChannel);
+    this.packetReader = new PacketReader(socketChannel, this);
     this.packetWriter = new PacketWriter(socketChannel);
   }
 
@@ -27,11 +30,7 @@ public abstract class PacketStreamBase implements PacketStream {
       throw new IOException("Stream is closed");
     }
 
-    Packet packet = packetReader.read();
-    if (packet != null) {
-      packet.setSource(this);
-    }
-    return packet;
+    return packetReader.read();
   }
 
   public void write(Packet packet) throws IOException {

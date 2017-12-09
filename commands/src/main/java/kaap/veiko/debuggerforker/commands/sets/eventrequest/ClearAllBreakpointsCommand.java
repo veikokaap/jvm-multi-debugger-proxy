@@ -12,7 +12,8 @@ public class ClearAllBreakpointsCommand extends CommandBase {
   public static final CommandIdentifier COMMAND_IDENTIFIER = CommandIdentifier.CLEAR_ALL_BREAKPOINTS_COMMAND;
 
   public ClearAllBreakpointsCommand(DataReader reader, Packet packet) {
-    super(packet);
+    super();
+    setPacket(packet);
   }
 
   @Override

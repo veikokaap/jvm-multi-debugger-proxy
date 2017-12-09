@@ -1,8 +1,12 @@
-package kaap.veiko.debuggerforker.packet;
+package kaap.veiko.debuggerforker.packet.internal;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+
+import kaap.veiko.debuggerforker.packet.CommandPacket;
+import kaap.veiko.debuggerforker.packet.Packet;
+import kaap.veiko.debuggerforker.packet.ReplyPacket;
 
 class PacketWriter {
 
@@ -24,11 +28,13 @@ class PacketWriter {
     byteBuffer.put((byte) packet.getFlags());
 
     if (packet.isReply()) {
-      byteBuffer.putShort(packet.getErrorCode());
+      ReplyPacket replyPacket = (ReplyPacket) packet;
+      byteBuffer.putShort(replyPacket.getErrorCode());
     }
     else {
-      byteBuffer.put((byte) packet.getCommandSetId());
-      byteBuffer.put((byte) packet.getCommandId());
+      CommandPacket commandPacket = (CommandPacket) packet;
+      byteBuffer.put((byte) commandPacket.getCommandSetId());
+      byteBuffer.put((byte) commandPacket.getCommandId());
     }
 
     if (packet.hasData()) {

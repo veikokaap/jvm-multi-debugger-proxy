@@ -21,10 +21,11 @@ public class SetEventRequestCommand extends CommandBase {
   private SetEventRequestReply eventRequestReply;
 
   public SetEventRequestCommand(CommandDataReader reader, Packet packet) {
-    super(packet);
+    super();
     this.eventKind = reader.readType(EventKind.class);
     this.suspendPolicy = reader.readByte();
     this.eventRequestFilters = reader.readList(EventRequestFilter.PARSER);
+    setPacket(packet);
   }
 
   @Override

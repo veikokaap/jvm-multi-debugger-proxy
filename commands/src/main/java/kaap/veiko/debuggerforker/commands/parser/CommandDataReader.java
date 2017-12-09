@@ -20,7 +20,7 @@ import kaap.veiko.debuggerforker.commands.sets.virtualmachine.DisposeCommand;
 import kaap.veiko.debuggerforker.commands.sets.virtualmachine.DisposeReply;
 import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IdSizesReplyCommand;
 import kaap.veiko.debuggerforker.packet.Packet;
-import kaap.veiko.debuggerforker.packet.PacketDataReader;
+import kaap.veiko.debuggerforker.packet.internal.PacketDataReader;
 import kaap.veiko.debuggerforker.types.DataType;
 import kaap.veiko.debuggerforker.types.VMInformation;
 
@@ -39,7 +39,7 @@ public class CommandDataReader extends PacketDataReader {
     parseMap.put(SetEventRequestReply.COMMAND_IDENTIFIER, SetEventRequestReply::new);
     parseMap.put(IdSizesReplyCommand.COMMAND_IDENTIFIER, IdSizesReplyCommand::new);
     parseMap.put(DisposeCommand.COMMAND_IDENTIFIER, (reader, packet) -> new DisposeCommand(packet));
-    parseMap.put(DisposeReply.COMMAND_IDENTIFIER, (reader, packet) -> new DisposeReply());
+    parseMap.put(DisposeReply.COMMAND_IDENTIFIER, (reader, packet) -> new DisposeReply(packet));
   }
 
   public <T extends DataType> List<T> readList(DataTypeArrayParser<T> parser) {

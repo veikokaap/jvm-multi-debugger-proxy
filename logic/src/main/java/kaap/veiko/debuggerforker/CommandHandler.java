@@ -69,11 +69,11 @@ public class CommandHandler implements CommandVisitor<CommandResult> {
   public CommandResult visit(DisposeCommand command) {
     PacketStream stream = command.getPacket().getSource();
 
-    DisposeReply disposeReply = new DisposeReply();
+    DisposeReply disposeReply = new DisposeReply(packetBuilder);
     int id = command.getCommandId();
 
     try {
-      stream.write(packetBuilder.build(disposeReply, id));
+      stream.write(disposeReply.getPacket());
     } catch (IOException error) {
       log.error("Failed to build packet from command {}", disposeReply, error);
     } finally {

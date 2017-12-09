@@ -1,4 +1,4 @@
-package kaap.veiko.debuggerforker.packet;
+package kaap.veiko.debuggerforker.packet.internal;
 
 import java.nio.ByteBuffer;
 

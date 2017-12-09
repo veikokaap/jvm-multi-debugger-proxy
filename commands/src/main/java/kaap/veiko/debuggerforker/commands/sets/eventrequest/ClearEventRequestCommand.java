@@ -16,9 +16,10 @@ public class ClearEventRequestCommand extends CommandBase {
   private final int requestId;
 
   public ClearEventRequestCommand(DataReader reader, Packet packet) {
-    super(packet);
+    super();
     this.eventKind = reader.readType(EventKind.class);
     this.requestId = reader.readInt();
+    setPacket(packet);
   }
 
   @Override
