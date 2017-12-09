@@ -34,4 +34,8 @@ public interface Packet {
   boolean isReply();
 
   boolean hasData();
+
+  PacketStream getSource();
+
+  void setSource(PacketStream source);
 }

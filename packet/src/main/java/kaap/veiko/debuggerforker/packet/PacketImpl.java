@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 public class PacketImpl implements Packet {
 
+  private PacketStream source;
   private int length = 0;
   private int id = 0;
   private short flags = 0;
@@ -93,6 +94,15 @@ public class PacketImpl implements Packet {
   @Override
   public boolean hasData() {
     return getLength() > HEADER_LENGTH;
+  }
+
+  public void setSource(PacketStream source) {
+    this.source = source;
+  }
+
+  @Override
+  public PacketStream getSource() {
+    return source;
   }
 
   @Override
