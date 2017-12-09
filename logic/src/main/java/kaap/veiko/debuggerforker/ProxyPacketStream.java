@@ -61,7 +61,7 @@ public class ProxyPacketStream implements AutoCloseable {
   private void observePackets(CommandStream stream) {
     Disposable readDisposable = Observable.<Command>create(subscriber -> {
       try {
-        while (!subscriber.isDisposed()) {
+        while (!subscriber.isDisposed() && !stream.isClosed()) {
           Command command = stream.read();
           if (command != null) {
             subscriber.onNext(command);
@@ -86,7 +86,9 @@ public class ProxyPacketStream implements AutoCloseable {
         () -> {
           log.info("Finished reading from {}", stream);
           try {
-            stream.close();
+            if (!stream.isClosed()) {
+              stream.close();
+            }
           }
           catch (Exception e) {
             log.error("Error when closing stream {}", stream, e);

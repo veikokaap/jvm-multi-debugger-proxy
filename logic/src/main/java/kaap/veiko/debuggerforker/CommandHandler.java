@@ -63,6 +63,7 @@ public class CommandHandler implements CommandVisitor<CommandResult> {
   /*
   When disconnecting, debugger sends a DisposeCommand. The VM must not receive this command, so block that command.
   Also send a reply command back to the debugger so it would think the connection has been successfully terminated.
+  After that close the connection to the debugger.
    */
   @Override
   public CommandResult visit(DisposeCommand command) {

@@ -35,4 +35,8 @@ public class CommandStream implements AutoCloseable {
   public void close() throws Exception {
     packetStream.close();
   }
+
+  public boolean isClosed() {
+    return packetStream.isClosed();
+  }
 }

@@ -76,7 +76,7 @@ public class DebuggerForker implements AutoCloseable {
         () -> log.info("ProxyPacketStream has finished work")
     );
 
-    while (!Thread.interrupted()) {
+    while (!Thread.interrupted() && !vmCommandStream.isClosed()) {
       Command command = vmCommandStream.read();
       if (command != null) {
         log.info("Packet from VM {}", command);
