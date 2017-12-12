@@ -18,7 +18,7 @@ public class ReplyPacketImpl extends PacketBase implements ReplyPacket {
 
   @Override
   public short getErrorCode() {
-    return 0;
+    return errorCode;
   }
 
   @Override

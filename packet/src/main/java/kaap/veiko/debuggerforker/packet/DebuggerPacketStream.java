@@ -2,15 +2,12 @@ package kaap.veiko.debuggerforker.packet;
 
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
-import java.util.ArrayList;
-import java.util.List;
 
 import kaap.veiko.debuggerforker.packet.internal.PacketTransformer;
 import kaap.veiko.debuggerforker.packet.internal.PacketStreamBase;
 
 public class DebuggerPacketStream extends PacketStreamBase {
 
-  private final List<Integer> myNewIds = new ArrayList<>();
   private final PacketTransformer packetTransformer;
 
   public DebuggerPacketStream(SocketChannel socketChannel, PacketTransformer packetTransformer) throws IOException {
