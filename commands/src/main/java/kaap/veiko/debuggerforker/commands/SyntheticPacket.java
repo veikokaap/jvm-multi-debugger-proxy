@@ -2,6 +2,7 @@ package kaap.veiko.debuggerforker.commands;
 
 import kaap.veiko.debuggerforker.packet.CommandPacket;
 import kaap.veiko.debuggerforker.packet.PacketStream;
+import kaap.veiko.debuggerforker.packet.PacketVisitor;
 import kaap.veiko.debuggerforker.packet.ReplyPacket;
 
 class SyntheticPacket implements CommandPacket, ReplyPacket {
@@ -84,6 +85,15 @@ class SyntheticPacket implements CommandPacket, ReplyPacket {
 
   @Override
   public void setReplyPacket(ReplyPacket replyPacket) {
+  }
+
+  @Override
+  public <T> T visit(PacketVisitor<T> visitor) {
+    if (isReply()) {
+      return visitor.visit((ReplyPacket) this);
+    } else {
+      return visitor.visit((CommandPacket) this);
+    }
   }
 
   @Override

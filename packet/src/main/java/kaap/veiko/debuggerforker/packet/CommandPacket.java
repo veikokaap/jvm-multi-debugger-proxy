@@ -8,4 +8,8 @@ public interface CommandPacket extends Packet {
   ReplyPacket getReplyPacket();
 
   void setReplyPacket(ReplyPacket replyPacket);
+
+  default <T> T visit(PacketVisitor<T> visitor) {
+    return visitor.visit(this);
+  }
 }

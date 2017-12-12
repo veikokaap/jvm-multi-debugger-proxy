@@ -20,4 +20,6 @@ public interface Packet {
   PacketStream getSource();
 
   boolean isSynthetic();
+
+  <T> T visit(PacketVisitor<T> visitor);
 }

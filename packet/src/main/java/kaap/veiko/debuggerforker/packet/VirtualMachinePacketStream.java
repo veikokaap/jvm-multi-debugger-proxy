@@ -12,6 +12,7 @@ public class VirtualMachinePacketStream extends PacketStreamBase {
 
   private final ConcurrentMap<Integer, CommandPacket> writtenPackets = new ConcurrentHashMap<>();
   private final PacketTransformer packetTransformer = new PacketTransformer();
+  private final ReplyPacketVisitor replyPacketVisitor = new ReplyPacketVisitor();
 
   public VirtualMachinePacketStream(SocketChannel socketChannel) throws IOException {
     super(socketChannel);
@@ -19,25 +20,33 @@ public class VirtualMachinePacketStream extends PacketStreamBase {
 
   @Override
   public Packet read() throws IOException {
-    Packet readPacket = super.read();
-    if (readPacket == null) {
+    Packet packet = super.read();
+    if (packet == null) {
       return null;
     }
 
-    if (readPacket.isReply()) {
-      CommandPacket commandPacket = writtenPackets.get(readPacket.getId());
-      ReplyPacket replyPacket = (ReplyPacket) readPacket;
-
-      commandPacket.setReplyPacket(replyPacket);
-      replyPacket.setCommandPacket(commandPacket);
-    }
-
-    return readPacket;
+    return packet.visit(replyPacketVisitor);
   }
 
   @Override
   public void write(Packet packet) throws IOException {
     writtenPackets.put(packet.getId(), (CommandPacket) packet);
     super.write(packet);
+  }
+
+  private class ReplyPacketVisitor implements PacketVisitor<Packet> {
+    @Override
+    public Packet visit(ReplyPacket replyPacket) {
+      CommandPacket commandPacket = writtenPackets.get(replyPacket.getId());
+      commandPacket.setReplyPacket(replyPacket);
+      replyPacket.setCommandPacket(commandPacket);
+
+      return replyPacket;
+    }
+
+    @Override
+    public Packet visit(CommandPacket packet) {
+      return packet;
+    }
   }
 }

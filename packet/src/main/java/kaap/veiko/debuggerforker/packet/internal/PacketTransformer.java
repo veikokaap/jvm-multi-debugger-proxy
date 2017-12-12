@@ -6,55 +6,22 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import kaap.veiko.debuggerforker.packet.CommandPacket;
 import kaap.veiko.debuggerforker.packet.Packet;
+import kaap.veiko.debuggerforker.packet.PacketVisitor;
 import kaap.veiko.debuggerforker.packet.ReplyPacket;
 
 public class PacketTransformer {
   private final ConcurrentMap<Integer, Integer> idMap = new ConcurrentHashMap<>();
   private final AtomicInteger idCounter = new AtomicInteger(0);
 
-  public Packet transformReadPacket(Packet packet) {
-    int originalId = packet.getId();
-    int newId = getNewId(originalId);
+  private final ReadPacketVisitor readPacketVisitor = new ReadPacketVisitor();
+  private final WritePacketVisitor writePacketVisitor = new WritePacketVisitor();
 
-    if (packet.isReply()) {
-      ReplyPacket replyPacket = (ReplyPacket) packet;
-      return new ReplyPacketImpl(
-          replyPacket.getLength(),
-          newId,
-          replyPacket.getFlags(),
-          replyPacket.getErrorCode(),
-          replyPacket.getDataBytes(),
-          replyPacket.getSource()
-      );
-    } else {
-      CommandPacket commandPacket = (CommandPacket) packet;
-      return new CommandPacketImpl(
-          commandPacket.getLength(),
-          newId,
-          commandPacket.getFlags(),
-          commandPacket.getCommandSetId(),
-          commandPacket.getCommandId(),
-          commandPacket.getDataBytes(),
-          commandPacket.getSource()
-      );
-    }
+  public Packet transformReadPacket(Packet packet) {
+    return packet.visit(readPacketVisitor);
   }
 
   public Packet transformWritePacket(Packet packet) {
-    if (packet.isReply()) {
-      ReplyPacket replyPacket = (ReplyPacket) packet;
-      int originalId = getOriginalId(packet.getId());
-      return new ReplyPacketImpl(
-          replyPacket.getLength(),
-          originalId,
-          replyPacket.getFlags(),
-          replyPacket.getErrorCode(),
-          replyPacket.getDataBytes(),
-          replyPacket.getSource()
-      );
-    }
-
-    return packet;
+    return packet.visit(writePacketVisitor);
   }
 
   private int getNewId(int originalId) {
@@ -65,5 +32,54 @@ public class PacketTransformer {
 
   private int getOriginalId(int newId) {
     return idMap.get(newId);
+  }
+
+  private class ReadPacketVisitor implements PacketVisitor<Packet> {
+    @Override
+    public Packet visit(ReplyPacket packet) {
+      int newId = getNewId(packet.getId());
+      return new ReplyPacketImpl(
+          packet.getLength(),
+          newId,
+          packet.getFlags(),
+          packet.getErrorCode(),
+          packet.getDataBytes(),
+          packet.getSource()
+      );
+    }
+
+    @Override
+    public Packet visit(CommandPacket packet) {
+      int newId = getNewId(packet.getId());
+      return new CommandPacketImpl(
+          packet.getLength(),
+          newId,
+          packet.getFlags(),
+          packet.getCommandSetId(),
+          packet.getCommandId(),
+          packet.getDataBytes(),
+          packet.getSource()
+      );
+    }
+  }
+
+  private class WritePacketVisitor implements PacketVisitor<Packet> {
+    @Override
+    public Packet visit(ReplyPacket packet) {
+      int originalId = getOriginalId(packet.getId());
+      return new ReplyPacketImpl(
+          packet.getLength(),
+          originalId,
+          packet.getFlags(),
+          packet.getErrorCode(),
+          packet.getDataBytes(),
+          packet.getSource()
+      );
+    }
+
+    @Override
+    public Packet visit(CommandPacket packet) {
+      return packet;
+    }
   }
 }
