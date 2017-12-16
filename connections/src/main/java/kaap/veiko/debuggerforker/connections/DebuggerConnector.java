@@ -16,7 +16,7 @@ public class DebuggerConnector implements AutoCloseable {
 
   public DebuggerConnector(int port) throws IOException {
     this.serverChannel = ServerSocketChannel.open();
-    serverChannel.socket().bind(new InetSocketAddress("127.0.0.1", port));
+    serverChannel.bind(new InetSocketAddress("127.0.0.1", port));
   }
 
   public DebuggerPacketStream getConnectionBlocking() throws IOException {
