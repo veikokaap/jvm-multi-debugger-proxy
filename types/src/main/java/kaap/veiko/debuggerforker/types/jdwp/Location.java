@@ -10,10 +10,14 @@ public class Location implements DataType {
   private final MethodId methodId;
   private final long index;
 
-  public Location(DataReader reader) {
+  public static Location read(DataReader reader) {
+    return new Location(reader);
+  }
+
+  Location(DataReader reader) {
     typeTag = reader.readByte();
-    classId = reader.readType(ClassId.class);
-    methodId = reader.readType(MethodId.class);
+    classId = ClassId.read(reader);
+    methodId = MethodId.read(reader);
     index = reader.readLong();
   }
 

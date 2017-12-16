@@ -33,7 +33,7 @@ public abstract class VirtualMachineEvent implements DataType {
       List<VirtualMachineEvent> events = new ArrayList<>();
 
       for (int i = 0; i < length; i++) {
-        Optional<VirtualMachineEvent> event = Optional.of(reader.readType(EventKind.class))
+        Optional<VirtualMachineEvent> event = Optional.of(EventKind.read(reader))
             .map(parseMap::get)
             .map(f -> f.apply(reader));
 

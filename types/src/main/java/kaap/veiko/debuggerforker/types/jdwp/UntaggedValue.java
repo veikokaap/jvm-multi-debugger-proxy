@@ -3,7 +3,11 @@ package kaap.veiko.debuggerforker.types.jdwp;
 import kaap.veiko.debuggerforker.types.DataReader;
 
 public class UntaggedValue extends Value {
-  public UntaggedValue(DataReader reader, byte typeTag) {
+  public static UntaggedValue read(DataReader reader, byte typeTag) {
+    return new UntaggedValue(reader, typeTag);
+  }
+
+  UntaggedValue(DataReader reader, byte typeTag) {
     super(reader, typeTag);
   }
 }

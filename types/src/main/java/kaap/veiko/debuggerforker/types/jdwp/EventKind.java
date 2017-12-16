@@ -2,6 +2,7 @@ package kaap.veiko.debuggerforker.types.jdwp;
 
 import java.util.Arrays;
 
+import kaap.veiko.debuggerforker.types.DataReader;
 import kaap.veiko.debuggerforker.types.DataType;
 import kaap.veiko.debuggerforker.types.DataWriter;
 
@@ -36,7 +37,11 @@ public enum EventKind implements DataType {
     this.id = (byte) id;
   }
 
-  public static EventKind findByValue(byte value) {
+  public static EventKind read(DataReader reader) {
+    return findByValue(reader.readByte());
+  }
+
+  private static EventKind findByValue(byte value) {
     return Arrays.stream(EventKind.values())
         .filter(eventKind -> eventKind.id == value)
         .findFirst().get();

@@ -3,7 +3,6 @@ package kaap.veiko.debuggerforker.packet.internal;
 import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SocketChannel;
-import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +55,7 @@ public abstract class PacketStreamBase implements PacketStream {
   }
 
   @Override
-  public void close() throws IOException {
+  public void close() {
     try {
       socketChannel.close();
     }

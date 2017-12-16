@@ -1,6 +1,5 @@
 package kaap.veiko.debuggerforker.types.jdwp;
 
-import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,30 +11,16 @@ abstract class DataTypeBase implements DataType {
 
   private final static Logger log = LoggerFactory.getLogger(DataTypeBase.class);
   private final long value;
-  private final int size;
+  private final IdSizes.SizeType sizeType;
 
-  DataTypeBase(long value, int size) {
-    this.value = value;
-    this.size = size;
-  }
-
-  DataTypeBase(DataReader reader, Function<IdSizes, Integer> sizeFunction) {
-    IdSizes idSizes = reader.getIdSizes();
-
-    if (idSizes != null) {
-      size = sizeFunction.apply(idSizes);
-    }
-    else {
-      size = 8;
-      log.warn("Parsing value without knowing its size in bytes. Assuming size is 8 bytes.");
-    }
-
-    value = reader.readLongOfSize(size);
+  DataTypeBase(DataReader reader, IdSizes.SizeType sizeType) {
+    this.sizeType = sizeType;
+    this.value = reader.readLongOfSize(sizeType);
   }
 
   @Override
   public void write(DataWriter writer) {
-    writer.writeLongOfSize(value, size);
+    writer.writeLongOfSize(value, sizeType);
   }
 
   @Override

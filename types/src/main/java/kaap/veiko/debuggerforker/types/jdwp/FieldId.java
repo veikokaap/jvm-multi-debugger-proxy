@@ -3,7 +3,11 @@ package kaap.veiko.debuggerforker.types.jdwp;
 import kaap.veiko.debuggerforker.types.DataReader;
 
 public class FieldId extends DataTypeBase {
-  public FieldId(DataReader reader) {
-    super(reader, IdSizes::getFieldIdSize);
+  public static FieldId read(DataReader reader) {
+    return new FieldId(reader);
+  }
+
+  FieldId(DataReader reader) {
+    super(reader, IdSizes.SizeType.FIELD_ID_SIZE);
   }
 }

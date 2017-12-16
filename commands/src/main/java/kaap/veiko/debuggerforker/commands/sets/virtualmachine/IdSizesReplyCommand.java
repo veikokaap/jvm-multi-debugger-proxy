@@ -15,7 +15,7 @@ public class IdSizesReplyCommand extends CommandBase {
 
   public IdSizesReplyCommand(DataReader reader, Packet packet) {
     super();
-    this.idSizes = reader.readType(IdSizes.class);
+    this.idSizes = IdSizes.read(reader);
     setPacket(packet);
   }
 

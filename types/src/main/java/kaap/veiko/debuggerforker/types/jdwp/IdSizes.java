@@ -11,7 +11,11 @@ public class IdSizes implements DataType {
   private final int referenceTypeIdSize;
   private final int frameIdSize;
 
-  public IdSizes(DataReader reader) {
+  public static IdSizes read(DataReader reader) {
+    return new IdSizes(reader);
+  }
+
+  IdSizes(DataReader reader) {
     this.fieldIdSize = reader.readInt();
     this.methodIdSize = reader.readInt();
     this.objectIdSize = reader.readInt();
@@ -26,6 +30,22 @@ public class IdSizes implements DataType {
     writer.writeInt(this.getObjectIdSize());
     writer.writeInt(this.getReferenceTypeIdSize());
     writer.writeInt(this.getFrameIdSize());
+  }
+
+  public int getSizeOfType(SizeType sizeType) {
+    switch (sizeType) {
+      case FIELD_ID_SIZE:
+        return getFieldIdSize();
+      case METHOD_ID_SIZE:
+        return getMethodIdSize();
+      case OBJECT_ID_SIZE:
+        return getObjectIdSize();
+      case REFERENCE_TYPE_ID_SIZE:
+        return getReferenceTypeIdSize();
+      case FRAME_ID_SIZE:
+      default:
+        return getFrameIdSize();
+    }
   }
 
   public int getFieldIdSize() {
@@ -57,5 +77,13 @@ public class IdSizes implements DataType {
         ", referenceTypeIdSize=" + referenceTypeIdSize +
         ", frameIdSize=" + frameIdSize +
         '}';
+  }
+
+  public enum SizeType {
+    FIELD_ID_SIZE,
+    METHOD_ID_SIZE,
+    OBJECT_ID_SIZE,
+    REFERENCE_TYPE_ID_SIZE,
+    FRAME_ID_SIZE
   }
 }

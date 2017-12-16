@@ -1,34 +1,38 @@
 package kaap.veiko.debuggerforker.types.jdwp;
 
 import java.util.Arrays;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
-import kaap.veiko.debuggerforker.types.DataType;
+import kaap.veiko.debuggerforker.types.DataReader;
 import kaap.veiko.debuggerforker.types.DataWriter;
 
-public enum Type implements DataType {
-  ARRAY(91, null),
-  BYTE(66, 1),
-  CHAR(67, 2),
-  OBJECT(76, null),
-  FLOAT(70, 4),
-  DOUBLE(68, 8),
-  INT(73, 4),
-  LONG(74, 8),
-  SHORT(83, 2),
-  VOID(86, 0),
-  BOOLEAN(90, 1),
-  STRING(115, null),
-  THREAD(116, null),
-  THREAD_GROUP(103, null),
-  CLASS_LOADER(108, null),
-  CLASS_OBJECT(99, null);
+public enum Type {
+  ARRAY(91, (reader) -> reader.readLongOfSize(IdSizes.SizeType.OBJECT_ID_SIZE), (writer,o) -> writer.writeLong((Long)o)),
+  BYTE(66, DataReader::readByte, (writer, o) -> writer.writeByte((Byte)o)),
+  CHAR(67, DataReader::readShort, (writer, o) -> writer.writeShort((Short)o)),
+  OBJECT(76, (reader) -> reader.readLongOfSize(IdSizes.SizeType.OBJECT_ID_SIZE), (writer,o) -> writer.writeLong((Long)o)),
+  FLOAT(70, DataReader::readInt, (writer, o) -> writer.writeInt((Integer) o)),
+  DOUBLE(68, DataReader::readLong, (writer, o) -> writer.writeLong((Long) o)),
+  INT(73, DataReader::readInt, (writer, o) -> writer.writeInt((Integer) o)),
+  LONG(74, DataReader::readLong, (writer, o) -> writer.writeLong((Long) o)),
+  SHORT(83, DataReader::readShort, (writer, o) -> writer.writeShort((Short)o)),
+  VOID(86, reader -> null, (writer, o) -> {}),
+  BOOLEAN(90, DataReader::readBoolean, (writer, o) -> writer.writeBoolean((Boolean) o)),
+  STRING(115, (reader) -> reader.readLongOfSize(IdSizes.SizeType.OBJECT_ID_SIZE), (writer,o) -> writer.writeLong((Long)o)),
+  THREAD(116, (reader) -> reader.readLongOfSize(IdSizes.SizeType.OBJECT_ID_SIZE), (writer,o) -> writer.writeLong((Long)o)),
+  THREAD_GROUP(103, (reader) -> reader.readLongOfSize(IdSizes.SizeType.OBJECT_ID_SIZE), (writer,o) -> writer.writeLong((Long)o)),
+  CLASS_LOADER(108, (reader) -> reader.readLongOfSize(IdSizes.SizeType.OBJECT_ID_SIZE), (writer,o) -> writer.writeLong((Long)o)),
+  CLASS_OBJECT(99, (reader) -> reader.readLongOfSize(IdSizes.SizeType.OBJECT_ID_SIZE), (writer,o) -> writer.writeLong((Long)o));
 
   private final byte id;
-  private final Integer size;
+  private final Function<DataReader, Object> readFunction;
+  private final BiConsumer<DataWriter, Object> writeFunction;
 
-  Type(int value, Integer size) {
+  Type(int value, Function<DataReader, Object> readFunction, BiConsumer<DataWriter, Object> writeConsumer) {
     this.id = (byte) value;
-    this.size = size;
+    this.readFunction = readFunction;
+    this.writeFunction = writeConsumer;
   }
 
   public static Type findByValue(byte value) {
@@ -37,16 +41,21 @@ public enum Type implements DataType {
         .findFirst().get();
   }
 
-  @Override
-  public void write(DataWriter writer) {
-    writer.writeByte(id);
+  public Object read(DataReader reader) {
+    return readFunction.apply(reader);
+  }
+
+  public void write(DataWriter writer, Object value) {
+    writeFunction.accept(writer, value);
   }
 
   public byte getId() {
     return id;
   }
 
-  public Integer getSize() {
-    return size;
+  private static class NO_WRITE_CONSUMER implements BiConsumer<DataWriter, Object> {
+    @Override
+    public void accept(DataWriter dataWriter, Object o) {
+    }
   }
 }

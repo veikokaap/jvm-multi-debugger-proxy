@@ -10,7 +10,7 @@ public class EventRequestLocationFilter extends EventRequestFilter {
   private final Location location;
 
   public EventRequestLocationFilter(DataReader dataReader) {
-    this.location = dataReader.readType(Location.class);
+    this.location = Location.read(dataReader);
   }
 
   @Override

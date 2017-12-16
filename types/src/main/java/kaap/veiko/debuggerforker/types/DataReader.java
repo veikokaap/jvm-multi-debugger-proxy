@@ -11,14 +11,9 @@ public interface DataReader {
 
   long readLong();
 
-  long readLongOfSize(int size);
+  long readLongOfSize(IdSizes.SizeType sizeType);
 
   boolean readBoolean();
 
   String readString();
-
-  IdSizes getIdSizes();
-
-  @SuppressWarnings("unchecked")
-  <T extends DataType> T readType(Class<T> clazz);
 }

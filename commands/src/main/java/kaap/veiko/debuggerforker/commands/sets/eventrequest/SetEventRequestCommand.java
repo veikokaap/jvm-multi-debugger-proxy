@@ -22,7 +22,7 @@ public class SetEventRequestCommand extends CommandBase {
 
   public SetEventRequestCommand(CommandDataReader reader, Packet packet) {
     super();
-    this.eventKind = reader.readType(EventKind.class);
+    this.eventKind = EventKind.read(reader);
     this.suspendPolicy = reader.readByte();
     this.eventRequestFilters = reader.readList(EventRequestFilter.PARSER);
     setPacket(packet);

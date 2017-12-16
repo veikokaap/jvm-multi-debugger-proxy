@@ -18,9 +18,9 @@ public class ClassPrepareEvent extends VirtualMachineEvent {
 
   public ClassPrepareEvent(DataReader reader) {
     this.requestId = reader.readInt();
-    this.thread = reader.readType(ThreadId.class);
+    this.thread = ThreadId.read(reader);
     this.refTypeTag = reader.readByte();
-    this.typeId = reader.readType(ReferenceTypeId.class);
+    this.typeId = ReferenceTypeId.read(reader);
     this.signature = reader.readString();
     this.status = reader.readInt();
   }

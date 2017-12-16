@@ -9,9 +9,13 @@ public class TaggedObjectId implements DataType {
   private final byte tag;
   private final ObjectId objectId;
 
-  public TaggedObjectId(DataReader reader) {
+  public static TaggedObjectId read(DataReader reader) {
+    return new TaggedObjectId(reader);
+  }
+
+  TaggedObjectId(DataReader reader) {
     tag = reader.readByte();
-    objectId = reader.readType(ObjectId.class);
+    objectId = new ObjectId(reader);
   }
 
   public byte getTag() {

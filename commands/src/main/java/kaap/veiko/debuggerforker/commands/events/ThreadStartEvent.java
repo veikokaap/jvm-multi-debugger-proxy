@@ -13,7 +13,7 @@ public class ThreadStartEvent extends VirtualMachineEvent {
 
   public ThreadStartEvent(DataReader reader) {
     this.requestId = reader.readInt();
-    this.thread = reader.readType(ThreadId.class);
+    this.thread = ThreadId.read(reader);
   }
 
   @Override

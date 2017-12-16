@@ -1,5 +1,7 @@
 package kaap.veiko.debuggerforker.types;
 
+import kaap.veiko.debuggerforker.types.jdwp.IdSizes;
+
 public interface DataWriter {
   void writeBoolean(boolean bool);
 
@@ -11,7 +13,7 @@ public interface DataWriter {
 
   void writeLong(long l);
 
-  void writeLongOfSize(long l, int size);
+  void writeLongOfSize(long l, IdSizes.SizeType sizeType);
 
   void writeString(String string);
 

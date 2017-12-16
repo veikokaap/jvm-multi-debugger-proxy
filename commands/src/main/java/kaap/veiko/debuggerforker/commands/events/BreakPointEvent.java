@@ -15,8 +15,8 @@ public class BreakPointEvent extends VirtualMachineEvent {
 
   public BreakPointEvent(DataReader reader) {
     this.requestId = reader.readInt();
-    this.threadId = reader.readType(ThreadId.class);
-    this.location = reader.readType(Location.class);
+    this.threadId = ThreadId.read(reader);
+    this.location = Location.read(reader);
   }
 
   @Override

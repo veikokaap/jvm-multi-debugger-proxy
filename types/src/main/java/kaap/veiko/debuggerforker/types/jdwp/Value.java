@@ -6,40 +6,33 @@ import kaap.veiko.debuggerforker.types.DataWriter;
 
 public class Value implements DataType {
   private final Type type;
-  private final Long value;
+  private final Object value;
 
-  public Value(DataReader reader) {
+  public static Value read(DataReader reader) {
+    return new Value(reader);
+  }
+
+  private Value(DataReader reader) {
     this(reader, reader.readByte());
   }
 
   protected Value(DataReader reader, byte typeTag) {
     this.type = Type.findByValue(typeTag);
-    Integer size = type.getSize();
-    IdSizes idSizes = reader.getIdSizes();
-
-    if (size == null) {
-      value = reader.readLongOfSize(idSizes.getObjectIdSize());
-    }
-    else if (size == 0) {
-      value = null;
-    }
-    else {
-      value = reader.readLongOfSize(size);
-    }
+    value = type.read(reader);
   }
 
   public Type getType() {
     return type;
   }
 
-  public Long getValue() {
+  public Object getValue() {
     return value;
   }
 
   @Override
   public void write(DataWriter writer) {
     writer.writeByte(type.getId());
-    writer.writeLong(value);
+    type.write(writer, value);
   }
 
   @Override
