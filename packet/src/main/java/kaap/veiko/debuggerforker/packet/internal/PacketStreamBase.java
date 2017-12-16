@@ -1,6 +1,7 @@
 package kaap.veiko.debuggerforker.packet.internal;
 
 import java.io.IOException;
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
@@ -16,7 +17,6 @@ public abstract class PacketStreamBase implements PacketStream {
   private final SocketChannel socketChannel;
   private final PacketReader packetReader;
   private final PacketWriter packetWriter;
-  private final AtomicBoolean closed = new AtomicBoolean(false);
 
   public PacketStreamBase(SocketChannel socketChannel) throws IOException {
     socketChannel.configureBlocking(false);
@@ -26,33 +26,47 @@ public abstract class PacketStreamBase implements PacketStream {
   }
 
   public Packet read() throws IOException {
-    if (closed.get()) {
+    if (isClosed()) {
       throw new IOException("Stream is closed");
     }
 
-    return packetReader.read();
+    try {
+      return packetReader.read();
+    }
+    catch (ClosedChannelException e) {
+      log.error("Received IOException while writing to channel", e);
+      close();
+      throw e;
+    }
   }
 
   public void write(Packet packet) throws IOException {
-    if (closed.get()) {
+    if (isClosed()) {
       throw new IOException("Stream is closed");
     }
 
-    packetWriter.write(packet);
+    try {
+      packetWriter.write(packet);
+    }
+    catch (IOException e) {
+      log.error("Received IOException while writing to channel", e);
+      close();
+      throw e;
+    }
   }
 
   @Override
   public void close() throws IOException {
-    closed.set(false);
     try {
       socketChannel.close();
-    } catch (IOException error) {
+    }
+    catch (IOException error) {
       log.error("Error while closing a SocketChannel", error);
     }
   }
 
   @Override
   public boolean isClosed() {
-    return closed.get();
+    return !socketChannel.isOpen();
   }
 }

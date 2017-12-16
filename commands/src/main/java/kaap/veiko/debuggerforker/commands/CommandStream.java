@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Optional;
 
 import kaap.veiko.debuggerforker.commands.parser.CommandParser;
-import kaap.veiko.debuggerforker.packet.Packet;
 import kaap.veiko.debuggerforker.packet.PacketStream;
 import kaap.veiko.debuggerforker.types.VMInformation;
 
