@@ -1,4 +1,4 @@
-package kaap.veiko.debuggerforker.connections.connectors;
+package kaap.veiko.debuggerforker.connections;
 
 import java.io.IOException;
 import java.net.ConnectException;
@@ -7,13 +7,13 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.Arrays;
 
-import kaap.veiko.debuggerforker.connections.VirtualMachineManager;
+import kaap.veiko.debuggerforker.packet.VirtualMachinePacketStream;
 
 public class VMConnector {
 
-  public static VirtualMachineManager connectToVM(InetSocketAddress address) throws InterruptedException, IOException {
+  public static VirtualMachinePacketStream connectToVM(InetSocketAddress address) throws InterruptedException, IOException {
     SocketChannel socketChannel = new VMConnector().connectAndHandshake(address);
-    return new VirtualMachineManager(socketChannel);
+    return new VirtualMachinePacketStream(socketChannel);
   }
 
   private SocketChannel connectAndHandshake(InetSocketAddress address) throws InterruptedException, IOException {

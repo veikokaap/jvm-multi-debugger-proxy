@@ -1,4 +1,4 @@
-package kaap.veiko.debuggerforker.connections.connectors;
+package kaap.veiko.debuggerforker.connections;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -7,7 +7,7 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Arrays;
 
-import kaap.veiko.debuggerforker.connections.DebuggerManager;
+import kaap.veiko.debuggerforker.packet.DebuggerPacketStream;
 import kaap.veiko.debuggerforker.packet.internal.PacketTransformer;
 
 public class DebuggerConnector implements AutoCloseable {
@@ -19,10 +19,10 @@ public class DebuggerConnector implements AutoCloseable {
     serverChannel.socket().bind(new InetSocketAddress("127.0.0.1", port));
   }
 
-  public DebuggerManager getConnectionBlocking() throws IOException {
+  public DebuggerPacketStream getConnectionBlocking() throws IOException {
     SocketChannel socketChannel = serverChannel.accept();
     handshake(socketChannel);
-    return new DebuggerManager(socketChannel, packetTransformer);
+    return new DebuggerPacketStream(socketChannel, packetTransformer);
   }
 
   private void handshake(SocketChannel socketChannel) throws IOException {

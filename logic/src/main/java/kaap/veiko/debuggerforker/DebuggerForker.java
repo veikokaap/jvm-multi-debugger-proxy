@@ -11,37 +11,35 @@ import io.reactivex.SingleEmitter;
 import io.reactivex.schedulers.Schedulers;
 import kaap.veiko.debuggerforker.commands.Command;
 import kaap.veiko.debuggerforker.commands.CommandStream;
-import kaap.veiko.debuggerforker.connections.DebuggerManager;
-import kaap.veiko.debuggerforker.connections.VirtualMachineManager;
-import kaap.veiko.debuggerforker.connections.connectors.DebuggerConnector;
-import kaap.veiko.debuggerforker.connections.connectors.VMConnector;
+import kaap.veiko.debuggerforker.connections.DebuggerConnector;
+import kaap.veiko.debuggerforker.connections.VMConnector;
+import kaap.veiko.debuggerforker.packet.DebuggerPacketStream;
+import kaap.veiko.debuggerforker.packet.VirtualMachinePacketStream;
 import kaap.veiko.debuggerforker.types.VMInformation;
 
-public class DebuggerForker implements AutoCloseable {
+public class DebuggerForker {
 
   private final static Logger log = LoggerFactory.getLogger(DebuggerForker.class);
 
-  private final VirtualMachineManager vm;
   private final CommandStream vmCommandStream;
   private final VMInformation vmInformation = new VMInformation();
   private final ProxyPacketStream proxyPacketStream = new ProxyPacketStream();
 
   private final CommandHandler commandHandler;
 
-  private DebuggerForker(VirtualMachineManager vm, int debuggerPort) throws IOException {
-    this.vm = vm;
-    this.vmCommandStream = new CommandStream(vm.getPacketStream(), vmInformation);
+  private DebuggerForker(VirtualMachinePacketStream vmPacketStream, int debuggerPort) throws IOException {
+    this.vmCommandStream = new CommandStream(vmPacketStream, vmInformation);
     this.commandHandler = new CommandHandler(vmInformation, proxyPacketStream, vmCommandStream);
 
     DebuggerConnector debuggerConnector = new DebuggerConnector(debuggerPort);
-    Single.create((SingleEmitter<DebuggerManager> subscriber) -> {
+    Single.create((SingleEmitter<DebuggerPacketStream> subscriber) -> {
       try {
         subscriber.onSuccess(debuggerConnector.getConnectionBlocking());
       }
       catch (IOException e) {
         subscriber.onError(e);
       }
-    }).repeat().toObservable().map(DebuggerManager::getPacketStream).map(ps -> new CommandStream(ps, vmInformation)).subscribeOn(Schedulers.newThread()).subscribe(
+    }).repeat().toObservable().map(ps -> new CommandStream(ps, vmInformation)).subscribeOn(Schedulers.newThread()).subscribe(
         proxyPacketStream::addPacketStream,
         error -> log.error("Error during debugger connection", error)
     );
@@ -49,9 +47,9 @@ public class DebuggerForker implements AutoCloseable {
   }
 
   public static void start(InetSocketAddress virtualMachineAddress, int debuggerPort) throws IOException, InterruptedException {
-    VirtualMachineManager vm = VMConnector.connectToVM(virtualMachineAddress);
+    VirtualMachinePacketStream vmPacketStream = VMConnector.connectToVM(virtualMachineAddress);
 
-    DebuggerForker debuggerForker = new DebuggerForker(vm, debuggerPort);
+    DebuggerForker debuggerForker = new DebuggerForker(vmPacketStream, debuggerPort);
     debuggerForker.start();
   }
 
@@ -89,7 +87,4 @@ public class DebuggerForker implements AutoCloseable {
     }
   }
 
-  @Override
-  public void close() throws Exception {
-  }
 }
