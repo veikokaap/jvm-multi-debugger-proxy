@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import kaap.veiko.debuggerforker.commands.Command;
-import kaap.veiko.debuggerforker.commands.PacketCommand;
+import kaap.veiko.debuggerforker.commands.UnknownCommand;
 import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;
 import kaap.veiko.debuggerforker.packet.CommandPacket;
 import kaap.veiko.debuggerforker.packet.Packet;
@@ -33,7 +33,7 @@ public class CommandParser {
     }
     catch (Exception e) {
       log.error("Failed to find CommandIdentifier", e);
-      return new PacketCommand(packet, commandPacket.getCommandSetId(), commandPacket.getCommandId(), packet.isReply());
+      return new UnknownCommand(packet, commandPacket.getCommandSetId(), commandPacket.getCommandId(), packet.isReply());
     }
   }
 

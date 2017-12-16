@@ -26,5 +26,5 @@ public interface CommandVisitor<T> {
 
   T visit(DisposeReply disposeReply);
 
-  T visit(PacketCommand packetCommand);
+  T visit(UnknownCommand packetCommand);
 }

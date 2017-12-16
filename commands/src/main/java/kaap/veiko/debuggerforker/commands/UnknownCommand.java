@@ -3,14 +3,14 @@ package kaap.veiko.debuggerforker.commands;
 import kaap.veiko.debuggerforker.commands.parser.CommandDataWriter;
 import kaap.veiko.debuggerforker.packet.Packet;
 
-public class PacketCommand implements Command {
+public class UnknownCommand implements Command {
 
   private final Packet packet;
   private final int commandId;
   private final int commandSetId;
   private final boolean reply;
 
-  public PacketCommand(Packet packet, int commandSetId, int commandId, boolean reply) {
+  public UnknownCommand(Packet packet, int commandSetId, int commandId, boolean reply) {
     this.packet = packet;
     this.commandSetId = commandSetId;
     this.commandId = commandId;
@@ -51,7 +51,7 @@ public class PacketCommand implements Command {
 
   @Override
   public String toString() {
-    return "PacketCommand{" +
+    return "UnknownCommand{" +
         "packet=" + packet +
         '}';
   }

@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import kaap.veiko.debuggerforker.commands.CommandStream;
 import kaap.veiko.debuggerforker.commands.CommandVisitor;
 import kaap.veiko.debuggerforker.commands.PacketBuilder;
-import kaap.veiko.debuggerforker.commands.PacketCommand;
+import kaap.veiko.debuggerforker.commands.UnknownCommand;
 import kaap.veiko.debuggerforker.commands.sets.event.CompositeEventCommand;
 import kaap.veiko.debuggerforker.commands.sets.eventrequest.ClearAllBreakpointsCommand;
 import kaap.veiko.debuggerforker.commands.sets.eventrequest.ClearEventRequestCommand;
@@ -103,7 +103,7 @@ public class CommandHandler implements CommandVisitor<CommandResult> {
   }
 
   @Override
-  public CommandResult visit(PacketCommand command) {
+  public CommandResult visit(UnknownCommand command) {
     return CommandResult.forwardPacket(command);
   }
 }
