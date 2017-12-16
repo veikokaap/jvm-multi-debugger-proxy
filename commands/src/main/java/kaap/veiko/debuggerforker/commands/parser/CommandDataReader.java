@@ -2,10 +2,7 @@ package kaap.veiko.debuggerforker.commands.parser;
 
 import java.nio.ByteBuffer;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.BiFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,18 +25,8 @@ public class CommandDataReader extends PacketDataReader {
 
   private final static Logger log = LoggerFactory.getLogger(CommandDataReader.class);
 
-  private final Map<CommandIdentifier, BiFunction<CommandDataReader, Packet, Command>> parseMap = new HashMap<>();
-
-  public CommandDataReader(ByteBuffer packetByteBuffer, VMInformation vmInformation) {
+  CommandDataReader(ByteBuffer packetByteBuffer, VMInformation vmInformation) {
     super(packetByteBuffer, vmInformation);
-    parseMap.put(CompositeEventCommand.COMMAND_IDENTIFIER, CompositeEventCommand::new);
-    parseMap.put(ClearAllBreakpointsCommand.COMMAND_IDENTIFIER, ClearAllBreakpointsCommand::new);
-    parseMap.put(ClearEventRequestCommand.COMMAND_IDENTIFIER, ClearEventRequestCommand::new);
-    parseMap.put(SetEventRequestCommand.COMMAND_IDENTIFIER, SetEventRequestCommand::new);
-    parseMap.put(SetEventRequestReply.COMMAND_IDENTIFIER, SetEventRequestReply::new);
-    parseMap.put(IdSizesReplyCommand.COMMAND_IDENTIFIER, IdSizesReplyCommand::new);
-    parseMap.put(DisposeCommand.COMMAND_IDENTIFIER, (reader, packet) -> new DisposeCommand(packet));
-    parseMap.put(DisposeReply.COMMAND_IDENTIFIER, (reader, packet) -> new DisposeReply(packet));
   }
 
   public <T extends DataType> List<T> readList(DataTypeArrayParser<T> parser) {
@@ -53,6 +40,28 @@ public class CommandDataReader extends PacketDataReader {
   }
 
   public Command readCommand(CommandIdentifier identifier, Packet packet) {
-    return parseMap.get(identifier).apply(this, packet);
+    switch (identifier) {
+      /* Commands */
+      case COMPOSITE_EVENT_COMMAND:
+        return new CompositeEventCommand(this, packet);
+      case CLEAR_ALL_BREAKPOINTS_COMMAND:
+        return new ClearAllBreakpointsCommand(this, packet);
+      case CLEAR_EVENT_REQUEST_COMMAND:
+        return new ClearEventRequestCommand(this, packet);
+      case SET_EVENT_REQUEST_COMMAND:
+        return new SetEventRequestCommand(this, packet);
+      case DISPOSE_COMMAND:
+        return new DisposeCommand(packet);
+      /* Replies */
+      case SET_EVENT_REQUEST_REPLY:
+        return new SetEventRequestReply(this, packet);
+      case ID_SIZES_REPLY:
+        return new IdSizesReplyCommand(this, packet);
+      case DISPOSE_REPLY:
+        return new DisposeReply(packet);
+      default:
+        log.warn("Found CommandIdentifier which doesn't have a rule for creating a command. {}", identifier);
+        return null;
+    }
   }
 }
