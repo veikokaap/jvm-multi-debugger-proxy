@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 
 import kaap.veiko.debuggerforker.commands.CommandStream;
 import kaap.veiko.debuggerforker.commands.CommandVisitor;
-import kaap.veiko.debuggerforker.commands.PacketBuilder;
 import kaap.veiko.debuggerforker.commands.UnknownCommand;
 import kaap.veiko.debuggerforker.commands.sets.event.CompositeEventCommand;
 import kaap.veiko.debuggerforker.commands.sets.eventrequest.ClearAllBreakpointsCommand;
@@ -16,7 +15,7 @@ import kaap.veiko.debuggerforker.commands.sets.eventrequest.SetEventRequestComma
 import kaap.veiko.debuggerforker.commands.sets.eventrequest.SetEventRequestReply;
 import kaap.veiko.debuggerforker.commands.sets.virtualmachine.DisposeCommand;
 import kaap.veiko.debuggerforker.commands.sets.virtualmachine.DisposeReply;
-import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IdSizesReplyCommand;
+import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IdSizesReply;
 import kaap.veiko.debuggerforker.packet.PacketStream;
 import kaap.veiko.debuggerforker.types.VMInformation;
 
@@ -25,14 +24,12 @@ public class CommandHandler implements CommandVisitor<CommandResult> {
   private final VMInformation vmInformation;
   private final ProxyPacketStream debuggerStream;
   private final CommandStream vmStream;
-  private final PacketBuilder packetBuilder;
   private final Logger log = LoggerFactory.getLogger(CommandHandler.class);
 
   public CommandHandler(VMInformation vmInformation, ProxyPacketStream debuggerStream, CommandStream vmStream) {
     this.vmInformation = vmInformation;
     this.debuggerStream = debuggerStream;
     this.vmStream = vmStream;
-    this.packetBuilder = new PacketBuilder(vmInformation);
   }
 
   @Override
@@ -69,8 +66,8 @@ public class CommandHandler implements CommandVisitor<CommandResult> {
   public CommandResult visit(DisposeCommand command) {
     PacketStream stream = command.getPacket().getSource();
 
-    DisposeReply disposeReply = new DisposeReply(packetBuilder);
     int id = command.getCommandId();
+    DisposeReply disposeReply = DisposeReply.create(id);
 
     try {
       stream.write(disposeReply.getPacket());
@@ -92,7 +89,7 @@ public class CommandHandler implements CommandVisitor<CommandResult> {
   Read IDSizes for knowing how to parse commands.
    */
   @Override
-  public CommandResult visit(IdSizesReplyCommand command) {
+  public CommandResult visit(IdSizesReply command) {
     vmInformation.setIdSizes(command.getIdSizes());
     return CommandResult.forwardPacket(command);
   }

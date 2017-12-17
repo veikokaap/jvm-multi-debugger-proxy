@@ -26,7 +26,7 @@ public class CommandParser {
   public Command parse(Packet packet) {
     CommandPacket commandPacket = packet.visit(commandPacketFinder);
 
-    CommandDataReader commandDataReader = new CommandDataReader(ByteBuffer.wrap(packet.getDataBytes()), vmInformation);
+    CommandDataReader commandDataReader = new CommandDataReader(packet, vmInformation);
     try {
       CommandIdentifier identifier = CommandIdentifier.of(commandPacket.getCommandSetId(), commandPacket.getCommandId(), packet.isReply());
       return commandDataReader.readCommand(identifier, packet);

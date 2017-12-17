@@ -22,13 +22,13 @@ public enum CommandIdentifier {
   CLEAR_EVENT_REQUEST_COMMAND(15, 2, COMMAND),
   CLEAR_ALL_BREAKPOINTS_COMMAND(15, 3, COMMAND);
 
-  private final int commandSetId;
-  private final int commandId;
+  private final short commandSetId;
+  private final short commandId;
   private final CommandType type;
 
   CommandIdentifier(int commandSetId, int commandId, CommandType type) {
-    this.commandSetId = commandSetId;
-    this.commandId = commandId;
+    this.commandSetId = (short) commandSetId;
+    this.commandId = (short) commandId;
     this.type = type;
   }
 
@@ -46,15 +46,24 @@ public enum CommandIdentifier {
     return identifiers.get(0);
   }
 
-  public int getCommandSetId() {
+  public short getCommandSetId() {
     return commandSetId;
   }
 
-  public int getCommandId() {
+  public short getCommandId() {
     return commandId;
   }
 
   public CommandType getType() {
     return type;
+  }
+
+  public short getFlags() {
+    if (type == REPLY) {
+      return -128;
+    }
+    else {
+      return 0;
+    }
   }
 }

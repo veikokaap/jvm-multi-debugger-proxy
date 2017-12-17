@@ -3,30 +3,40 @@ package kaap.veiko.debuggerforker.commands.sets.eventrequest;
 
 import kaap.veiko.debuggerforker.commands.CommandBase;
 import kaap.veiko.debuggerforker.commands.CommandVisitor;
+import kaap.veiko.debuggerforker.commands.SyntheticPacket;
+import kaap.veiko.debuggerforker.commands.parser.CommandDataReader;
 import kaap.veiko.debuggerforker.commands.parser.CommandDataWriter;
 import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;
+import kaap.veiko.debuggerforker.commands.util.CommandDataUtil;
 import kaap.veiko.debuggerforker.packet.Packet;
-import kaap.veiko.debuggerforker.types.DataReader;
+import kaap.veiko.debuggerforker.types.VMInformation;
 
 public class SetEventRequestReply extends CommandBase {
-  public static final CommandIdentifier COMMAND_IDENTIFIER = CommandIdentifier.SET_EVENT_REQUEST_REPLY;
+  private static final CommandIdentifier COMMAND_IDENTIFIER = CommandIdentifier.SET_EVENT_REQUEST_REPLY;
 
   private final int requestId;
 
-  public SetEventRequestReply(DataReader reader, Packet packet) {
-    super();
-    this.requestId = reader.readInt();
-    setPacket(packet);
+  public static SetEventRequestReply create(int packetId, VMInformation vmInformation, int requestId) {
+    SyntheticPacket packet = SyntheticPacket.create(packetId, COMMAND_IDENTIFIER);
+    SetEventRequestReply command = new SetEventRequestReply(packet, requestId);
+    packet.setDataBytes(CommandDataUtil.getCommandDataBytes(command, vmInformation));
+
+    return command;
+  }
+
+  public static SetEventRequestReply read(CommandDataReader reader) {
+    int requestId = reader.readInt();
+    return new SetEventRequestReply(reader.getPacket(), requestId);
+  }
+
+  private SetEventRequestReply(Packet packet, int requestId) {
+    super(packet, COMMAND_IDENTIFIER);
+    this.requestId = requestId;
   }
 
   @Override
   public void writeCommand(CommandDataWriter writer) {
     writer.writeInt(requestId);
-  }
-
-  @Override
-  protected CommandIdentifier getCommandIdentifier() {
-    return COMMAND_IDENTIFIER;
   }
 
   public int getRequestId() {

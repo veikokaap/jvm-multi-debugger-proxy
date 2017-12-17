@@ -6,9 +6,12 @@ import kaap.veiko.debuggerforker.packet.Packet;
 
 public abstract class CommandBase implements Command {
 
-  private Packet packet;
+  private final Packet packet;
+  private final CommandIdentifier commandIdentifier;
 
-  protected CommandBase() {
+  protected CommandBase(Packet packet, CommandIdentifier commandIdentifier) {
+    this.packet = packet;
+    this.commandIdentifier = commandIdentifier;
   }
 
   @Override
@@ -18,26 +21,16 @@ public abstract class CommandBase implements Command {
 
   @Override
   public int getCommandSetId() {
-    return getCommandIdentifier().getCommandSetId();
+    return commandIdentifier.getCommandSetId();
   }
 
   @Override
   public int getCommandId() {
-    return getCommandIdentifier().getCommandId();
+    return commandIdentifier.getCommandId();
   }
 
   @Override
   public boolean isReply() {
-    return getCommandIdentifier().getType() == CommandType.REPLY;
+    return commandIdentifier.getType() == CommandType.REPLY;
   }
-
-  protected void setPacket(Packet packet) {
-    this.packet = packet;
-  }
-
-  protected void createSyntheticPacket(PacketBuilder packetBuilder) {
-    this.packet = packetBuilder.build(this);
-  }
-
-  protected abstract CommandIdentifier getCommandIdentifier();
 }

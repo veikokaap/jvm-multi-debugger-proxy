@@ -4,15 +4,18 @@ import java.util.List;
 
 import kaap.veiko.debuggerforker.commands.CommandBase;
 import kaap.veiko.debuggerforker.commands.CommandVisitor;
+import kaap.veiko.debuggerforker.commands.SyntheticPacket;
 import kaap.veiko.debuggerforker.commands.parser.CommandDataReader;
 import kaap.veiko.debuggerforker.commands.parser.CommandDataWriter;
 import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;
 import kaap.veiko.debuggerforker.commands.sets.eventrequest.filters.EventRequestFilter;
+import kaap.veiko.debuggerforker.commands.util.CommandDataUtil;
 import kaap.veiko.debuggerforker.packet.Packet;
+import kaap.veiko.debuggerforker.types.VMInformation;
 import kaap.veiko.debuggerforker.types.jdwp.EventKind;
 
 public class SetEventRequestCommand extends CommandBase {
-  public static final CommandIdentifier COMMAND_IDENTIFIER = CommandIdentifier.SET_EVENT_REQUEST_COMMAND;
+  private static final CommandIdentifier COMMAND_IDENTIFIER = CommandIdentifier.SET_EVENT_REQUEST_COMMAND;
 
   private final EventKind eventKind;
   private final byte suspendPolicy;
@@ -20,12 +23,27 @@ public class SetEventRequestCommand extends CommandBase {
 
   private SetEventRequestReply eventRequestReply;
 
-  public SetEventRequestCommand(CommandDataReader reader, Packet packet) {
-    super();
-    this.eventKind = EventKind.read(reader);
-    this.suspendPolicy = reader.readByte();
-    this.eventRequestFilters = reader.readList(EventRequestFilter.PARSER);
-    setPacket(packet);
+  public static SetEventRequestCommand create(int packetId, VMInformation vmInformation, EventKind eventKind, byte suspendPolicy, List<EventRequestFilter> eventRequestFilters) {
+    SyntheticPacket packet = SyntheticPacket.create(packetId, COMMAND_IDENTIFIER);
+    SetEventRequestCommand command = new SetEventRequestCommand(packet, eventKind, suspendPolicy, eventRequestFilters);
+    packet.setDataBytes(CommandDataUtil.getCommandDataBytes(command, vmInformation));
+
+    return command;
+  }
+
+  public static SetEventRequestCommand read(CommandDataReader reader) {
+    EventKind eventKind = EventKind.read(reader);
+    byte suspendPolicy = reader.readByte();
+    List<EventRequestFilter> eventRequestFilters = reader.readList(EventRequestFilter.PARSER);
+
+    return new SetEventRequestCommand(reader.getPacket(), eventKind, suspendPolicy, eventRequestFilters);
+  }
+
+  private SetEventRequestCommand(Packet packet, EventKind eventKind, byte suspendPolicy, List<EventRequestFilter> eventRequestFilters) {
+    super(packet, COMMAND_IDENTIFIER);
+    this.eventKind = eventKind;
+    this.suspendPolicy = suspendPolicy;
+    this.eventRequestFilters = eventRequestFilters;
   }
 
   @Override
@@ -33,11 +51,6 @@ public class SetEventRequestCommand extends CommandBase {
     writer.writeType(eventKind);
     writer.writeByte(suspendPolicy);
     writer.writeList(EventRequestFilter.PARSER, eventRequestFilters);
-  }
-
-  @Override
-  protected CommandIdentifier getCommandIdentifier() {
-    return COMMAND_IDENTIFIER;
   }
 
   public EventKind getEventKind() {

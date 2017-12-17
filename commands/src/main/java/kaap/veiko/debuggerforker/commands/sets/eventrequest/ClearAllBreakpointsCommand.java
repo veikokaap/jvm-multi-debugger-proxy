@@ -3,26 +3,30 @@ package kaap.veiko.debuggerforker.commands.sets.eventrequest;
 
 import kaap.veiko.debuggerforker.commands.CommandBase;
 import kaap.veiko.debuggerforker.commands.CommandVisitor;
+import kaap.veiko.debuggerforker.commands.SyntheticPacket;
+import kaap.veiko.debuggerforker.commands.parser.CommandDataReader;
 import kaap.veiko.debuggerforker.commands.parser.CommandDataWriter;
 import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;
 import kaap.veiko.debuggerforker.packet.Packet;
-import kaap.veiko.debuggerforker.types.DataReader;
 
 public class ClearAllBreakpointsCommand extends CommandBase {
-  public static final CommandIdentifier COMMAND_IDENTIFIER = CommandIdentifier.CLEAR_ALL_BREAKPOINTS_COMMAND;
+  private static final CommandIdentifier COMMAND_IDENTIFIER = CommandIdentifier.CLEAR_ALL_BREAKPOINTS_COMMAND;
 
-  public ClearAllBreakpointsCommand(DataReader reader, Packet packet) {
-    super();
-    setPacket(packet);
+  public static ClearAllBreakpointsCommand create(int packetId) {
+    SyntheticPacket packet = SyntheticPacket.create(packetId, COMMAND_IDENTIFIER);
+    return new ClearAllBreakpointsCommand(packet);
+  }
+
+  public static ClearAllBreakpointsCommand read(CommandDataReader reader) {
+    return new ClearAllBreakpointsCommand(reader.getPacket());
+  }
+
+  private ClearAllBreakpointsCommand(Packet packet) {
+    super(packet, COMMAND_IDENTIFIER);
   }
 
   @Override
   public void writeCommand(CommandDataWriter writer) {
-  }
-
-  @Override
-  protected CommandIdentifier getCommandIdentifier() {
-    return COMMAND_IDENTIFIER;
   }
 
   @Override

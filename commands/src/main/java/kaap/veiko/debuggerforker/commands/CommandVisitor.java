@@ -7,7 +7,7 @@ import kaap.veiko.debuggerforker.commands.sets.eventrequest.SetEventRequestComma
 import kaap.veiko.debuggerforker.commands.sets.eventrequest.SetEventRequestReply;
 import kaap.veiko.debuggerforker.commands.sets.virtualmachine.DisposeCommand;
 import kaap.veiko.debuggerforker.commands.sets.virtualmachine.DisposeReply;
-import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IdSizesReplyCommand;
+import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IdSizesReply;
 
 public interface CommandVisitor<T> {
   T visit(CompositeEventCommand command);
@@ -22,7 +22,7 @@ public interface CommandVisitor<T> {
 
   T visit(DisposeCommand command);
 
-  T visit(IdSizesReplyCommand command);
+  T visit(IdSizesReply command);
 
   T visit(DisposeReply disposeReply);
 

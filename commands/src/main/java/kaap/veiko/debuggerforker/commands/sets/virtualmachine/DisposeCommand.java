@@ -2,21 +2,26 @@ package kaap.veiko.debuggerforker.commands.sets.virtualmachine;
 
 import kaap.veiko.debuggerforker.commands.CommandBase;
 import kaap.veiko.debuggerforker.commands.CommandVisitor;
+import kaap.veiko.debuggerforker.commands.SyntheticPacket;
+import kaap.veiko.debuggerforker.commands.parser.CommandDataReader;
 import kaap.veiko.debuggerforker.commands.parser.CommandDataWriter;
 import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;
 import kaap.veiko.debuggerforker.packet.Packet;
 
 public class DisposeCommand extends CommandBase {
-  public static final CommandIdentifier COMMAND_IDENTIFIER = CommandIdentifier.DISPOSE_COMMAND;
+  private static final CommandIdentifier COMMAND_IDENTIFIER = CommandIdentifier.DISPOSE_COMMAND;
 
-  public DisposeCommand(Packet packet) {
-    super();
-    setPacket(packet);
+  public static DisposeCommand create(int packetId) {
+    SyntheticPacket packet = SyntheticPacket.create(packetId, COMMAND_IDENTIFIER);
+    return new DisposeCommand(packet);
   }
 
-  @Override
-  protected CommandIdentifier getCommandIdentifier() {
-    return COMMAND_IDENTIFIER;
+  public static DisposeCommand read(CommandDataReader reader) {
+    return new DisposeCommand(reader.getPacket());
+  }
+
+  private DisposeCommand(Packet packet) {
+    super(packet, COMMAND_IDENTIFIER);
   }
 
   @Override

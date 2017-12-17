@@ -4,34 +4,46 @@ import java.util.List;
 
 import kaap.veiko.debuggerforker.commands.CommandBase;
 import kaap.veiko.debuggerforker.commands.CommandVisitor;
+import kaap.veiko.debuggerforker.commands.SyntheticPacket;
 import kaap.veiko.debuggerforker.commands.events.VirtualMachineEvent;
 import kaap.veiko.debuggerforker.commands.parser.CommandDataReader;
 import kaap.veiko.debuggerforker.commands.parser.CommandDataWriter;
 import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;
+import kaap.veiko.debuggerforker.commands.util.CommandDataUtil;
 import kaap.veiko.debuggerforker.packet.Packet;
+import kaap.veiko.debuggerforker.types.VMInformation;
 
 public class CompositeEventCommand extends CommandBase {
-  public static final CommandIdentifier COMMAND_IDENTIFIER = CommandIdentifier.COMPOSITE_EVENT_COMMAND;
+  private static final CommandIdentifier COMMAND_IDENTIFIER = CommandIdentifier.COMPOSITE_EVENT_COMMAND;
 
   private final byte suspendPolicy;
   private final List<VirtualMachineEvent> events;
 
-  public CompositeEventCommand(CommandDataReader reader, Packet packet) {
-    super();
-    this.suspendPolicy = reader.readByte();
-    this.events = reader.readList(VirtualMachineEvent.PARSER);
-    setPacket(packet);
+  public static CompositeEventCommand create(int packetId, VMInformation vmInformation, byte suspendPolicy, List<VirtualMachineEvent> events) {
+    SyntheticPacket packet = SyntheticPacket.create(packetId, COMMAND_IDENTIFIER);
+    CompositeEventCommand command = new CompositeEventCommand(packet, suspendPolicy, events);
+    packet.setDataBytes(CommandDataUtil.getCommandDataBytes(command, vmInformation));
+
+    return command;
+  }
+
+  public static CompositeEventCommand read(CommandDataReader reader) {
+    byte suspendPolicy = reader.readByte();
+    List<VirtualMachineEvent> events = reader.readList(VirtualMachineEvent.PARSER);
+
+    return new CompositeEventCommand(reader.getPacket(), suspendPolicy, events);
+  }
+
+  private CompositeEventCommand(Packet packet, byte suspendPolicy, List<VirtualMachineEvent> events) {
+    super(packet, CommandIdentifier.COMPOSITE_EVENT_COMMAND);
+    this.suspendPolicy = suspendPolicy;
+    this.events = events;
   }
 
   @Override
   public void writeCommand(CommandDataWriter writer) {
     writer.writeByte(suspendPolicy);
     writer.writeList(VirtualMachineEvent.PARSER, events);
-  }
-
-  @Override
-  protected CommandIdentifier getCommandIdentifier() {
-    return COMMAND_IDENTIFIER;
   }
 
   public byte getSuspendPolicy() {

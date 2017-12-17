@@ -1,15 +1,17 @@
 package kaap.veiko.debuggerforker.commands;
 
+import kaap.veiko.debuggerforker.commands.parser.CommandType;
+import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;
 import kaap.veiko.debuggerforker.packet.CommandPacket;
+import kaap.veiko.debuggerforker.packet.Packet;
 import kaap.veiko.debuggerforker.packet.PacketStream;
 import kaap.veiko.debuggerforker.packet.PacketVisitor;
 import kaap.veiko.debuggerforker.packet.ReplyPacket;
 
-class SyntheticPacket implements CommandPacket, ReplyPacket {
-  private final int length;
+public class SyntheticPacket implements CommandPacket, ReplyPacket {
   private final int id;
   private final short flags;
-  private final byte[] data;
+  private byte[] data = new byte[0];
   private final PacketStream source;
 
   //ReplyPacket
@@ -19,11 +21,17 @@ class SyntheticPacket implements CommandPacket, ReplyPacket {
   private final short commandSetId;
   private final short commandId;
 
-  SyntheticPacket(int length, int id, short flags, short errorCode, short commandSetId, short commandId,  byte[] data) {
-    this.length = length;
+  public static SyntheticPacket create(int packetId, CommandIdentifier identifier) {
+    if (identifier.getType() == CommandType.REPLY) {
+      return new SyntheticPacket(packetId, (short) -128, (short) 0, identifier.getCommandSetId(), identifier.getCommandId());
+    } else {
+      return new SyntheticPacket(packetId, (short)0, (short)0, identifier.getCommandSetId(), identifier.getCommandId());
+    }
+  }
+
+  private SyntheticPacket(int id, short flags, short errorCode, short commandSetId, short commandId) {
     this.id = id;
     this.flags = flags;
-    this.data = data;
     this.source = null;
     this.errorCode = errorCode;
     this.commandSetId = commandSetId;
@@ -32,7 +40,7 @@ class SyntheticPacket implements CommandPacket, ReplyPacket {
 
   @Override
   public int getLength() {
-    return length;
+    return Packet.HEADER_LENGTH + data.length;
   }
 
   @Override
@@ -48,6 +56,10 @@ class SyntheticPacket implements CommandPacket, ReplyPacket {
   @Override
   public boolean isReply() {
     return flags == -128;
+  }
+
+  public void setDataBytes(byte[] data) {
+    this.data = data;
   }
 
   public byte[] getDataBytes() {
@@ -91,7 +103,8 @@ class SyntheticPacket implements CommandPacket, ReplyPacket {
   public <T> T visit(PacketVisitor<T> visitor) {
     if (isReply()) {
       return visitor.visit((ReplyPacket) this);
-    } else {
+    }
+    else {
       return visitor.visit((CommandPacket) this);
     }
   }

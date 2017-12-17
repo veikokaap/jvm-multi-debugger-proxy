@@ -15,7 +15,7 @@ import kaap.veiko.debuggerforker.commands.sets.eventrequest.SetEventRequestComma
 import kaap.veiko.debuggerforker.commands.sets.eventrequest.SetEventRequestReply;
 import kaap.veiko.debuggerforker.commands.sets.virtualmachine.DisposeCommand;
 import kaap.veiko.debuggerforker.commands.sets.virtualmachine.DisposeReply;
-import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IdSizesReplyCommand;
+import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IdSizesReply;
 import kaap.veiko.debuggerforker.packet.Packet;
 import kaap.veiko.debuggerforker.packet.internal.PacketDataReader;
 import kaap.veiko.debuggerforker.types.DataType;
@@ -24,9 +24,15 @@ import kaap.veiko.debuggerforker.types.VMInformation;
 public class CommandDataReader extends PacketDataReader {
 
   private final static Logger log = LoggerFactory.getLogger(CommandDataReader.class);
+  private final Packet packet;
 
-  CommandDataReader(ByteBuffer packetByteBuffer, VMInformation vmInformation) {
-    super(packetByteBuffer, vmInformation);
+  CommandDataReader(Packet packet, VMInformation vmInformation) {
+    super(ByteBuffer.wrap(packet.getDataBytes()), vmInformation);
+    this.packet = packet;
+  }
+
+  public Packet getPacket() {
+    return packet;
   }
 
   public <T extends DataType> List<T> readList(DataTypeArrayParser<T> parser) {
@@ -43,22 +49,22 @@ public class CommandDataReader extends PacketDataReader {
     switch (identifier) {
       /* Commands */
       case COMPOSITE_EVENT_COMMAND:
-        return new CompositeEventCommand(this, packet);
+        return CompositeEventCommand.read(this);
       case CLEAR_ALL_BREAKPOINTS_COMMAND:
-        return new ClearAllBreakpointsCommand(this, packet);
+        return ClearAllBreakpointsCommand.read(this);
       case CLEAR_EVENT_REQUEST_COMMAND:
-        return new ClearEventRequestCommand(this, packet);
+        return ClearEventRequestCommand.read(this);
       case SET_EVENT_REQUEST_COMMAND:
-        return new SetEventRequestCommand(this, packet);
+        return SetEventRequestCommand.read(this);
       case DISPOSE_COMMAND:
-        return new DisposeCommand(packet);
+        return DisposeCommand.read(this);
       /* Replies */
       case SET_EVENT_REQUEST_REPLY:
-        return new SetEventRequestReply(this, packet);
+        return SetEventRequestReply.read(this);
       case ID_SIZES_REPLY:
-        return new IdSizesReplyCommand(this, packet);
+        return IdSizesReply.read(this);
       case DISPOSE_REPLY:
-        return new DisposeReply(packet);
+        return DisposeReply.read(this);
       default:
         log.warn("Found CommandIdentifier which doesn't have a rule for creating a command. {}", identifier);
         return null;
