@@ -2,7 +2,7 @@ package kaap.veiko.debuggerforker.commands.sets.virtualmachine;
 
 import kaap.veiko.debuggerforker.commands.CommandBase;
 import kaap.veiko.debuggerforker.commands.CommandVisitor;
-import kaap.veiko.debuggerforker.commands.SyntheticPacket;
+import kaap.veiko.debuggerforker.commands.MutableReplyPacket;
 import kaap.veiko.debuggerforker.commands.parser.CommandDataReader;
 import kaap.veiko.debuggerforker.commands.parser.CommandDataWriter;
 import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;
@@ -17,9 +17,9 @@ public class IdSizesReply extends CommandBase {
   private final IdSizes idSizes;
 
   public static IdSizesReply create(int packetId, VMInformation vmInformation, IdSizes idSizes) {
-    SyntheticPacket packet = SyntheticPacket.create(packetId, COMMAND_IDENTIFIER);
+    MutableReplyPacket packet = MutableReplyPacket.create(packetId);
     IdSizesReply command = new IdSizesReply(packet, idSizes);
-    packet.setDataBytes(CommandDataUtil.getCommandDataBytes(command, vmInformation));
+    packet.setData(CommandDataUtil.getCommandDataBytes(command, vmInformation));
 
     return command;
   }

@@ -44,7 +44,7 @@ public class UnknownCommand implements Command {
 
   @Override
   public void writeCommand(CommandDataWriter writer) {
-    for (byte b : packet.getDataBytes()) {
+    for (byte b : packet.getData()) {
       writer.writeByte(b);
     }
   }

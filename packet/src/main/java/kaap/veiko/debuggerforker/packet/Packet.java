@@ -9,7 +9,7 @@ public interface Packet {
 
   short getFlags();
 
-  byte[] getDataBytes();
+  byte[] getData();
 
   boolean isReply();
 

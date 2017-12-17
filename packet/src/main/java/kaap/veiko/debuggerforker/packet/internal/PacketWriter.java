@@ -35,7 +35,7 @@ class PacketWriter {
 
     private void writeData(Packet packet, ByteBuffer byteBuffer) {
       if (packet.hasData()) {
-        byteBuffer.put(packet.getDataBytes());
+        byteBuffer.put(packet.getData());
       }
     }
 

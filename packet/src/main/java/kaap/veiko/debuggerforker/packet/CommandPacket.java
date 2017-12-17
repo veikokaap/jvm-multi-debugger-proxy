@@ -1,15 +1,57 @@
 package kaap.veiko.debuggerforker.packet;
 
-public interface CommandPacket extends Packet {
-  short getCommandSetId();
+import java.util.Arrays;
 
-  short getCommandId();
+import kaap.veiko.debuggerforker.packet.internal.PacketBase;
 
-  ReplyPacket getReplyPacket();
+public class CommandPacket extends PacketBase {
 
-  void setReplyPacket(ReplyPacket replyPacket);
+  private final short commandId;
+  private final short commandSetId;
+  private ReplyPacket replyPacket;
 
-  default <T> T visit(PacketVisitor<T> visitor) {
+  public CommandPacket(int id, short commandSetId, short commandId, byte[] data, PacketStream source) {
+    super(id, data, source);
+    this.commandSetId = commandSetId;
+    this.commandId = commandId;
+  }
+
+  public short getCommandId() {
+    return commandId;
+  }
+
+  public short getCommandSetId() {
+    return commandSetId;
+  }
+
+  public ReplyPacket getReplyPacket() {
+    return replyPacket;
+  }
+
+  public void setReplyPacket(ReplyPacket replyPacket) {
+    this.replyPacket = replyPacket;
+  }
+
+  @Override
+  public boolean isReply() {
+    return false;
+  }
+
+  @Override
+  public <T> T visit(PacketVisitor<T> visitor) {
     return visitor.visit(this);
+  }
+
+  @Override
+  public String toString() {
+    return "CommandPacket{" +
+        "length=" + getLength() +
+        ", id=" + getId() +
+        ", flags=" + getFlags() +
+        ", commandId=" + commandId +
+        ", commandSetId=" + commandSetId +
+        ", data=" + Arrays.toString(getData()) +
+        ", source=" + getSource() +
+        '}';
   }
 }

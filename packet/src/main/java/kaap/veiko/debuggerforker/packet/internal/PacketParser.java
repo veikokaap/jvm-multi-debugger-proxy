@@ -3,8 +3,10 @@ package kaap.veiko.debuggerforker.packet.internal;
 import java.nio.ByteBuffer;
 import java.util.function.Function;
 
+import kaap.veiko.debuggerforker.packet.CommandPacket;
 import kaap.veiko.debuggerforker.packet.Packet;
 import kaap.veiko.debuggerforker.packet.PacketStream;
+import kaap.veiko.debuggerforker.packet.ReplyPacket;
 
 class PacketParser {
 
@@ -28,14 +30,14 @@ class PacketParser {
     if (flags == -128) {
       short errorCode = readShort();
       byte[] data = readData();
-      return new ReplyPacketImpl(length, id, flags, errorCode, data, source);
+      return new ReplyPacket(id, errorCode, data, source);
     }
     else {
       short commandSetId = readByte();
       short commandId = readByte();
       byte[] data = readData();
 
-      return new CommandPacketImpl(length, id, flags, commandSetId, commandId, data, source);
+      return new CommandPacket(id, commandSetId, commandId, data, source);
     }
   }
 

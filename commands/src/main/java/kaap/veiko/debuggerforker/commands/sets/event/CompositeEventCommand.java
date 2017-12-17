@@ -4,12 +4,13 @@ import java.util.List;
 
 import kaap.veiko.debuggerforker.commands.CommandBase;
 import kaap.veiko.debuggerforker.commands.CommandVisitor;
-import kaap.veiko.debuggerforker.commands.SyntheticPacket;
+import kaap.veiko.debuggerforker.commands.MutableCommandPacket;
 import kaap.veiko.debuggerforker.commands.events.VirtualMachineEvent;
 import kaap.veiko.debuggerforker.commands.parser.CommandDataReader;
 import kaap.veiko.debuggerforker.commands.parser.CommandDataWriter;
 import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;
 import kaap.veiko.debuggerforker.commands.util.CommandDataUtil;
+import kaap.veiko.debuggerforker.packet.CommandPacket;
 import kaap.veiko.debuggerforker.packet.Packet;
 import kaap.veiko.debuggerforker.types.VMInformation;
 
@@ -20,9 +21,9 @@ public class CompositeEventCommand extends CommandBase {
   private final List<VirtualMachineEvent> events;
 
   public static CompositeEventCommand create(int packetId, VMInformation vmInformation, byte suspendPolicy, List<VirtualMachineEvent> events) {
-    SyntheticPacket packet = SyntheticPacket.create(packetId, COMMAND_IDENTIFIER);
+    MutableCommandPacket packet = MutableCommandPacket.create(packetId, COMMAND_IDENTIFIER);
     CompositeEventCommand command = new CompositeEventCommand(packet, suspendPolicy, events);
-    packet.setDataBytes(CommandDataUtil.getCommandDataBytes(command, vmInformation));
+    packet.setData(CommandDataUtil.getCommandDataBytes(command, vmInformation));
 
     return command;
   }

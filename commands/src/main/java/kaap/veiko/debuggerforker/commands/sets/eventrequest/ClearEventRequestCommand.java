@@ -2,13 +2,12 @@ package kaap.veiko.debuggerforker.commands.sets.eventrequest;
 
 import kaap.veiko.debuggerforker.commands.CommandBase;
 import kaap.veiko.debuggerforker.commands.CommandVisitor;
-import kaap.veiko.debuggerforker.commands.SyntheticPacket;
+import kaap.veiko.debuggerforker.commands.MutableCommandPacket;
 import kaap.veiko.debuggerforker.commands.parser.CommandDataReader;
 import kaap.veiko.debuggerforker.commands.parser.CommandDataWriter;
 import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;
 import kaap.veiko.debuggerforker.commands.util.CommandDataUtil;
 import kaap.veiko.debuggerforker.packet.Packet;
-import kaap.veiko.debuggerforker.types.DataReader;
 import kaap.veiko.debuggerforker.types.VMInformation;
 import kaap.veiko.debuggerforker.types.jdwp.EventKind;
 
@@ -19,9 +18,9 @@ public class ClearEventRequestCommand extends CommandBase {
   private final int requestId;
 
   public static ClearEventRequestCommand create(int packetId, VMInformation vmInformation, EventKind eventKind, int requestId) {
-    SyntheticPacket packet = SyntheticPacket.create(packetId, COMMAND_IDENTIFIER);
+    MutableCommandPacket packet = MutableCommandPacket.create(packetId, COMMAND_IDENTIFIER);
     ClearEventRequestCommand command = new ClearEventRequestCommand(packet, eventKind, requestId);
-    packet.setDataBytes(CommandDataUtil.getCommandDataBytes(command, vmInformation));
+    packet.setData(CommandDataUtil.getCommandDataBytes(command, vmInformation));
 
     return command;
   }

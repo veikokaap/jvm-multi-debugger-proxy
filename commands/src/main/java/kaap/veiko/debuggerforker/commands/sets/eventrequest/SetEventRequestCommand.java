@@ -4,7 +4,7 @@ import java.util.List;
 
 import kaap.veiko.debuggerforker.commands.CommandBase;
 import kaap.veiko.debuggerforker.commands.CommandVisitor;
-import kaap.veiko.debuggerforker.commands.SyntheticPacket;
+import kaap.veiko.debuggerforker.commands.MutableCommandPacket;
 import kaap.veiko.debuggerforker.commands.parser.CommandDataReader;
 import kaap.veiko.debuggerforker.commands.parser.CommandDataWriter;
 import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;
@@ -24,9 +24,9 @@ public class SetEventRequestCommand extends CommandBase {
   private SetEventRequestReply eventRequestReply;
 
   public static SetEventRequestCommand create(int packetId, VMInformation vmInformation, EventKind eventKind, byte suspendPolicy, List<EventRequestFilter> eventRequestFilters) {
-    SyntheticPacket packet = SyntheticPacket.create(packetId, COMMAND_IDENTIFIER);
+    MutableCommandPacket packet = MutableCommandPacket.create(packetId, COMMAND_IDENTIFIER);
     SetEventRequestCommand command = new SetEventRequestCommand(packet, eventKind, suspendPolicy, eventRequestFilters);
-    packet.setDataBytes(CommandDataUtil.getCommandDataBytes(command, vmInformation));
+    packet.setData(CommandDataUtil.getCommandDataBytes(command, vmInformation));
 
     return command;
   }

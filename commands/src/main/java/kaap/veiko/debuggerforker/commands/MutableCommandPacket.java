@@ -1,0 +1,26 @@
+package kaap.veiko.debuggerforker.commands;
+
+import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;
+import kaap.veiko.debuggerforker.packet.CommandPacket;
+
+public class MutableCommandPacket extends CommandPacket {
+
+  private byte[] data;
+
+  public static MutableCommandPacket create(int packetId, CommandIdentifier commandIdentifier) {
+    return new MutableCommandPacket(packetId, commandIdentifier.getCommandSetId(), commandIdentifier.getCommandId());
+  }
+
+  private MutableCommandPacket(int id, short commandSetId, short commandId) {
+    super(id, commandSetId, commandId, null, null);
+  }
+
+  public void setData(byte[] data) {
+    this.data = data;
+  }
+
+  @Override
+  public byte[] getData() {
+    return data;
+  }
+}

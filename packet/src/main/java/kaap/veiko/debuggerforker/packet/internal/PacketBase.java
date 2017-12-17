@@ -8,23 +8,19 @@ import kaap.veiko.debuggerforker.packet.PacketStream;
 
 public abstract class PacketBase implements Packet {
 
-  private final int length;
   private final int id;
-  private final short flags;
   private final byte[] data;
   private final PacketStream source;
 
-  public PacketBase(int length, int id, short flags, byte[] data, PacketStream source) {
-    this.length = length;
+  public PacketBase(int id, byte[] data, PacketStream source) {
     this.id = id;
-    this.flags = flags;
     this.data = data;
     this.source = source;
   }
 
   @Override
   public int getLength() {
-    return length;
+    return Packet.HEADER_LENGTH + getData().length;
   }
 
   @Override
@@ -34,11 +30,11 @@ public abstract class PacketBase implements Packet {
 
   @Override
   public short getFlags() {
-    return flags;
+    return (short) (isReply() ? -128 : 0);
   }
 
   @Override
-  public byte[] getDataBytes() {
+  public byte[] getData() {
     return data;
   }
 
@@ -57,21 +53,20 @@ public abstract class PacketBase implements Packet {
     if (this == o) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if (!(o instanceof PacketBase)) {
       return false;
     }
     PacketBase that = (PacketBase) o;
-    return length == that.length &&
-        id == that.id &&
-        flags == that.flags &&
-        Arrays.equals(data, that.data) &&
-        Objects.equals(source, that.source);
+    return getId() == that.getId() &&
+        isReply() == that.isReply() &&
+        Arrays.equals(getData(), that.getData()) &&
+        Objects.equals(getSource(), that.getSource());
   }
 
   @Override
   public int hashCode() {
-    int result = Objects.hash(length, id, flags, source);
-    result = 31 * result + Arrays.hashCode(data);
+    int result = Objects.hash(getId(), isReply(), getSource());
+    result = 31 * result + Arrays.hashCode(getData());
     return result;
   }
 }

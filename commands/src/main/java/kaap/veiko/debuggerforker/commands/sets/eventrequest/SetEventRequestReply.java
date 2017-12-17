@@ -3,7 +3,7 @@ package kaap.veiko.debuggerforker.commands.sets.eventrequest;
 
 import kaap.veiko.debuggerforker.commands.CommandBase;
 import kaap.veiko.debuggerforker.commands.CommandVisitor;
-import kaap.veiko.debuggerforker.commands.SyntheticPacket;
+import kaap.veiko.debuggerforker.commands.MutableReplyPacket;
 import kaap.veiko.debuggerforker.commands.parser.CommandDataReader;
 import kaap.veiko.debuggerforker.commands.parser.CommandDataWriter;
 import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;
@@ -17,9 +17,9 @@ public class SetEventRequestReply extends CommandBase {
   private final int requestId;
 
   public static SetEventRequestReply create(int packetId, VMInformation vmInformation, int requestId) {
-    SyntheticPacket packet = SyntheticPacket.create(packetId, COMMAND_IDENTIFIER);
+    MutableReplyPacket packet = MutableReplyPacket.create(packetId);
     SetEventRequestReply command = new SetEventRequestReply(packet, requestId);
-    packet.setDataBytes(CommandDataUtil.getCommandDataBytes(command, vmInformation));
+    packet.setData(CommandDataUtil.getCommandDataBytes(command, vmInformation));
 
     return command;
   }

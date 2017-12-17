@@ -38,12 +38,10 @@ public class PacketTransformer {
     @Override
     public Packet visit(ReplyPacket packet) {
       int newId = getNewId(packet.getId());
-      return new ReplyPacketImpl(
-          packet.getLength(),
+      return new ReplyPacket(
           newId,
-          packet.getFlags(),
           packet.getErrorCode(),
-          packet.getDataBytes(),
+          packet.getData(),
           packet.getSource()
       );
     }
@@ -51,13 +49,11 @@ public class PacketTransformer {
     @Override
     public Packet visit(CommandPacket packet) {
       int newId = getNewId(packet.getId());
-      return new CommandPacketImpl(
-          packet.getLength(),
+      return new CommandPacket(
           newId,
-          packet.getFlags(),
           packet.getCommandSetId(),
           packet.getCommandId(),
-          packet.getDataBytes(),
+          packet.getData(),
           packet.getSource()
       );
     }
@@ -67,12 +63,10 @@ public class PacketTransformer {
     @Override
     public Packet visit(ReplyPacket packet) {
       int originalId = getOriginalId(packet.getId());
-      return new ReplyPacketImpl(
-          packet.getLength(),
+      return new ReplyPacket(
           originalId,
-          packet.getFlags(),
           packet.getErrorCode(),
-          packet.getDataBytes(),
+          packet.getData(),
           packet.getSource()
       );
     }

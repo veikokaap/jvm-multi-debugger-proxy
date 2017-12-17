@@ -27,7 +27,7 @@ public class CommandDataReader extends ByteBufferDataReader {
   private final Packet packet;
 
   CommandDataReader(Packet packet, VMInformation vmInformation) {
-    super(ByteBuffer.wrap(packet.getDataBytes()), vmInformation);
+    super(ByteBuffer.wrap(packet.getData()), vmInformation);
     this.packet = packet;
   }
 
