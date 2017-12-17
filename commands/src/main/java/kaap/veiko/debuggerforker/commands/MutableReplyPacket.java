@@ -11,7 +11,7 @@ public class MutableReplyPacket extends ReplyPacket {
   }
 
   private MutableReplyPacket(int id, short errorCode) {
-    super(id, errorCode, null, null);
+    super(id, errorCode, new byte[0], null);
   }
 
   public void setData(byte[] data) {

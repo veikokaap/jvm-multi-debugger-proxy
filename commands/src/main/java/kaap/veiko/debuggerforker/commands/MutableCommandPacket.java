@@ -12,7 +12,7 @@ public class MutableCommandPacket extends CommandPacket {
   }
 
   private MutableCommandPacket(int id, short commandSetId, short commandId) {
-    super(id, commandSetId, commandId, null, null);
+    super(id, commandSetId, commandId, new byte[0], null);
   }
 
   public void setData(byte[] data) {
