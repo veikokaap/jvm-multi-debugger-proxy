@@ -5,13 +5,16 @@ import java.nio.channels.SocketChannel;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import kaap.veiko.debuggerforker.packet.internal.PacketTransformer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import kaap.veiko.debuggerforker.packet.internal.PacketStreamBase;
 
 public class VirtualMachinePacketStream extends PacketStreamBase {
 
-  private final ConcurrentMap<Integer, CommandPacket> writtenPackets = new ConcurrentHashMap<>();
-  private final PacketTransformer packetTransformer = new PacketTransformer();
+  private final Logger log = LoggerFactory.getLogger(VirtualMachinePacketStream.class);
+
+  private final ConcurrentMap<Integer, CommandPacket> writtenCommands = new ConcurrentHashMap<>();
   private final ReplyPacketVisitor replyPacketVisitor = new ReplyPacketVisitor();
 
   public VirtualMachinePacketStream(SocketChannel socketChannel) throws IOException {
@@ -30,14 +33,19 @@ public class VirtualMachinePacketStream extends PacketStreamBase {
 
   @Override
   public void write(Packet packet) throws IOException {
-    writtenPackets.put(packet.getId(), (CommandPacket) packet);
-    super.write(packet);
+    if (!packet.isReply() && packet instanceof CommandPacket) {
+      writtenCommands.put(packet.getId(), (CommandPacket) packet);
+      super.write(packet);
+    }
+    else {
+      log.error("VirtualMachine can't receive replies. Tried to write packet {}", packet);
+    }
   }
 
   private class ReplyPacketVisitor implements PacketVisitor<Packet> {
     @Override
     public Packet visit(ReplyPacket replyPacket) {
-      CommandPacket commandPacket = writtenPackets.get(replyPacket.getId());
+      CommandPacket commandPacket = writtenCommands.get(replyPacket.getId());
       commandPacket.setReplyPacket(replyPacket);
       replyPacket.setCommandPacket(commandPacket);
 

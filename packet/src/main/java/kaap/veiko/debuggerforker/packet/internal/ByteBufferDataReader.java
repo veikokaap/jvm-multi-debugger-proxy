@@ -11,14 +11,14 @@ import kaap.veiko.debuggerforker.types.DataReader;
 import kaap.veiko.debuggerforker.types.VMInformation;
 import kaap.veiko.debuggerforker.types.jdwp.IdSizes;
 
-public class PacketDataReader implements DataReader {
+public class ByteBufferDataReader implements DataReader {
 
-  private final static Logger log = LoggerFactory.getLogger(PacketDataReader.class);
+  private final static Logger log = LoggerFactory.getLogger(ByteBufferDataReader.class);
 
   private final ByteBuffer byteBuffer;
   private final VMInformation vmInformation;
 
-  public PacketDataReader(ByteBuffer packetByteBuffer, VMInformation vmInformation) {
+  public ByteBufferDataReader(ByteBuffer packetByteBuffer, VMInformation vmInformation) {
     this.byteBuffer = packetByteBuffer;
     this.vmInformation = vmInformation;
   }

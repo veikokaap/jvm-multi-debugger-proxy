@@ -26,14 +26,13 @@ public abstract class PacketStreamBase implements PacketStream {
 
   public Packet read() throws IOException {
     if (isClosed()) {
-      throw new IOException("Stream is closed");
+      throw new ClosedChannelException();
     }
 
     try {
       return packetReader.read();
     }
-    catch (ClosedChannelException e) {
-      log.error("Received IOException while writing to channel", e);
+    catch (IOException e) {
       close();
       throw e;
     }
@@ -41,14 +40,13 @@ public abstract class PacketStreamBase implements PacketStream {
 
   public void write(Packet packet) throws IOException {
     if (isClosed()) {
-      throw new IOException("Stream is closed");
+      throw new ClosedChannelException();
     }
 
     try {
       packetWriter.write(packet);
     }
     catch (IOException e) {
-      log.error("Received IOException while writing to channel", e);
       close();
       throw e;
     }

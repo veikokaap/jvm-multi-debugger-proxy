@@ -20,7 +20,9 @@ class PacketWriter {
 
   void write(Packet packet) throws IOException {
     ByteBuffer buffer = packet.visit(packetByteBufferConverter);
-    socketChannel.write(buffer);
+    while (buffer.hasRemaining()) {
+      socketChannel.write(buffer);
+    }
   }
 
   private class PacketByteBufferConverter implements PacketVisitor<ByteBuffer> {

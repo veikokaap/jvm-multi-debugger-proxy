@@ -17,11 +17,11 @@ import kaap.veiko.debuggerforker.commands.sets.virtualmachine.DisposeCommand;
 import kaap.veiko.debuggerforker.commands.sets.virtualmachine.DisposeReply;
 import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IdSizesReply;
 import kaap.veiko.debuggerforker.packet.Packet;
-import kaap.veiko.debuggerforker.packet.internal.PacketDataReader;
+import kaap.veiko.debuggerforker.packet.internal.ByteBufferDataReader;
 import kaap.veiko.debuggerforker.types.DataType;
 import kaap.veiko.debuggerforker.types.VMInformation;
 
-public class CommandDataReader extends PacketDataReader {
+public class CommandDataReader extends ByteBufferDataReader {
 
   private final static Logger log = LoggerFactory.getLogger(CommandDataReader.class);
   private final Packet packet;
