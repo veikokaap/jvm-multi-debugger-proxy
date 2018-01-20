@@ -57,10 +57,9 @@ public class ByteBufferUtil {
   }
 
   public static void putString(ByteBuffer buffer, String string) {
-    int length = string.length();
     byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
 
-    buffer.putInt(length);
+    buffer.putInt(bytes.length);
     buffer.put(bytes);
   }
 }
