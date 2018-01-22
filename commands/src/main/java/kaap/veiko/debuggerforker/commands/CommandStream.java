@@ -1,13 +1,22 @@
 package kaap.veiko.debuggerforker.commands;
 
 import java.io.IOException;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
+import java.nio.channels.SocketChannel;
 import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import kaap.veiko.debuggerforker.commands.parser.CommandParser;
 import kaap.veiko.debuggerforker.packet.PacketStream;
 import kaap.veiko.debuggerforker.types.VMInformation;
 
-public class CommandStream implements AutoCloseable {
+public class CommandStream {
+
+  private static final Logger log = LoggerFactory.getLogger(CommandStream.class);
+
   private final PacketStream packetStream;
   private final VMInformation vmInformation;
   private final CommandParser commandParser;
@@ -30,8 +39,11 @@ public class CommandStream implements AutoCloseable {
     }
   }
 
-  @Override
-  public void close() throws Exception {
+  public SocketChannel getSocketChannel() {
+    return packetStream.getSocketChannel();
+  }
+
+  public void close() {
     packetStream.close();
   }
 

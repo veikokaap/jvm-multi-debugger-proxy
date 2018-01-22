@@ -21,15 +21,16 @@ import kaap.veiko.debuggerforker.types.VMInformation;
 
 public class CommandHandler implements CommandVisitor<CommandResult> {
 
-  private final VMInformation vmInformation;
-  private final ProxyPacketStream debuggerStream;
-  private final CommandStream vmStream;
-  private final Logger log = LoggerFactory.getLogger(CommandHandler.class);
+  private static final Logger log = LoggerFactory.getLogger(CommandHandler.class);
 
-  public CommandHandler(VMInformation vmInformation, ProxyPacketStream debuggerStream, CommandStream vmStream) {
+  private final VMInformation vmInformation;
+  private final CommandStream vmStream;
+  private final ProxyCommandStream proxyCommandStream;
+
+  public CommandHandler(VMInformation vmInformation, CommandStream vmStream, ProxyCommandStream proxyCommandStream) {
     this.vmInformation = vmInformation;
-    this.debuggerStream = debuggerStream;
     this.vmStream = vmStream;
+    this.proxyCommandStream = proxyCommandStream;
   }
 
   @Override
@@ -74,12 +75,7 @@ public class CommandHandler implements CommandVisitor<CommandResult> {
     } catch (IOException error) {
       log.error("Failed to build packet from command {}", disposeReply, error);
     } finally {
-      try {
-        stream.close();
-      }
-      catch (IOException error) {
-        log.error("Exception when trying to close stream.", error);
-      }
+      stream.close();
     }
 
     return CommandResult.NO_PACKETS_SENT;
