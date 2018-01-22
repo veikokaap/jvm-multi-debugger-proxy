@@ -30,4 +30,11 @@ public class DebuggerPacketStream extends PacketStreamBase {
     Packet transformed = packetTransformer.transformWritePacket(packet);
     super.write(transformed);
   }
+
+  @Override
+  public String toString() {
+    return "DebuggerPacketStream{" +
+        "socketChannel=" + getSocketChannel() +
+        '}';
+  }
 }

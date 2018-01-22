@@ -71,4 +71,23 @@ public abstract class PacketStreamBase implements PacketStream {
   public boolean isClosed() {
     return !socketChannel.isOpen();
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    PacketStreamBase that = (PacketStreamBase) o;
+
+    return socketChannel.equals(that.socketChannel);
+  }
+
+  @Override
+  public int hashCode() {
+    return socketChannel.hashCode();
+  }
 }

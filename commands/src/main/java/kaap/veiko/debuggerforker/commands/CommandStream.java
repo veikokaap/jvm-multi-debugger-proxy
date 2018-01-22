@@ -50,4 +50,30 @@ public class CommandStream {
   public boolean isClosed() {
     return packetStream.isClosed();
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    CommandStream that = (CommandStream) o;
+
+    return packetStream.equals(that.packetStream);
+  }
+
+  @Override
+  public int hashCode() {
+    return packetStream.hashCode();
+  }
+
+  @Override
+  public String toString() {
+    return "CommandStream{" +
+        "packetStream=" + packetStream +
+        '}';
+  }
 }

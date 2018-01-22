@@ -57,4 +57,11 @@ public class VirtualMachinePacketStream extends PacketStreamBase {
       return packet;
     }
   }
+
+  @Override
+  public String toString() {
+    return "VirtualMachinePacketStream{" +
+        "socketChannel=" + getSocketChannel() +
+        '}';
+  }
 }

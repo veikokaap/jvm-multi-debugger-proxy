@@ -40,7 +40,7 @@ public class CommandStreamChannelSelectorRunnable implements Runnable {
         selector.wakeup();
         synchronized (registerLock) {
           commandStream.getSocketChannel().register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE, commandStream);
-          log.info("Registered new debugger: {}", commandStream);
+          log.info("Registered new commandStream: {}", commandStream);
         }
       }
     }
