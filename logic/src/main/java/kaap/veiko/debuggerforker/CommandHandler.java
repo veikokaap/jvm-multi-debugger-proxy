@@ -24,12 +24,10 @@ public class CommandHandler implements CommandVisitor<CommandResult> {
   private static final Logger log = LoggerFactory.getLogger(CommandHandler.class);
 
   private final VMInformation vmInformation;
-  private final CommandStream vmStream;
   private final ProxyCommandStream proxyCommandStream;
 
-  public CommandHandler(VMInformation vmInformation, CommandStream vmStream, ProxyCommandStream proxyCommandStream) {
+  public CommandHandler(VMInformation vmInformation, ProxyCommandStream proxyCommandStream) {
     this.vmInformation = vmInformation;
-    this.vmStream = vmStream;
     this.proxyCommandStream = proxyCommandStream;
   }
 

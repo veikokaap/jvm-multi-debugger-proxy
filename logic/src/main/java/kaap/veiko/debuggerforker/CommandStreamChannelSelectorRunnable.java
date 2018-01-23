@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -19,6 +20,8 @@ public class CommandStreamChannelSelectorRunnable implements Runnable {
 
   private final Object selectLock = new Object();
   private final Object registerLock = new Object();
+
+  private final AtomicBoolean open = new AtomicBoolean(true);
 
   private final Selector selector;
   private final Consumer<Command> readPacketConsumer;
@@ -62,7 +65,7 @@ public class CommandStreamChannelSelectorRunnable implements Runnable {
 
   @Override
   public void run() {
-    while (!Thread.interrupted()) {
+    while (open.get() && !Thread.currentThread().isInterrupted()) {
       try {
         int selected = synchronizedSelect();
         if (selected == 0) continue;
@@ -108,5 +111,9 @@ public class CommandStreamChannelSelectorRunnable implements Runnable {
     if (command != null) {
       readPacketConsumer.accept(command);
     }
+  }
+  
+  public void close() {
+    open.set(false);
   }
 }

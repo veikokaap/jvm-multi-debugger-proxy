@@ -20,7 +20,7 @@ public class ProxyCommandStream {
   private final Map<CommandStream, Deque<Command>> writeQueues = new ConcurrentHashMap<>();
   private final CommandStreamChannelSelectorRunnable channelSelectorRunnable;
   private final Thread thread;
-
+  
   public static ProxyCommandStream create() throws IOException {
     return new ProxyCommandStream();
   }
@@ -76,6 +76,16 @@ public class ProxyCommandStream {
   }
 
   public void close() {
-    thread.interrupt();
+    channelSelectorRunnable.close();
+
+    try {
+      Thread.sleep(100);
+    }
+    catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    }
+    finally {
+      thread.interrupt();
+    }
   }
 }

@@ -15,7 +15,7 @@ public class DebuggerConnector extends ConnectorBase<DebuggerPacketStream> {
   private final ServerSocketChannel serverChannel;
   private final PacketTransformer packetTransformer = new PacketTransformer();
 
-  public static DebuggerConnector open(int port, Consumer<DebuggerPacketStream> listener) throws IOException {
+  public static DebuggerConnector create(int port, Consumer<DebuggerPacketStream> listener) throws IOException {
     ServerSocketChannel serverChannel = ServerSocketChannel.open();
     serverChannel.bind(new InetSocketAddress("127.0.0.1", port));
     return new DebuggerConnector(serverChannel, listener);
