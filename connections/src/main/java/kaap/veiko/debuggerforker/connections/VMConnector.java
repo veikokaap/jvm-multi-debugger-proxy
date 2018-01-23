@@ -6,35 +6,46 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.Arrays;
+import java.util.function.Consumer;
 
 import kaap.veiko.debuggerforker.packet.VirtualMachinePacketStream;
 
-public class VMConnector {
+public class VMConnector extends ConnectorBase<VirtualMachinePacketStream> {
+  
+  private final InetSocketAddress socketAddress;
 
-  public static VirtualMachinePacketStream connectToVM(InetSocketAddress address) throws InterruptedException, IOException {
-    SocketChannel socketChannel = new VMConnector().connectAndHandshake(address);
+  public static VMConnector create(InetSocketAddress socketAddress, Consumer<VirtualMachinePacketStream> listener) {
+    return new VMConnector(socketAddress, listener);
+  }
+
+  private VMConnector(InetSocketAddress socketAddress, Consumer<VirtualMachinePacketStream> listener) {
+    super(listener, 1, "VmConnectorThread");
+    this.socketAddress = socketAddress;
+  }
+
+  @Override
+  protected VirtualMachinePacketStream getConnectionBlocking() throws IOException {
+    SocketChannel socketChannel = connect(socketAddress);
+    if (socketChannel == null) {
+      return null;
+    }
+    
+    handshake(socketChannel);
     return new VirtualMachinePacketStream(socketChannel);
   }
 
-  private SocketChannel connectAndHandshake(InetSocketAddress address) throws InterruptedException, IOException {
-    SocketChannel socketChannel = connect(address);
-    handshake(socketChannel);
-    return socketChannel;
-  }
-
   private SocketChannel connect(InetSocketAddress address) throws IOException {
-    while (true) {
+    try {
+      return SocketChannel.open(address);
+    }
+    catch (ConnectException connectException) {
       try {
-        return SocketChannel.open(address);
+        Thread.sleep(50);
+        return null;
       }
-      catch (ConnectException connectException) {
-        try {
-          Thread.sleep(1000);
-        }
-        catch (InterruptedException interruptedException) {
-          Thread.currentThread().interrupt();
-          throw new IOException("Connection failed - InterruptedException before connected to the VM");
-        }
+      catch (InterruptedException interruptedException) {
+        Thread.currentThread().interrupt();
+        throw new IOException("Connection failed - InterruptedException before connected to the VM");
       }
     }
   }

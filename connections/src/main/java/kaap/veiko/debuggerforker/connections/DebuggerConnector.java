@@ -11,10 +11,9 @@ import java.util.function.Consumer;
 import kaap.veiko.debuggerforker.packet.DebuggerPacketStream;
 import kaap.veiko.debuggerforker.packet.internal.PacketTransformer;
 
-public class DebuggerConnector implements AutoCloseable {
+public class DebuggerConnector extends ConnectorBase<DebuggerPacketStream> {
   private final ServerSocketChannel serverChannel;
   private final PacketTransformer packetTransformer = new PacketTransformer();
-  private final Thread thread;
 
   public static DebuggerConnector open(int port, Consumer<DebuggerPacketStream> listener) throws IOException {
     ServerSocketChannel serverChannel = ServerSocketChannel.open();
@@ -22,25 +21,13 @@ public class DebuggerConnector implements AutoCloseable {
     return new DebuggerConnector(serverChannel, listener);
   }
 
-  private DebuggerConnector(ServerSocketChannel serverChannel, Consumer<DebuggerPacketStream> listener) throws IOException {
+  private DebuggerConnector(ServerSocketChannel serverChannel, Consumer<DebuggerPacketStream> listener) {
+    super(listener, Integer.MAX_VALUE, "DebuggerConnectorThread");
     this.serverChannel = serverChannel;
-    thread = new Thread(() -> {
-      while (!Thread.interrupted()) {
-        try {
-          DebuggerPacketStream packetStream = getConnectionBlocking();
-          listener.accept(packetStream);
-        } catch (Exception e) {
-          return;
-        }
-      }
-    }, "DebuggerConnectorThread");
   }
-
-  public void start() {
-    thread.start();
-  }
-
-  private DebuggerPacketStream getConnectionBlocking() throws IOException {
+  
+  @Override
+  protected DebuggerPacketStream getConnectionBlocking() throws IOException {
     SocketChannel socketChannel = serverChannel.accept();
     handshake(socketChannel);
     return new DebuggerPacketStream(socketChannel, packetTransformer);
@@ -64,11 +51,5 @@ public class DebuggerConnector implements AutoCloseable {
     while (outBuffer.hasRemaining()) {
       socketChannel.write(outBuffer);
     }
-  }
-
-  @Override
-  public void close() throws IOException {
-    thread.interrupt();
-    serverChannel.close();
   }
 }
