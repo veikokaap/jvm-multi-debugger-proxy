@@ -1,6 +1,7 @@
 package kaap.veiko.debuggerforker;
 
 import java.io.IOException;
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.Set;
@@ -39,13 +40,7 @@ public class CommandStreamChannelSelectorRunnable implements Runnable {
 
   public void addCommandStream(CommandStream commandStream) {
     try {
-      synchronized (selectLock) {
-        selector.wakeup();
-        synchronized (registerLock) {
-          commandStream.getSocketChannel().register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE, commandStream);
-          log.info("Registered new commandStream: {}", commandStream);
-        }
-      }
+      synchronizedRegister(commandStream);
     }
     catch (Exception e) {
       commandStream.close();
@@ -53,12 +48,22 @@ public class CommandStreamChannelSelectorRunnable implements Runnable {
     }
   }
 
+  private void synchronizedRegister(CommandStream commandStream) throws ClosedChannelException {
+    synchronized (registerLock) {
+      selector.wakeup();
+      synchronized (selectLock) { // Wait until select has woken.
+        commandStream.getSocketChannel().register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE, commandStream);
+        log.info("Registered new commandStream: {}", commandStream);
+      }
+    }
+  }
+
   private int synchronizedSelect() throws IOException {
     int selected;
-    synchronized (registerLock) {
+    synchronized (selectLock) {
       selected = selector.select();
     }
-    synchronized (selectLock) {} // Wait until new channel is registered
+    synchronized (registerLock) {} // Wait until new channel is registered
 
     return selected;
   }
