@@ -1,5 +1,7 @@
 package kaap.veiko.debuggerforker.packet;
 
+import static kaap.veiko.debuggerforker.packet.PacketSource.SourceType.DEBUGGER;
+
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
 
@@ -11,7 +13,7 @@ public class DebuggerPacketStream extends PacketStreamBase {
   private final PacketTransformer packetTransformer;
 
   public DebuggerPacketStream(SocketChannel socketChannel, PacketTransformer packetTransformer) throws IOException {
-    super(socketChannel);
+    super(socketChannel, DEBUGGER);
     this.packetTransformer = packetTransformer;
   }
 

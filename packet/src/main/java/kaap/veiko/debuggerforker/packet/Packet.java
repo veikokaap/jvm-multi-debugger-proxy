@@ -17,7 +17,7 @@ public interface Packet {
     return getLength() > HEADER_LENGTH;
   }
 
-  PacketStream getSource();
+  PacketSource getSource();
 
   boolean isSynthetic();
 

@@ -10,7 +10,7 @@ public class CommandPacket extends PacketBase {
   private final short commandSetId;
   private ReplyPacket replyPacket;
 
-  public CommandPacket(int id, short commandSetId, short commandId, byte[] data, PacketStream source) {
+  public CommandPacket(int id, short commandSetId, short commandId, byte[] data, PacketSource source) {
     super(id, data, source);
     this.commandSetId = commandSetId;
     this.commandId = commandId;

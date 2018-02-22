@@ -10,6 +10,8 @@ public interface PacketStream {
 
   SocketChannel getSocketChannel();
 
+  PacketSource getSource();
+
   void close();
 
   boolean isClosed();

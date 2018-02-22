@@ -5,6 +5,7 @@ import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -14,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import kaap.veiko.debuggerforker.commands.Command;
 import kaap.veiko.debuggerforker.commands.CommandStream;
+import kaap.veiko.debuggerforker.packet.PacketSource;
 
 public class CommandStreamChannelSelectorRunnable implements Runnable {
 
@@ -26,13 +28,15 @@ public class CommandStreamChannelSelectorRunnable implements Runnable {
 
   private final Selector selector;
   private final Consumer<Command> readPacketConsumer;
-  private final Function<CommandStream, Command> packetToWriteProducer;
+  private final Function<PacketSource, Command> packetToWriteProducer;
 
-  public static CommandStreamChannelSelectorRunnable create(Consumer<Command> readCommandConsumer, Function<CommandStream, Command> writePacketProducer) throws IOException {
+  private final Set<PacketSource> sourcesMarkedForClosing = new ConcurrentSkipListSet<>();
+
+  public static CommandStreamChannelSelectorRunnable create(Consumer<Command> readCommandConsumer, Function<PacketSource, Command> writePacketProducer) throws IOException {
     return new CommandStreamChannelSelectorRunnable(Selector.open(), readCommandConsumer, writePacketProducer);
   }
 
-  private CommandStreamChannelSelectorRunnable(Selector selector, Consumer<Command> readCommandConsumer, Function<CommandStream, Command> packetToWriteProducer) {
+  private CommandStreamChannelSelectorRunnable(Selector selector, Consumer<Command> readCommandConsumer, Function<PacketSource, Command> packetToWriteProducer) {
     this.selector = selector;
     this.readPacketConsumer = readCommandConsumer;
     this.packetToWriteProducer = packetToWriteProducer;
@@ -102,12 +106,19 @@ public class CommandStreamChannelSelectorRunnable implements Runnable {
     if (key.isWritable()) {
       writeCommand(commandStream);
     }
+    closeIfMarked(commandStream);
   }
 
   private void writeCommand(CommandStream commandStream) throws IOException {
-    Command command = packetToWriteProducer.apply(commandStream);
+    Command command = packetToWriteProducer.apply(commandStream.getSource());
     if (command != null) {
       commandStream.write(command);
+    }
+  }
+
+  private void closeIfMarked(CommandStream commandStream) {
+    if (sourcesMarkedForClosing.contains(commandStream.getSource())) {
+      commandStream.close();
     }
   }
 
@@ -120,5 +131,12 @@ public class CommandStreamChannelSelectorRunnable implements Runnable {
   
   public void close() {
     open.set(false);
+  }
+
+  /**
+   * Close the CommandStream corresponding to the source the next time it's reads/writes are done. This is done to ensure the last packet is sent before closing.
+   */
+  public void markForClosing(PacketSource source) {
+    sourcesMarkedForClosing.add(source);
   }
 }

@@ -5,6 +5,7 @@ import java.util.function.Function;
 
 import kaap.veiko.debuggerforker.packet.CommandPacket;
 import kaap.veiko.debuggerforker.packet.Packet;
+import kaap.veiko.debuggerforker.packet.PacketSource;
 import kaap.veiko.debuggerforker.packet.PacketStream;
 import kaap.veiko.debuggerforker.packet.ReplyPacket;
 
@@ -19,11 +20,11 @@ class PacketParser {
     this.packetBytes = packetBytes;
   }
 
-  static Packet parse(int length, byte[] packetBytes, PacketStream source) {
+  static Packet parse(int length, byte[] packetBytes, PacketSource source) {
     return new PacketParser(length, packetBytes).internalParse(source);
   }
 
-  private Packet internalParse(PacketStream source) {
+  private Packet internalParse(PacketSource source) {
     int id = readInt();
     short flags = readByte();
 

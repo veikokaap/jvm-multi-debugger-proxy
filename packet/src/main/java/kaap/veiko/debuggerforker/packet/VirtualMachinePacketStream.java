@@ -1,5 +1,7 @@
 package kaap.veiko.debuggerforker.packet;
 
+import static kaap.veiko.debuggerforker.packet.PacketSource.SourceType.VIRTUAL_MACHINE;
+
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,7 +20,7 @@ public class VirtualMachinePacketStream extends PacketStreamBase {
   private final ReplyPacketVisitor replyPacketVisitor = new ReplyPacketVisitor();
 
   public VirtualMachinePacketStream(SocketChannel socketChannel) throws IOException {
-    super(socketChannel);
+    super(socketChannel, VIRTUAL_MACHINE);
   }
 
   @Override

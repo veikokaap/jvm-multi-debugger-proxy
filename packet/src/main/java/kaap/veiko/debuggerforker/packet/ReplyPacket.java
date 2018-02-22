@@ -9,7 +9,7 @@ public class ReplyPacket extends PacketBase {
   private final short errorCode;
   private CommandPacket commandPacket;
 
-  public ReplyPacket(int id, short errorCode, byte[] data, PacketStream source) {
+  public ReplyPacket(int id, short errorCode, byte[] data, PacketSource source) {
     super(id, data, source);
     this.errorCode = errorCode;
   }

@@ -1,11 +1,8 @@
 package kaap.veiko.debuggerforker;
 
-import java.io.IOException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import kaap.veiko.debuggerforker.commands.CommandStream;
 import kaap.veiko.debuggerforker.commands.CommandVisitor;
 import kaap.veiko.debuggerforker.commands.UnknownCommand;
 import kaap.veiko.debuggerforker.commands.sets.event.CompositeEventCommand;
@@ -16,7 +13,7 @@ import kaap.veiko.debuggerforker.commands.sets.eventrequest.SetEventRequestReply
 import kaap.veiko.debuggerforker.commands.sets.virtualmachine.DisposeCommand;
 import kaap.veiko.debuggerforker.commands.sets.virtualmachine.DisposeReply;
 import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IdSizesReply;
-import kaap.veiko.debuggerforker.packet.PacketStream;
+import kaap.veiko.debuggerforker.packet.PacketSource;
 import kaap.veiko.debuggerforker.types.VMInformation;
 
 public class CommandHandler implements CommandVisitor<CommandResult> {
@@ -57,24 +54,19 @@ public class CommandHandler implements CommandVisitor<CommandResult> {
   }
 
   /*
-  When disconnecting, debugger sends a DisposeCommand. The VM must not receive this command, so block that command.
-  Also send a reply command back to the debugger so it would think the connection has been successfully terminated.
+  When disconnecting, debugger sends a DisposeCommand. The VM must not receive this command, otherwise it will terminate the connection.
+  So block that command and also send a reply command back to the debugger so it would think the connection has been successfully terminated.
   After that close the connection to the debugger.
    */
   @Override
   public CommandResult visit(DisposeCommand command) {
-    PacketStream stream = command.getPacket().getSource();
+    PacketSource source = command.getPacket().getSource();
 
     int id = command.getCommandId();
     DisposeReply disposeReply = DisposeReply.create(id);
 
-    try {
-      stream.write(disposeReply.getPacket());
-    } catch (IOException error) {
-      log.error("Failed to build packet from command {}", disposeReply, error);
-    } finally {
-      stream.close();
-    }
+    proxyCommandStream.write(source, disposeReply);
+    proxyCommandStream.markForClosingAfterAllPacketsWritten(source);
 
     return CommandResult.NO_PACKETS_SENT;
   }

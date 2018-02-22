@@ -2,12 +2,12 @@ package kaap.veiko.debuggerforker.packet.internal;
 
 import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
-import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import kaap.veiko.debuggerforker.packet.Packet;
+import kaap.veiko.debuggerforker.packet.PacketSource;
 import kaap.veiko.debuggerforker.packet.PacketStream;
 
 public abstract class PacketStreamBase implements PacketStream {
@@ -15,13 +15,15 @@ public abstract class PacketStreamBase implements PacketStream {
   private final Logger log = LoggerFactory.getLogger(PacketStreamBase.class);
 
   private final SocketChannel socketChannel;
+  private final PacketSource packetSource;
   private final PacketReader packetReader;
   private final PacketWriter packetWriter;
 
-  public PacketStreamBase(SocketChannel socketChannel) throws IOException {
+  public PacketStreamBase(SocketChannel socketChannel, PacketSource.SourceType sourceType) throws IOException {
     socketChannel.configureBlocking(false);
     this.socketChannel = socketChannel;
-    this.packetReader = new PacketReader(socketChannel, this);
+    this.packetSource = new PacketSource(socketChannel, sourceType);
+    this.packetReader = new PacketReader(socketChannel, packetSource);
     this.packetWriter = new PacketWriter(socketChannel);
   }
 
@@ -55,6 +57,11 @@ public abstract class PacketStreamBase implements PacketStream {
 
   public SocketChannel getSocketChannel() {
     return socketChannel;
+  }
+
+  @Override
+  public PacketSource getSource() {
+    return packetSource;
   }
 
   @Override

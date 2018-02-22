@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import kaap.veiko.debuggerforker.commands.parser.CommandParser;
+import kaap.veiko.debuggerforker.packet.PacketSource;
 import kaap.veiko.debuggerforker.packet.PacketStream;
 import kaap.veiko.debuggerforker.types.VMInformation;
 
@@ -41,6 +42,10 @@ public class CommandStream {
 
   public SocketChannel getSocketChannel() {
     return packetStream.getSocketChannel();
+  }
+
+  public PacketSource getSource() {
+    return packetStream.getSource();
   }
 
   public void close() {

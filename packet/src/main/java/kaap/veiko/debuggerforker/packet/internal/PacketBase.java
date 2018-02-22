@@ -4,15 +4,16 @@ import java.util.Arrays;
 import java.util.Objects;
 
 import kaap.veiko.debuggerforker.packet.Packet;
+import kaap.veiko.debuggerforker.packet.PacketSource;
 import kaap.veiko.debuggerforker.packet.PacketStream;
 
 public abstract class PacketBase implements Packet {
 
   private final int id;
   private final byte[] data;
-  private final PacketStream source;
+  private final PacketSource source;
 
-  public PacketBase(int id, byte[] data, PacketStream source) {
+  public PacketBase(int id, byte[] data, PacketSource source) {
     this.id = id;
     this.data = data;
     this.source = source;
@@ -39,7 +40,7 @@ public abstract class PacketBase implements Packet {
   }
 
   @Override
-  public PacketStream getSource() {
+  public PacketSource getSource() {
     return source;
   }
 
