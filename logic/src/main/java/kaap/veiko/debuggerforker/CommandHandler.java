@@ -52,7 +52,7 @@ public class CommandHandler implements CommandVisitor {
 
   @Override
   public void visit(SetEventRequestReply command) {
-    forwardReplyToOriginalSource(command);
+    sendReplyToOriginalSource(command);
   }
 
   /**
@@ -82,7 +82,7 @@ public class CommandHandler implements CommandVisitor {
   @Override
   public void visit(IdSizesReply reply) {
     vmInformation.setIdSizes(reply.getIdSizes());
-    forwardReplyToOriginalSource(reply);
+    sendReplyToOriginalSource(reply);
   }
 
   @Override
@@ -92,7 +92,7 @@ public class CommandHandler implements CommandVisitor {
 
   private void defaultHandle(Command command) {
     if (command.getPacket().isReply()) {
-      forwardReplyToOriginalSource(command);
+      sendReplyToOriginalSource(command);
     }
     else {
       if (command.getSource().isDebugger()) {
@@ -105,7 +105,7 @@ public class CommandHandler implements CommandVisitor {
     }
   }
 
-  private void forwardReplyToOriginalSource(Command<ReplyPacket> reply) {
+  private void sendReplyToOriginalSource(Command<ReplyPacket> reply) {
     PacketSource originalSource = reply.getPacket().getCommandPacket().getSource();
     proxyCommandStream.write(originalSource, reply);
   }
