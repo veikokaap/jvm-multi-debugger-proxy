@@ -96,6 +96,7 @@ public class CommandStreamChannelSelectorRunnable implements Runnable {
           }
         }
       }
+      selectionKeys.clear();
     }
   }
 
