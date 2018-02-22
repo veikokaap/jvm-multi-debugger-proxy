@@ -60,12 +60,10 @@ public class CommandHandler implements CommandVisitor<CommandResult> {
    */
   @Override
   public CommandResult visit(DisposeCommand command) {
-    PacketSource source = command.getPacket().getSource();
+    PacketSource source = command.getSource();
 
     int id = command.getCommandId();
-    DisposeReply disposeReply = DisposeReply.create(id);
-
-    proxyCommandStream.write(source, disposeReply);
+    proxyCommandStream.write(source, DisposeReply.create(id));
     proxyCommandStream.markForClosingAfterAllPacketsWritten(source);
 
     return CommandResult.NO_PACKETS_SENT;
