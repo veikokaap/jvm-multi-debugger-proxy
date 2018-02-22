@@ -5,6 +5,7 @@ import java.net.InetSocketAddress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import kaap.veiko.debuggerforker.commands.Command;
 import kaap.veiko.debuggerforker.commands.CommandStream;
 import kaap.veiko.debuggerforker.connections.DebuggerConnector;
 import kaap.veiko.debuggerforker.connections.VMConnector;
@@ -38,6 +39,13 @@ public class DebuggerForker {
     proxyCommandStream.start();
     debuggerConnector.start();
     vmConnector.start();
+
+    while (true) {
+      Command command = proxyCommandStream.read();
+      if (command != null) {
+        command.visit(commandHandler);
+      }
+    }
   }
 
 }
