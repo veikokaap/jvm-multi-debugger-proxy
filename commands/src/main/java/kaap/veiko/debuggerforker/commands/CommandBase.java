@@ -5,18 +5,18 @@ import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;
 import kaap.veiko.debuggerforker.packet.Packet;
 import kaap.veiko.debuggerforker.packet.PacketSource;
 
-public abstract class CommandBase implements Command {
+public abstract class CommandBase<T extends Packet> implements Command<T> {
 
-  private final Packet packet;
+  private final T packet;
   private final CommandIdentifier commandIdentifier;
 
-  protected CommandBase(Packet packet, CommandIdentifier commandIdentifier) {
+  protected CommandBase(T packet, CommandIdentifier commandIdentifier) {
     this.packet = packet;
     this.commandIdentifier = commandIdentifier;
   }
 
   @Override
-  public Packet getPacket() {
+  public T getPacket() {
     return packet;
   }
 

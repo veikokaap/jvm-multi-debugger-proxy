@@ -4,7 +4,7 @@ import kaap.veiko.debuggerforker.commands.parser.CommandDataWriter;
 import kaap.veiko.debuggerforker.packet.Packet;
 import kaap.veiko.debuggerforker.packet.PacketSource;
 
-public interface Command {
+public interface Command<T extends Packet> {
   int getCommandSetId();
 
   int getCommandId();
@@ -13,7 +13,7 @@ public interface Command {
 
   void visit(CommandVisitor visitor);
 
-  Packet getPacket();
+  T getPacket();
 
   PacketSource getSource();
 

@@ -6,9 +6,9 @@ import kaap.veiko.debuggerforker.commands.MutableReplyPacket;
 import kaap.veiko.debuggerforker.commands.parser.CommandDataReader;
 import kaap.veiko.debuggerforker.commands.parser.CommandDataWriter;
 import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;
-import kaap.veiko.debuggerforker.packet.Packet;
+import kaap.veiko.debuggerforker.packet.ReplyPacket;
 
-public class DisposeReply extends CommandBase {
+public class DisposeReply extends CommandBase<ReplyPacket> {
   private static final CommandIdentifier COMMAND_IDENTIFIER = CommandIdentifier.DISPOSE_REPLY;
 
   public static DisposeReply create(int packetId) {
@@ -17,10 +17,10 @@ public class DisposeReply extends CommandBase {
   }
 
   public static DisposeReply read(CommandDataReader reader) {
-    return new DisposeReply(reader.getPacket());
+    return new DisposeReply((ReplyPacket) reader.getPacket());
   }
 
-  private DisposeReply(Packet packet) {
+  private DisposeReply(ReplyPacket packet) {
     super(packet, COMMAND_IDENTIFIER);
   }
 
