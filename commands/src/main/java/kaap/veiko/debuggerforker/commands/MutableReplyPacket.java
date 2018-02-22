@@ -12,6 +12,7 @@ public class MutableReplyPacket extends ReplyPacket {
 
   private MutableReplyPacket(int id, short errorCode) {
     super(id, errorCode, new byte[0], null);
+    this.data = super.getData();
   }
 
   public void setData(byte[] data) {
