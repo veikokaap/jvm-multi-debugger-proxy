@@ -2,6 +2,7 @@ package kaap.veiko.debuggerforker.commands;
 
 import kaap.veiko.debuggerforker.commands.parser.CommandDataWriter;
 import kaap.veiko.debuggerforker.packet.Packet;
+import kaap.veiko.debuggerforker.packet.PacketSource;
 
 public class UnknownCommand implements Command {
 
@@ -40,6 +41,11 @@ public class UnknownCommand implements Command {
   @Override
   public Packet getPacket() {
     return packet;
+  }
+
+  @Override
+  public PacketSource getSource() {
+    return packet.getSource();
   }
 
   @Override

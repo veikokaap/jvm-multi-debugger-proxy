@@ -3,6 +3,7 @@ package kaap.veiko.debuggerforker.commands;
 import kaap.veiko.debuggerforker.commands.parser.CommandType;
 import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;
 import kaap.veiko.debuggerforker.packet.Packet;
+import kaap.veiko.debuggerforker.packet.PacketSource;
 
 public abstract class CommandBase implements Command {
 
@@ -17,6 +18,11 @@ public abstract class CommandBase implements Command {
   @Override
   public Packet getPacket() {
     return packet;
+  }
+
+  @Override
+  public PacketSource getSource() {
+    return packet.getSource();
   }
 
   @Override
