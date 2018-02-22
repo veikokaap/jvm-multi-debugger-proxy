@@ -70,6 +70,19 @@ public class ProxyCommandStream {
     }
   }
 
+  public void writeToVm(Command command) {
+    writeQueues.keySet().stream()
+        .filter(PacketSource::isVirtualMachine)
+        .findFirst()
+        .ifPresent(s -> write(s, command));
+  }
+
+  public void writeToAllDebuggers(Command command) {
+    writeQueues.keySet().stream()
+        .filter(PacketSource::isDebugger)
+        .forEach(s -> write(s, command));
+  }
+
   public void write(PacketSource source, Command command) {
     /* Don't add any new packets to be written to a stream marked for closing */
     if (markedForClosing(source)) {
@@ -98,13 +111,21 @@ public class ProxyCommandStream {
     if (writeQueue != null) {
       Command command = writeQueue.pollFirst();
       if (writeQueue.isEmpty()) {
-        channelSelectorRunnable.markForClosing(source);
+        removeSource(source);
       }
       return command;
     } else {
       log.warn("Trying to find a writable command from a packet source which isn't registered: {}", source);
       return null;
     }
+  }
+
+  private void removeSource(PacketSource source) {
+    CommandStream stream = sourceStreamMap.remove(source);
+    streamsMarkedForClosing.remove(stream);
+
+    channelSelectorRunnable.markForClosing(source);
+    writeQueues.remove(source);
   }
 
   public void close() {
