@@ -25,10 +25,14 @@ public class DebuggerConnector extends ConnectorBase<DebuggerPacketStream> {
     super(listener, Integer.MAX_VALUE, "DebuggerConnectorThread");
     this.serverChannel = serverChannel;
   }
-  
+
   @Override
   protected DebuggerPacketStream getConnectionBlocking() throws IOException {
     SocketChannel socketChannel = serverChannel.accept();
+    socketChannel.configureBlocking(true);
+    if (!socketChannel.finishConnect()) {
+      throw new IOException("Failed to connect channel");
+    }
     handshake(socketChannel);
     return new DebuggerPacketStream(socketChannel, packetTransformer);
   }

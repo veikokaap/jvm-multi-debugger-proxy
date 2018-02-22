@@ -36,7 +36,12 @@ public class VMConnector extends ConnectorBase<VirtualMachinePacketStream> {
 
   private SocketChannel connect(InetSocketAddress address) throws IOException {
     try {
-      return SocketChannel.open(address);
+      SocketChannel channel = SocketChannel.open(address);
+      channel.configureBlocking(true);
+      if (!channel.finishConnect()) {
+        throw new IOException("Failed to connect channel");
+      }
+      return channel;
     }
     catch (ConnectException connectException) {
       try {
