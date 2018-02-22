@@ -74,6 +74,15 @@ public class CommandStreamChannelSelectorRunnable implements Runnable {
 
   @Override
   public void run() {
+    try {
+      selectLoop();
+    }
+    catch (Exception e) {
+      log.error("Thread '{}' will shut down due to exception in runnable", Thread.currentThread(), e);
+    }
+  }
+
+  private void selectLoop() {
     while (open.get() && !Thread.currentThread().isInterrupted()) {
       try {
         int selected = synchronizedSelect();
