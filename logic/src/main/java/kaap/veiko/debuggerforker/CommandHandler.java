@@ -32,22 +32,27 @@ public class CommandHandler implements CommandVisitor {
 
   @Override
   public void visit(CompositeEventCommand command) {
+    defaultHandle(command);
   }
 
   @Override
   public void visit(ClearAllBreakpointsCommand command) {
+    defaultHandle(command);
   }
 
   @Override
   public void visit(ClearEventRequestCommand command) {
+    defaultHandle(command);
   }
 
   @Override
   public void visit(SetEventRequestCommand command) {
+    defaultHandle(command);
   }
 
   @Override
   public void visit(SetEventRequestReply command) {
+    forwardReplyToOriginalSource(command);
   }
 
   /**
@@ -82,6 +87,10 @@ public class CommandHandler implements CommandVisitor {
 
   @Override
   public void visit(UnknownCommand command) {
+    defaultHandle(command);
+  }
+
+  private void defaultHandle(Command command) {
     if (command.getPacket().isReply()) {
       forwardReplyToOriginalSource(command);
     }

@@ -9,9 +9,10 @@ import kaap.veiko.debuggerforker.commands.parser.CommandDataWriter;
 import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;
 import kaap.veiko.debuggerforker.commands.util.CommandDataUtil;
 import kaap.veiko.debuggerforker.packet.Packet;
+import kaap.veiko.debuggerforker.packet.ReplyPacket;
 import kaap.veiko.debuggerforker.types.VMInformation;
 
-public class SetEventRequestReply extends CommandBase {
+public class SetEventRequestReply extends CommandBase<ReplyPacket> {
   private static final CommandIdentifier COMMAND_IDENTIFIER = CommandIdentifier.SET_EVENT_REQUEST_REPLY;
 
   private final int requestId;
@@ -26,10 +27,10 @@ public class SetEventRequestReply extends CommandBase {
 
   public static SetEventRequestReply read(CommandDataReader reader) {
     int requestId = reader.readInt();
-    return new SetEventRequestReply(reader.getPacket(), requestId);
+    return new SetEventRequestReply((ReplyPacket) reader.getPacket(), requestId);
   }
 
-  private SetEventRequestReply(Packet packet, int requestId) {
+  private SetEventRequestReply(ReplyPacket packet, int requestId) {
     super(packet, COMMAND_IDENTIFIER);
     this.requestId = requestId;
   }
