@@ -59,7 +59,9 @@ public class ProxyCommandStream {
 
   public Command read() {
     Command readCommand = readQueue.pollFirst();
-    log.info("Command from readQueue: {}", readCommand);
+    if (readCommand != null) {
+      log.info("Command from readQueue: {}", readCommand);
+    }
     return readCommand;
   }
 
@@ -109,7 +111,7 @@ public class ProxyCommandStream {
     Deque<Command> writeQueue = writeQueues.get(source);
     if (writeQueue != null) {
       Command command = writeQueue.pollFirst();
-      if (writeQueue.isEmpty()) {
+      if (markedForClosing(source) && writeQueue.isEmpty()) {
         removeSource(source);
       }
       return command;
