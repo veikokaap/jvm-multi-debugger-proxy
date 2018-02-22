@@ -29,8 +29,8 @@ public class DisposeCommand extends CommandBase {
   }
 
   @Override
-  public <T> T visit(CommandVisitor<T> visitor) {
-    return visitor.visit(this);
+  public void visit(CommandVisitor visitor) {
+    visitor.visit(this);
   }
 
   @Override

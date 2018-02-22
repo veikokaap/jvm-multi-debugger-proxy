@@ -9,22 +9,22 @@ import kaap.veiko.debuggerforker.commands.sets.virtualmachine.DisposeCommand;
 import kaap.veiko.debuggerforker.commands.sets.virtualmachine.DisposeReply;
 import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IdSizesReply;
 
-public interface CommandVisitor<T> {
-  T visit(CompositeEventCommand command);
+public interface CommandVisitor {
+  void visit(CompositeEventCommand command);
 
-  T visit(ClearAllBreakpointsCommand command);
+  void visit(ClearAllBreakpointsCommand command);
 
-  T visit(ClearEventRequestCommand command);
+  void visit(ClearEventRequestCommand command);
 
-  T visit(SetEventRequestCommand command);
+  void visit(SetEventRequestCommand command);
 
-  T visit(SetEventRequestReply command);
+  void visit(SetEventRequestReply command);
 
-  T visit(DisposeCommand command);
+  void visit(DisposeCommand command);
 
-  T visit(IdSizesReply command);
+  void visit(IdSizesReply command);
 
-  T visit(DisposeReply disposeReply);
+  void visit(DisposeReply disposeReply);
 
-  T visit(UnknownCommand packetCommand);
+  void visit(UnknownCommand packetCommand);
 }

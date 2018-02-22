@@ -16,7 +16,7 @@ import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IdSizesReply;
 import kaap.veiko.debuggerforker.packet.PacketSource;
 import kaap.veiko.debuggerforker.types.VMInformation;
 
-public class CommandHandler implements CommandVisitor<CommandResult> {
+public class CommandHandler implements CommandVisitor {
 
   private static final Logger log = LoggerFactory.getLogger(CommandHandler.class);
 
@@ -29,28 +29,23 @@ public class CommandHandler implements CommandVisitor<CommandResult> {
   }
 
   @Override
-  public CommandResult visit(CompositeEventCommand command) {
-    return CommandResult.forwardPacket(command);
+  public void visit(CompositeEventCommand command) {
   }
 
   @Override
-  public CommandResult visit(ClearAllBreakpointsCommand command) {
-    return CommandResult.forwardPacket(command);
+  public void visit(ClearAllBreakpointsCommand command) {
   }
 
   @Override
-  public CommandResult visit(ClearEventRequestCommand command) {
-    return CommandResult.forwardPacket(command);
+  public void visit(ClearEventRequestCommand command) {
   }
 
   @Override
-  public CommandResult visit(SetEventRequestCommand command) {
-    return CommandResult.forwardPacket(command);
+  public void visit(SetEventRequestCommand command) {
   }
 
   @Override
-  public CommandResult visit(SetEventRequestReply command) {
-    return CommandResult.forwardPacket(command);
+  public void visit(SetEventRequestReply command) {
   }
 
   /*
@@ -59,32 +54,30 @@ public class CommandHandler implements CommandVisitor<CommandResult> {
   After that close the connection to the debugger.
    */
   @Override
-  public CommandResult visit(DisposeCommand command) {
+  public void visit(DisposeCommand command) {
     PacketSource source = command.getSource();
 
     int id = command.getCommandId();
     proxyCommandStream.write(source, DisposeReply.create(id));
     proxyCommandStream.markForClosingAfterAllPacketsWritten(source);
 
-    return CommandResult.NO_PACKETS_SENT;
   }
 
   /*
   Read IDSizes for knowing how to parse commands.
    */
   @Override
-  public CommandResult visit(IdSizesReply command) {
+  public void visit(IdSizesReply command) {
     vmInformation.setIdSizes(command.getIdSizes());
-    return CommandResult.forwardPacket(command);
   }
 
   @Override
-  public CommandResult visit(DisposeReply command) {
-    return CommandResult.NO_PACKETS_SENT;
+  public void visit(DisposeReply command) {
+
   }
 
   @Override
-  public CommandResult visit(UnknownCommand command) {
-    return CommandResult.forwardPacket(command);
+  public void visit(UnknownCommand command) {
+
   }
 }

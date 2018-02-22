@@ -11,7 +11,7 @@ public interface Command {
 
   boolean isReply();
 
-  <T> T visit(CommandVisitor<T> visitor);
+  void visit(CommandVisitor visitor);
 
   Packet getPacket();
 
