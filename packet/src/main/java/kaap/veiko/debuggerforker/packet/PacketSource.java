@@ -39,6 +39,14 @@ public class PacketSource {
     return socketChannel != null ? socketChannel.hashCode() : 0;
   }
 
+  @Override
+  public String toString() {
+    return "PacketSource{" +
+        "socketChannel=" + socketChannel +
+        ", sourceType=" + sourceType +
+        '}';
+  }
+
   public enum SourceType {
     DEBUGGER,
     VIRTUAL_MACHINE;
