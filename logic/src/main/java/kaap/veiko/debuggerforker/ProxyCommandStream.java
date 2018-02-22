@@ -92,7 +92,7 @@ public class ProxyCommandStream {
 
     Deque<Command> writeQueue = writeQueues.get(source);
     if (writeQueue != null) {
-      log.info("Adding to writeQueue: {}", command);
+      log.info("Adding command '{}' to writeQueue for source {}", command, source);
       writeQueue.addLast(command);
     } else {
       log.warn("Trying to write to a packet source which isn't registered: {}", source);
