@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +25,7 @@ public class ProxyCommandStream {
 
   private final Map<PacketSource, CommandStream> sourceStreamMap = new ConcurrentHashMap<>();
 
-  private final Set<CommandStream> streamsMarkedForClosing = new ConcurrentSkipListSet<>();
+  private final Set<CommandStream> streamsMarkedForClosing = ConcurrentHashMap.newKeySet();
 
   public static ProxyCommandStream create() throws IOException {
     return new ProxyCommandStream();

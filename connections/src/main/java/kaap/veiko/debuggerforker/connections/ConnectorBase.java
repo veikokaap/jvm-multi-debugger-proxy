@@ -2,7 +2,7 @@ package kaap.veiko.debuggerforker.connections;
 
 import java.io.IOException;
 import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -12,7 +12,7 @@ public abstract class ConnectorBase<T extends PacketStream> implements AutoClose
   
   private final Thread thread;
   private final AtomicBoolean open = new AtomicBoolean(true);
-  private final Set<T> connectionHistory = new ConcurrentSkipListSet<>();
+  private final Set<T> connectionHistory = ConcurrentHashMap.newKeySet();
   private final int maxOpenConnections;
 
   protected ConnectorBase(Consumer<T> listener, int maxOpenConnections, String threadName) {

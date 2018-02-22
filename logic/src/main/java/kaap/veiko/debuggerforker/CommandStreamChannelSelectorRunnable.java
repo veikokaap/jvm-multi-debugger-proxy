@@ -5,7 +5,7 @@ import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -30,7 +30,7 @@ public class CommandStreamChannelSelectorRunnable implements Runnable {
   private final Consumer<Command> readPacketConsumer;
   private final Function<PacketSource, Command> packetToWriteProducer;
 
-  private final Set<PacketSource> sourcesMarkedForClosing = new ConcurrentSkipListSet<>();
+  private final Set<PacketSource> sourcesMarkedForClosing = ConcurrentHashMap.newKeySet();
 
   public static CommandStreamChannelSelectorRunnable create(Consumer<Command> readCommandConsumer, Function<PacketSource, Command> writePacketProducer) throws IOException {
     return new CommandStreamChannelSelectorRunnable(Selector.open(), readCommandConsumer, writePacketProducer);
