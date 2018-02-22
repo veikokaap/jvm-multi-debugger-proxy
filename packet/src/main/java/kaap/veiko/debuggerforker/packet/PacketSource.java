@@ -41,14 +41,11 @@ public class PacketSource {
 
   @Override
   public String toString() {
-    return "PacketSource{" +
-        "socketChannel=" + socketChannel +
-        ", sourceType=" + sourceType +
-        '}';
+    return sourceType.toString();
   }
 
   public enum SourceType {
     DEBUGGER,
-    VIRTUAL_MACHINE;
+    VIRTUAL_MACHINE
   }
 }
