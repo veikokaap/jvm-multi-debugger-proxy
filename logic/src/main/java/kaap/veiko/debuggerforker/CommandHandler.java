@@ -3,6 +3,7 @@ package kaap.veiko.debuggerforker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import kaap.veiko.debuggerforker.commands.Command;
 import kaap.veiko.debuggerforker.commands.CommandVisitor;
 import kaap.veiko.debuggerforker.commands.UnknownCommand;
 import kaap.veiko.debuggerforker.commands.sets.event.CompositeEventCommand;
@@ -14,6 +15,7 @@ import kaap.veiko.debuggerforker.commands.sets.virtualmachine.DisposeCommand;
 import kaap.veiko.debuggerforker.commands.sets.virtualmachine.DisposeReply;
 import kaap.veiko.debuggerforker.commands.sets.virtualmachine.IdSizesReply;
 import kaap.veiko.debuggerforker.packet.PacketSource;
+import kaap.veiko.debuggerforker.packet.ReplyPacket;
 import kaap.veiko.debuggerforker.types.VMInformation;
 
 public class CommandHandler implements CommandVisitor {
@@ -48,36 +50,54 @@ public class CommandHandler implements CommandVisitor {
   public void visit(SetEventRequestReply command) {
   }
 
-  /*
-  When disconnecting, debugger sends a DisposeCommand. The VM must not receive this command, otherwise it will terminate the connection.
-  So block that command and also send a reply command back to the debugger so it would think the connection has been successfully terminated.
-  After that close the connection to the debugger.
+  /**
+   * When disconnecting, debugger sends a DisposeCommand. The VM must not receive this command, otherwise it will terminate the connection.
+   * So block that command and also send a reply command back to the debugger so it would think the connection has been successfully terminated.
+   * After that close the connection to the debugger.
    */
   @Override
   public void visit(DisposeCommand command) {
-    PacketSource source = command.getSource();
+    PacketSource debugger = command.getSource();
 
     int id = command.getCommandId();
-    proxyCommandStream.write(source, DisposeReply.create(id));
-    proxyCommandStream.markForClosingAfterAllPacketsWritten(source);
-
+    proxyCommandStream.write(debugger, DisposeReply.create(id));
+    proxyCommandStream.markForClosingAfterAllPacketsWritten(debugger);
   }
 
-  /*
-  Read IDSizes for knowing how to parse commands.
+  /**
+   * This command should NEVER reach the vm, otherwise it will disconnect from the proxy.
    */
   @Override
-  public void visit(IdSizesReply command) {
-    vmInformation.setIdSizes(command.getIdSizes());
+  public void visit(DisposeReply reply) {
   }
 
+  /**
+   * Read IDSizes for knowing how to parse commands.
+   */
   @Override
-  public void visit(DisposeReply command) {
-
+  public void visit(IdSizesReply reply) {
+    vmInformation.setIdSizes(reply.getIdSizes());
+    forwardReplyToOriginalSource(reply);
   }
 
   @Override
   public void visit(UnknownCommand command) {
+    if (command.getPacket().isReply()) {
+      forwardReplyToOriginalSource(command);
+    }
+    else {
+      if (command.getSource().isDebugger()) {
+        proxyCommandStream.writeToVm(command);
+      }
+      else {
+        /* Biggest point of failure - if vm sends a command that we don't know, send it to all debuggers */
+        proxyCommandStream.writeToAllDebuggers(command);
+      }
+    }
+  }
 
+  private void forwardReplyToOriginalSource(Command<ReplyPacket> reply) {
+    PacketSource originalSource = reply.getPacket().getCommandPacket().getSource();
+    proxyCommandStream.write(originalSource, reply);
   }
 }
