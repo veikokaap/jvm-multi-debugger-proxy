@@ -1,27 +1,26 @@
-package kaap.veiko.debuggerforker.commands.sets.eventrequest;
-
+package kaap.veiko.debuggerforker.commands.commandsets.virtualmachine;
 
 import kaap.veiko.debuggerforker.commands.CommandBase;
 import kaap.veiko.debuggerforker.commands.CommandVisitor;
 import kaap.veiko.debuggerforker.commands.MutableCommandPacket;
 import kaap.veiko.debuggerforker.commands.parser.CommandDataReader;
 import kaap.veiko.debuggerforker.commands.parser.CommandDataWriter;
-import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;
+import kaap.veiko.debuggerforker.commands.commandsets.CommandIdentifier;
 import kaap.veiko.debuggerforker.packet.Packet;
 
-public class ClearAllBreakpointsCommand extends CommandBase {
-  private static final CommandIdentifier COMMAND_IDENTIFIER = CommandIdentifier.CLEAR_ALL_BREAKPOINTS_COMMAND;
+public class DisposeCommand extends CommandBase {
+  private static final CommandIdentifier COMMAND_IDENTIFIER = CommandIdentifier.DISPOSE_COMMAND;
 
-  public static ClearAllBreakpointsCommand create(int packetId) {
+  public static DisposeCommand create(int packetId) {
     MutableCommandPacket packet = MutableCommandPacket.create(packetId, COMMAND_IDENTIFIER);
-    return new ClearAllBreakpointsCommand(packet);
+    return new DisposeCommand(packet);
   }
 
-  public static ClearAllBreakpointsCommand read(CommandDataReader reader) {
-    return new ClearAllBreakpointsCommand(reader.getPacket());
+  public static DisposeCommand read(CommandDataReader reader) {
+    return new DisposeCommand(reader.getPacket());
   }
 
-  private ClearAllBreakpointsCommand(Packet packet) {
+  private DisposeCommand(Packet packet) {
     super(packet, COMMAND_IDENTIFIER);
   }
 
@@ -36,6 +35,6 @@ public class ClearAllBreakpointsCommand extends CommandBase {
 
   @Override
   public String toString() {
-    return "ClearAllBreakpointsCommand{}";
+    return "DisposeCommand{}";
   }
 }

@@ -1,16 +1,15 @@
-package kaap.veiko.debuggerforker.commands.sets.event;
+package kaap.veiko.debuggerforker.commands.commandsets.event;
 
 import java.util.List;
 
 import kaap.veiko.debuggerforker.commands.CommandBase;
 import kaap.veiko.debuggerforker.commands.CommandVisitor;
 import kaap.veiko.debuggerforker.commands.MutableCommandPacket;
-import kaap.veiko.debuggerforker.commands.events.VirtualMachineEvent;
+import kaap.veiko.debuggerforker.commands.commandsets.event.events.VirtualMachineEvent;
 import kaap.veiko.debuggerforker.commands.parser.CommandDataReader;
 import kaap.veiko.debuggerforker.commands.parser.CommandDataWriter;
-import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;
+import kaap.veiko.debuggerforker.commands.commandsets.CommandIdentifier;
 import kaap.veiko.debuggerforker.commands.util.CommandDataUtil;
-import kaap.veiko.debuggerforker.packet.CommandPacket;
 import kaap.veiko.debuggerforker.packet.Packet;
 import kaap.veiko.debuggerforker.types.VMInformation;
 

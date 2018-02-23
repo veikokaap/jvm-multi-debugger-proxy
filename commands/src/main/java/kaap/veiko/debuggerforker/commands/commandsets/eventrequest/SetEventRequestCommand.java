@@ -1,4 +1,4 @@
-package kaap.veiko.debuggerforker.commands.sets.eventrequest;
+package kaap.veiko.debuggerforker.commands.commandsets.eventrequest;
 
 import java.util.List;
 
@@ -7,8 +7,8 @@ import kaap.veiko.debuggerforker.commands.CommandVisitor;
 import kaap.veiko.debuggerforker.commands.MutableCommandPacket;
 import kaap.veiko.debuggerforker.commands.parser.CommandDataReader;
 import kaap.veiko.debuggerforker.commands.parser.CommandDataWriter;
-import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;
-import kaap.veiko.debuggerforker.commands.sets.eventrequest.filters.EventRequestFilter;
+import kaap.veiko.debuggerforker.commands.commandsets.CommandIdentifier;
+import kaap.veiko.debuggerforker.commands.commandsets.eventrequest.filters.EventRequestFilter;
 import kaap.veiko.debuggerforker.commands.util.CommandDataUtil;
 import kaap.veiko.debuggerforker.packet.Packet;
 import kaap.veiko.debuggerforker.types.VMInformation;

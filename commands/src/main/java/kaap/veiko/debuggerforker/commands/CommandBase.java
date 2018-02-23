@@ -1,7 +1,7 @@
 package kaap.veiko.debuggerforker.commands;
 
 import kaap.veiko.debuggerforker.commands.parser.CommandType;
-import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;
+import kaap.veiko.debuggerforker.commands.commandsets.CommandIdentifier;
 import kaap.veiko.debuggerforker.packet.Packet;
 import kaap.veiko.debuggerforker.packet.PacketSource;
 

@@ -1,6 +1,6 @@
 package kaap.veiko.debuggerforker.commands;
 
-import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;
+import kaap.veiko.debuggerforker.commands.commandsets.CommandIdentifier;
 import kaap.veiko.debuggerforker.packet.CommandPacket;
 
 public class MutableCommandPacket extends CommandPacket {

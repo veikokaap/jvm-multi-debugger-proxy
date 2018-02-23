@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import kaap.veiko.debuggerforker.commands.Command;
 import kaap.veiko.debuggerforker.commands.UnknownCommand;
-import kaap.veiko.debuggerforker.commands.sets.CommandIdentifier;
+import kaap.veiko.debuggerforker.commands.commandsets.CommandIdentifier;
 import kaap.veiko.debuggerforker.packet.CommandPacket;
 import kaap.veiko.debuggerforker.packet.Packet;
 import kaap.veiko.debuggerforker.packet.PacketVisitor;

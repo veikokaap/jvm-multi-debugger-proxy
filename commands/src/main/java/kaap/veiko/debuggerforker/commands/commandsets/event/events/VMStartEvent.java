@@ -1,4 +1,4 @@
-package kaap.veiko.debuggerforker.commands.events;
+package kaap.veiko.debuggerforker.commands.commandsets.event.events;
 
 import kaap.veiko.debuggerforker.types.DataReader;
 import kaap.veiko.debuggerforker.types.DataWriter;

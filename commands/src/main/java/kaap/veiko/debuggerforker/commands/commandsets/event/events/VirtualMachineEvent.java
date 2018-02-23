@@ -1,4 +1,4 @@
-package kaap.veiko.debuggerforker.commands.events;
+package kaap.veiko.debuggerforker.commands.commandsets.event.events;
 
 import java.util.ArrayList;
 import java.util.HashMap;
