@@ -27,15 +27,15 @@ public class DebuggerForker {
     return new DebuggerForker(virtualMachineAddress, debuggerPort, proxyCommandStream);
   }
 
-  private DebuggerForker(InetSocketAddress vmAadress, int debuggerPort, ProxyCommandStream proxyCommandStream) throws IOException {
+  private DebuggerForker(InetSocketAddress vmAddress, int debuggerPort, ProxyCommandStream proxyCommandStream) throws IOException {
     this.commandHandler = new CommandHandler(vmInformation, proxyCommandStream);
     this.debuggerConnector = DebuggerConnector.create(debuggerPort, ps -> proxyCommandStream.addCommandStream(new CommandStream(ps, vmInformation)));
-    this.vmConnector = VMConnector.create(vmAadress, ps -> proxyCommandStream.addCommandStream(new CommandStream(ps, vmInformation)));
+    this.vmConnector = VMConnector.create(vmAddress, ps -> proxyCommandStream.addCommandStream(new CommandStream(ps, vmInformation)));
 
     this.proxyCommandStream = proxyCommandStream;
   }
 
-  public void start() throws IOException {
+  public void start() {
     proxyCommandStream.start();
     debuggerConnector.start();
     vmConnector.start();
