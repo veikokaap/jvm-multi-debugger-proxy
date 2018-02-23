@@ -7,8 +7,6 @@ import kaap.veiko.debuggerforker.types.jdwp.ReferenceTypeId;
 import kaap.veiko.debuggerforker.types.jdwp.ThreadId;
 
 public class ClassPrepareEvent extends VirtualMachineEvent {
-  public static final EventKind EVENT_KIND_IDENTIFIER = EventKind.CLASS_PREPARE;
-
   private final int requestId;
   private final ThreadId thread;
   private final byte refTypeTag;
@@ -16,7 +14,11 @@ public class ClassPrepareEvent extends VirtualMachineEvent {
   private final String signature;
   private final int status;
 
-  public ClassPrepareEvent(DataReader reader) {
+  public static ClassPrepareEvent read(DataReader reader) {
+    return new ClassPrepareEvent(reader);
+  }
+
+  private ClassPrepareEvent(DataReader reader) {
     this.requestId = reader.readInt();
     this.thread = ThreadId.read(reader);
     this.refTypeTag = reader.readByte();
@@ -27,7 +29,7 @@ public class ClassPrepareEvent extends VirtualMachineEvent {
 
   @Override
   public void write(DataWriter writer) {
-    writer.writeType(EVENT_KIND_IDENTIFIER);
+    writer.writeType(EventKind.CLASS_PREPARE);
     writer.writeInt(requestId);
     writer.writeType(thread);
     writer.writeByte(refTypeTag);

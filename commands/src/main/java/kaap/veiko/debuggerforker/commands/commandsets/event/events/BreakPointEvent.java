@@ -7,13 +7,15 @@ import kaap.veiko.debuggerforker.types.jdwp.Location;
 import kaap.veiko.debuggerforker.types.jdwp.ThreadId;
 
 public class BreakPointEvent extends VirtualMachineEvent {
-  public static final EventKind EVENT_KIND_IDENTIFIER = EventKind.BREAKPOINT;
-
   private int requestId;
   private ThreadId threadId;
   private Location location;
 
-  public BreakPointEvent(DataReader reader) {
+  public static BreakPointEvent read(DataReader reader) {
+    return new BreakPointEvent(reader);
+  }
+
+  private BreakPointEvent(DataReader reader) {
     this.requestId = reader.readInt();
     this.threadId = ThreadId.read(reader);
     this.location = Location.read(reader);
@@ -21,7 +23,7 @@ public class BreakPointEvent extends VirtualMachineEvent {
 
   @Override
   public void write(DataWriter writer) {
-    writer.writeType(EVENT_KIND_IDENTIFIER);
+    writer.writeType(EventKind.BREAKPOINT);
     writer.writeInt(requestId);
     writer.writeType(threadId);
     writer.writeType(location);

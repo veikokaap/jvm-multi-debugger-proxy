@@ -6,19 +6,21 @@ import kaap.veiko.debuggerforker.types.jdwp.EventKind;
 import kaap.veiko.debuggerforker.types.jdwp.ThreadId;
 
 public class VMStartEvent extends VirtualMachineEvent {
-  public static final EventKind EVENT_KIND_IDENTIFIER = EventKind.VM_START;
-
   private final int requestId;
   private final ThreadId thread;
 
-  public VMStartEvent(DataReader reader) {
+  public static VMStartEvent read(DataReader reader) {
+    return new VMStartEvent(reader);
+  }
+
+  private VMStartEvent(DataReader reader) {
     this.requestId = reader.readInt();
     this.thread = ThreadId.read(reader);
   }
 
   @Override
   public void write(DataWriter writer) {
-    writer.writeType(EVENT_KIND_IDENTIFIER);
+    writer.writeType(EventKind.VM_START);
     writer.writeInt(requestId);
     writer.writeType(thread);
   }
