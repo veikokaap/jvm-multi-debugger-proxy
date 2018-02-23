@@ -94,18 +94,22 @@ public class CommandStreamChannelSelectorRunnable implements Runnable {
       }
       Set<SelectionKey> selectionKeys = selector.selectedKeys();
       for (SelectionKey key : selectionKeys) {
-        if (key.attachment() instanceof CommandStream) {
-          CommandStream commandStream = (CommandStream) key.attachment();
-          try {
-            readWriteCommand(key, commandStream);
-          } catch (Exception exception) {
-            log.error("Error while reading/writing with channel", exception);
-            commandStream.close();
-            key.cancel();
-          }
-        }
+        handleKey(key);
       }
       selectionKeys.clear();
+    }
+  }
+
+  private void handleKey(SelectionKey key) {
+    if (key.attachment() instanceof CommandStream) {
+      CommandStream commandStream = (CommandStream) key.attachment();
+      try {
+        readWriteCommand(key, commandStream);
+      } catch (Exception exception) {
+        log.error("Error while reading/writing with channel", exception);
+        commandStream.close();
+        key.cancel();
+      }
     }
   }
 
