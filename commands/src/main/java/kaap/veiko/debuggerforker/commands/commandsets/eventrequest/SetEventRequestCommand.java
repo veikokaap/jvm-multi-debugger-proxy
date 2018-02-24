@@ -34,7 +34,7 @@ public class SetEventRequestCommand extends CommandBase {
   public static SetEventRequestCommand read(CommandDataReader reader) {
     EventKind eventKind = EventKind.read(reader);
     byte suspendPolicy = reader.readByte();
-    List<EventRequestFilter> eventRequestFilters = reader.readList(EventRequestFilter.PARSER);
+    List<EventRequestFilter> eventRequestFilters = EventRequestFilter.readList(reader);
 
     return new SetEventRequestCommand(reader.getPacket(), eventKind, suspendPolicy, eventRequestFilters);
   }
@@ -50,7 +50,7 @@ public class SetEventRequestCommand extends CommandBase {
   public void writeCommand(CommandDataWriter writer) {
     writer.writeType(eventKind);
     writer.writeByte(suspendPolicy);
-    writer.writeList(EventRequestFilter.PARSER, eventRequestFilters);
+    EventRequestFilter.writeList(writer, eventRequestFilters);
   }
 
   public EventKind getEventKind() {
