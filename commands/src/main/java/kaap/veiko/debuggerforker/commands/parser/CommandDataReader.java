@@ -15,7 +15,9 @@ import kaap.veiko.debuggerforker.commands.commandsets.eventrequest.SetEventReque
 import kaap.veiko.debuggerforker.commands.commandsets.eventrequest.SetEventRequestReply;
 import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.DisposeCommand;
 import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.DisposeReply;
+import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.HoldEventsCommand;
 import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.IdSizesReply;
+import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.ReleaseEventsCommand;
 import kaap.veiko.debuggerforker.packet.Packet;
 import kaap.veiko.debuggerforker.packet.internal.ByteBufferDataReader;
 import kaap.veiko.debuggerforker.types.DataType;
@@ -58,6 +60,10 @@ public class CommandDataReader extends ByteBufferDataReader {
         return SetEventRequestCommand.read(this);
       case DISPOSE_COMMAND:
         return DisposeCommand.read(this);
+      case HOLD_EVENTS_COMMAND:
+        return HoldEventsCommand.read(this);
+      case RELEASE_EVENTS_COMMAND:
+        return ReleaseEventsCommand.read(this);
       /* Replies */
       case SET_EVENT_REQUEST_REPLY:
         return SetEventRequestReply.read(this);

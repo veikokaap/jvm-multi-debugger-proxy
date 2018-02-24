@@ -13,7 +13,9 @@ import kaap.veiko.debuggerforker.commands.commandsets.eventrequest.SetEventReque
 import kaap.veiko.debuggerforker.commands.commandsets.eventrequest.SetEventRequestReply;
 import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.DisposeCommand;
 import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.DisposeReply;
+import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.HoldEventsCommand;
 import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.IdSizesReply;
+import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.ReleaseEventsCommand;
 import kaap.veiko.debuggerforker.packet.PacketSource;
 import kaap.veiko.debuggerforker.packet.ReplyPacket;
 import kaap.veiko.debuggerforker.types.VMInformation;
@@ -70,10 +72,11 @@ public class CommandHandler implements CommandVisitor {
   }
 
   /**
-   * This command should NEVER reach the vm, otherwise it will disconnect from the proxy.
+   * The DisposeCommand should never reach the VM so the VM should never send a reply.
    */
   @Override
   public void visit(DisposeReply reply) {
+    log.warn("Received DisposeReply from VM!");
   }
 
   /**
@@ -83,6 +86,18 @@ public class CommandHandler implements CommandVisitor {
   public void visit(IdSizesReply reply) {
     vmInformation.setIdSizes(reply.getIdSizes());
     sendReplyToOriginalSource(reply);
+  }
+
+  @Override
+  public void visit(HoldEventsCommand command) {
+    // TODO: hold events only for the source which sent it
+    defaultHandle(command);
+  }
+
+  @Override
+  public void visit(ReleaseEventsCommand command) {
+    // TODO: release events only for the source which sent it
+    defaultHandle(command);
   }
 
   @Override
