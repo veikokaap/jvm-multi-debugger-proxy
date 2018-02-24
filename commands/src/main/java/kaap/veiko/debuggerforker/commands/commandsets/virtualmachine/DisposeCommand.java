@@ -4,9 +4,9 @@ import kaap.veiko.debuggerforker.commands.CommandBase;
 import kaap.veiko.debuggerforker.commands.CommandVisitor;
 import kaap.veiko.debuggerforker.commands.MutableCommandPacket;
 import kaap.veiko.debuggerforker.commands.parser.CommandDataReader;
-import kaap.veiko.debuggerforker.commands.parser.CommandDataWriter;
 import kaap.veiko.debuggerforker.commands.commandsets.CommandIdentifier;
 import kaap.veiko.debuggerforker.packet.Packet;
+import kaap.veiko.debuggerforker.types.DataWriter;
 
 public class DisposeCommand extends CommandBase {
   private static final CommandIdentifier COMMAND_IDENTIFIER = CommandIdentifier.DISPOSE_COMMAND;
@@ -25,7 +25,7 @@ public class DisposeCommand extends CommandBase {
   }
 
   @Override
-  public void writeCommand(CommandDataWriter writer) {
+  public void writeCommand(DataWriter writer) {
   }
 
   @Override

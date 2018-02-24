@@ -6,11 +6,11 @@ import kaap.veiko.debuggerforker.commands.CommandBase;
 import kaap.veiko.debuggerforker.commands.CommandVisitor;
 import kaap.veiko.debuggerforker.commands.MutableCommandPacket;
 import kaap.veiko.debuggerforker.commands.parser.CommandDataReader;
-import kaap.veiko.debuggerforker.commands.parser.CommandDataWriter;
 import kaap.veiko.debuggerforker.commands.commandsets.CommandIdentifier;
 import kaap.veiko.debuggerforker.commands.commandsets.eventrequest.filters.EventRequestFilter;
 import kaap.veiko.debuggerforker.commands.util.CommandDataUtil;
 import kaap.veiko.debuggerforker.packet.Packet;
+import kaap.veiko.debuggerforker.types.DataWriter;
 import kaap.veiko.debuggerforker.types.VMInformation;
 import kaap.veiko.debuggerforker.types.jdwp.EventKind;
 
@@ -47,7 +47,7 @@ public class SetEventRequestCommand extends CommandBase {
   }
 
   @Override
-  public void writeCommand(CommandDataWriter writer) {
+  public void writeCommand(DataWriter writer) {
     writer.writeType(eventKind);
     writer.writeByte(suspendPolicy);
     EventRequestFilter.writeList(writer, eventRequestFilters);

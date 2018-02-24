@@ -1,8 +1,8 @@
 package kaap.veiko.debuggerforker.commands;
 
-import kaap.veiko.debuggerforker.commands.parser.CommandDataWriter;
 import kaap.veiko.debuggerforker.packet.Packet;
 import kaap.veiko.debuggerforker.packet.PacketSource;
+import kaap.veiko.debuggerforker.types.DataWriter;
 
 public interface Command<T extends Packet> {
   int getCommandSetId();
@@ -17,5 +17,5 @@ public interface Command<T extends Packet> {
 
   PacketSource getSource();
 
-  void writeCommand(CommandDataWriter writer);
+  void writeCommand(DataWriter writer);
 }

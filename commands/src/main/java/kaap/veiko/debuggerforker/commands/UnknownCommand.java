@@ -1,8 +1,8 @@
 package kaap.veiko.debuggerforker.commands;
 
-import kaap.veiko.debuggerforker.commands.parser.CommandDataWriter;
 import kaap.veiko.debuggerforker.packet.Packet;
 import kaap.veiko.debuggerforker.packet.PacketSource;
+import kaap.veiko.debuggerforker.types.DataWriter;
 
 public class UnknownCommand implements Command {
 
@@ -49,7 +49,7 @@ public class UnknownCommand implements Command {
   }
 
   @Override
-  public void writeCommand(CommandDataWriter writer) {
+  public void writeCommand(DataWriter writer) {
     for (byte b : packet.getData()) {
       writer.writeByte(b);
     }

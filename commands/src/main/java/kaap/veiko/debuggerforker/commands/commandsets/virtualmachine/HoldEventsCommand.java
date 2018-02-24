@@ -5,8 +5,8 @@ import kaap.veiko.debuggerforker.commands.CommandVisitor;
 import kaap.veiko.debuggerforker.commands.MutableCommandPacket;
 import kaap.veiko.debuggerforker.commands.commandsets.CommandIdentifier;
 import kaap.veiko.debuggerforker.commands.parser.CommandDataReader;
-import kaap.veiko.debuggerforker.commands.parser.CommandDataWriter;
 import kaap.veiko.debuggerforker.packet.CommandPacket;
+import kaap.veiko.debuggerforker.types.DataWriter;
 
 public class HoldEventsCommand extends CommandBase<CommandPacket> {
   private static final CommandIdentifier COMMAND_IDENTIFIER = CommandIdentifier.HOLD_EVENTS_COMMAND;
@@ -25,7 +25,7 @@ public class HoldEventsCommand extends CommandBase<CommandPacket> {
   }
 
   @Override
-  public void writeCommand(CommandDataWriter writer) {
+  public void writeCommand(DataWriter writer) {
   }
 
   @Override
