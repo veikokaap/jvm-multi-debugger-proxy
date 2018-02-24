@@ -20,6 +20,7 @@ data class MethodEntryEvent(
     }
 
     companion object {
+        @JvmStatic
         fun read(reader: DataReader) = MethodEntryEvent(
                 reader.readInt(),
                 ThreadId.read(reader),

@@ -26,6 +26,7 @@ data class ClassPrepareEvent(
     }
 
     companion object {
+        @JvmStatic
         fun read(reader: DataReader) = ClassPrepareEvent(
                 reader.readInt(),
                 ThreadId.read(reader),

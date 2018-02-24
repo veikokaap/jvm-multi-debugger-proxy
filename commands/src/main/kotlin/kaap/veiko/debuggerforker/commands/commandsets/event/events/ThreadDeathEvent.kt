@@ -8,7 +8,7 @@ import kaap.veiko.debuggerforker.types.jdwp.ThreadId
 data class ThreadDeathEvent(
         val requestId: Int,
         val thread: ThreadId
-): VirtualMachineEvent() {
+) : VirtualMachineEvent() {
 
     override fun write(writer: DataWriter?) = writer!!.run {
         writeType(EventKind.THREAD_DEATH)
@@ -17,6 +17,7 @@ data class ThreadDeathEvent(
     }
 
     companion object {
+        @JvmStatic
         fun read(reader: DataReader) = ThreadDeathEvent(
                 reader.readInt(),
                 ThreadId.read(reader)

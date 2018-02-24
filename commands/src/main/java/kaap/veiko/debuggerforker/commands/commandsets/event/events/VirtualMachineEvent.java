@@ -33,41 +33,41 @@ public abstract class VirtualMachineEvent implements DataType {
     EventKind eventKind = EventKind.read(reader);
     switch (eventKind) {
       case VM_START:
-        return VmStartEvent.Companion.read(reader);
+        return VmStartEvent.read(reader);
       case SINGLE_STEP:
-        return SingleStepEvent.Companion.read(reader);
+        return SingleStepEvent.read(reader);
       case BREAKPOINT:
-        return BreakPointEvent.Companion.read(reader);
+        return BreakPointEvent.read(reader);
       case METHOD_ENTRY:
-        return MethodEntryEvent.Companion.read(reader);
+        return MethodEntryEvent.read(reader);
       case THREAD_START:
-        return ThreadStartEvent.Companion.read(reader);
+        return ThreadStartEvent.read(reader);
       case METHOD_EXIT:
-        return MethodExitEvent.Companion.read(reader);
+        return MethodExitEvent.read(reader);
       case METHOD_EXIT_WITH_RETURN_VALUE:
-        return MethodExitWithReturnValueEvent.Companion.read(reader);
+        return MethodExitWithReturnValueEvent.read(reader);
       case MONITOR_CONTENDED_ENTER:
-        return MonitorContendedEnterEvent.Companion.read(reader);
+        return MonitorContendedEnterEvent.read(reader);
       case MONITOR_CONTENDED_ENTERED:
-        return MonitorContendedEnteredEvent.Companion.read(reader);
+        return MonitorContendedEnteredEvent.read(reader);
       case MONITOR_WAIT:
-        return MonitorWaitEvent.Companion.read(reader);
+        return MonitorWaitEvent.read(reader);
       case MONITOR_WAITED:
-        return MonitorWaitedEvent.Companion.read(reader);
+        return MonitorWaitedEvent.read(reader);
       case EXCEPTION:
-        return ExceptionEvent.Companion.read(reader);
+        return ExceptionEvent.read(reader);
       case THREAD_DEATH:
-        return ThreadDeathEvent.Companion.read(reader);
+        return ThreadDeathEvent.read(reader);
       case CLASS_PREPARE:
-        return ClassPrepareEvent.Companion.read(reader);
+        return ClassPrepareEvent.read(reader);
       case CLASS_UNLOAD:
-        return ClassUnloadEvent.Companion.read(reader);
+        return ClassUnloadEvent.read(reader);
       case FIELD_ACCESS:
-        return FieldAccessEvent.Companion.read(reader);
+        return FieldAccessEvent.read(reader);
       case FIELD_MODIFICATION:
-        return FieldModificationEvent.Companion.read(reader);
+        return FieldModificationEvent.read(reader);
       case VM_DEATH:
-        return VmDeathEvent.Companion.read(reader);
+        return VmDeathEvent.read(reader);
       default:
         throw new RuntimeException("Failed to parse");
     }

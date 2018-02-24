@@ -20,6 +20,7 @@ data class BreakPointEvent(
     }
 
     companion object {
+        @JvmStatic
         fun read(reader: DataReader) = BreakPointEvent(
                 reader.readInt(),
                 ThreadId.read(reader),

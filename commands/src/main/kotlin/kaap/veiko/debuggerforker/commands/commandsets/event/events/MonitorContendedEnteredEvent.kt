@@ -23,6 +23,7 @@ data class MonitorContendedEnteredEvent(
     }
 
     companion object {
+        @JvmStatic
         fun read(reader: DataReader) = MonitorContendedEnteredEvent(
                 reader.readInt(),
                 ThreadId.read(reader),

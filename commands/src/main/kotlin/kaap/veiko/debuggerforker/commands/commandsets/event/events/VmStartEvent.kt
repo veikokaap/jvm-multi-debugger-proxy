@@ -16,6 +16,7 @@ data class VmStartEvent(
     }
 
     companion object {
+        @JvmStatic
         fun read(reader: DataReader) = VmStartEvent(
                 reader.readInt(),
                 ThreadId.read(reader)

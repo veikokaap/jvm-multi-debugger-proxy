@@ -25,6 +25,7 @@ data class ExceptionEvent(
     }
 
     companion object {
+        @JvmStatic
         fun read(reader: DataReader) = ExceptionEvent(
                 reader.readInt(),
                 ThreadId.read(reader),

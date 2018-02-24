@@ -20,6 +20,7 @@ data class SingleStepEvent(
     }
 
     companion object {
+        @JvmStatic
         fun read(reader: DataReader) = SingleStepEvent(
                 reader.readInt(),
                 ThreadId.read(reader),

@@ -16,6 +16,7 @@ data class ClassUnloadEvent(
     }
 
     companion object {
+        @JvmStatic
         fun read(reader: DataReader) = ClassUnloadEvent(
                 reader.readInt(),
                 reader.readString()

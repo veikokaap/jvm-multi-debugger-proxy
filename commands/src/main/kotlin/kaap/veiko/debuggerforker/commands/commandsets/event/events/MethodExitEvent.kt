@@ -20,6 +20,7 @@ data class MethodExitEvent(
     }
 
     companion object {
+        @JvmStatic
         fun read(reader: DataReader) = MethodExitEvent(
                 reader.readInt(),
                 ThreadId.read(reader),

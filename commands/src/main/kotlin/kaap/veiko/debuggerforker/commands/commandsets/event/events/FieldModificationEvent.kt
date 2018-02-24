@@ -28,6 +28,7 @@ data class FieldModificationEvent(
     }
 
     companion object {
+        @JvmStatic
         fun read(reader: DataReader) = FieldModificationEvent(
                 reader.readInt(),
                 ThreadId.read(reader),

@@ -25,6 +25,7 @@ data class MonitorWaitEvent(
     }
 
     companion object {
+        @JvmStatic
         fun read(reader: DataReader) = MonitorWaitEvent(
                 reader.readInt(),
                 ThreadId.read(reader),

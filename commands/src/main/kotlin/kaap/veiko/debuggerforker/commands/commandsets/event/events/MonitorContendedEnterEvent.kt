@@ -2,7 +2,10 @@ package kaap.veiko.debuggerforker.commands.commandsets.event.events
 
 import kaap.veiko.debuggerforker.types.DataReader
 import kaap.veiko.debuggerforker.types.DataWriter
-import kaap.veiko.debuggerforker.types.jdwp.*
+import kaap.veiko.debuggerforker.types.jdwp.EventKind
+import kaap.veiko.debuggerforker.types.jdwp.Location
+import kaap.veiko.debuggerforker.types.jdwp.TaggedObjectId
+import kaap.veiko.debuggerforker.types.jdwp.ThreadId
 
 data class MonitorContendedEnterEvent(
         val requestId: Int,
@@ -20,6 +23,7 @@ data class MonitorContendedEnterEvent(
     }
 
     companion object {
+        @JvmStatic
         fun read(reader: DataReader) = MonitorContendedEnterEvent(
                 reader.readInt(),
                 ThreadId.read(reader),

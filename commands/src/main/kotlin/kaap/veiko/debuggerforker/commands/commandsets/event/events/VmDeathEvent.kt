@@ -12,6 +12,7 @@ data class VmDeathEvent(val requestId: Int) : VirtualMachineEvent() {
     }
 
     companion object {
+        @JvmStatic
         fun read(reader: DataReader) = VmDeathEvent(
                 reader.readInt()
         )
