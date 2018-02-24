@@ -9,12 +9,12 @@ import kaap.veiko.debuggerforker.commands.parser.CommandDataReader;
 import kaap.veiko.debuggerforker.commands.commandsets.CommandIdentifier;
 import kaap.veiko.debuggerforker.commands.commandsets.eventrequest.filters.EventRequestFilter;
 import kaap.veiko.debuggerforker.commands.util.CommandDataUtil;
-import kaap.veiko.debuggerforker.packet.Packet;
+import kaap.veiko.debuggerforker.packet.CommandPacket;
 import kaap.veiko.debuggerforker.types.DataWriter;
 import kaap.veiko.debuggerforker.types.VMInformation;
 import kaap.veiko.debuggerforker.types.jdwp.EventKind;
 
-public class SetEventRequestCommand extends CommandBase {
+public class SetEventRequestCommand extends CommandBase<CommandPacket> {
   private static final CommandIdentifier COMMAND_IDENTIFIER = CommandIdentifier.SET_EVENT_REQUEST_COMMAND;
 
   private final EventKind eventKind;
@@ -36,10 +36,10 @@ public class SetEventRequestCommand extends CommandBase {
     byte suspendPolicy = reader.readByte();
     List<EventRequestFilter> eventRequestFilters = EventRequestFilter.readList(reader);
 
-    return new SetEventRequestCommand(reader.getPacket(), eventKind, suspendPolicy, eventRequestFilters);
+    return new SetEventRequestCommand((CommandPacket) reader.getPacket(), eventKind, suspendPolicy, eventRequestFilters);
   }
 
-  private SetEventRequestCommand(Packet packet, EventKind eventKind, byte suspendPolicy, List<EventRequestFilter> eventRequestFilters) {
+  private SetEventRequestCommand(CommandPacket packet, EventKind eventKind, byte suspendPolicy, List<EventRequestFilter> eventRequestFilters) {
     super(packet, COMMAND_IDENTIFIER);
     this.eventKind = eventKind;
     this.suspendPolicy = suspendPolicy;

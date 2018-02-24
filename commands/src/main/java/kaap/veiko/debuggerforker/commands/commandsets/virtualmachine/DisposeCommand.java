@@ -5,10 +5,10 @@ import kaap.veiko.debuggerforker.commands.CommandVisitor;
 import kaap.veiko.debuggerforker.commands.MutableCommandPacket;
 import kaap.veiko.debuggerforker.commands.parser.CommandDataReader;
 import kaap.veiko.debuggerforker.commands.commandsets.CommandIdentifier;
-import kaap.veiko.debuggerforker.packet.Packet;
+import kaap.veiko.debuggerforker.packet.CommandPacket;
 import kaap.veiko.debuggerforker.types.DataWriter;
 
-public class DisposeCommand extends CommandBase {
+public class DisposeCommand extends CommandBase<CommandPacket> {
   private static final CommandIdentifier COMMAND_IDENTIFIER = CommandIdentifier.DISPOSE_COMMAND;
 
   public static DisposeCommand create(int packetId) {
@@ -17,10 +17,10 @@ public class DisposeCommand extends CommandBase {
   }
 
   public static DisposeCommand read(CommandDataReader reader) {
-    return new DisposeCommand(reader.getPacket());
+    return new DisposeCommand((CommandPacket) reader.getPacket());
   }
 
-  private DisposeCommand(Packet packet) {
+  private DisposeCommand(CommandPacket packet) {
     super(packet, COMMAND_IDENTIFIER);
   }
 

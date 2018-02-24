@@ -5,10 +5,10 @@ import kaap.veiko.debuggerforker.commands.CommandVisitor;
 import kaap.veiko.debuggerforker.commands.MutableCommandPacket;
 import kaap.veiko.debuggerforker.commands.parser.CommandDataReader;
 import kaap.veiko.debuggerforker.commands.commandsets.CommandIdentifier;
-import kaap.veiko.debuggerforker.packet.Packet;
+import kaap.veiko.debuggerforker.packet.CommandPacket;
 import kaap.veiko.debuggerforker.types.DataWriter;
 
-public class ClearAllBreakpointsCommand extends CommandBase {
+public class ClearAllBreakpointsCommand extends CommandBase<CommandPacket> {
   private static final CommandIdentifier COMMAND_IDENTIFIER = CommandIdentifier.CLEAR_ALL_BREAKPOINTS_COMMAND;
 
   public static ClearAllBreakpointsCommand create(int packetId) {
@@ -17,10 +17,10 @@ public class ClearAllBreakpointsCommand extends CommandBase {
   }
 
   public static ClearAllBreakpointsCommand read(CommandDataReader reader) {
-    return new ClearAllBreakpointsCommand(reader.getPacket());
+    return new ClearAllBreakpointsCommand((CommandPacket) reader.getPacket());
   }
 
-  private ClearAllBreakpointsCommand(Packet packet) {
+  private ClearAllBreakpointsCommand(CommandPacket packet) {
     super(packet, COMMAND_IDENTIFIER);
   }
 

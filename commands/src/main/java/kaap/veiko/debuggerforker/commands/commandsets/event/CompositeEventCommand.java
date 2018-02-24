@@ -9,11 +9,11 @@ import kaap.veiko.debuggerforker.commands.commandsets.event.events.VirtualMachin
 import kaap.veiko.debuggerforker.commands.parser.CommandDataReader;
 import kaap.veiko.debuggerforker.commands.commandsets.CommandIdentifier;
 import kaap.veiko.debuggerforker.commands.util.CommandDataUtil;
-import kaap.veiko.debuggerforker.packet.Packet;
+import kaap.veiko.debuggerforker.packet.CommandPacket;
 import kaap.veiko.debuggerforker.types.DataWriter;
 import kaap.veiko.debuggerforker.types.VMInformation;
 
-public class CompositeEventCommand extends CommandBase {
+public class CompositeEventCommand extends CommandBase<CommandPacket> {
   private static final CommandIdentifier COMMAND_IDENTIFIER = CommandIdentifier.COMPOSITE_EVENT_COMMAND;
 
   private final byte suspendPolicy;
@@ -31,10 +31,10 @@ public class CompositeEventCommand extends CommandBase {
     byte suspendPolicy = reader.readByte();
     List<VirtualMachineEvent> events = VirtualMachineEvent.readList(reader);
 
-    return new CompositeEventCommand(reader.getPacket(), suspendPolicy, events);
+    return new CompositeEventCommand((CommandPacket) reader.getPacket(), suspendPolicy, events);
   }
 
-  private CompositeEventCommand(Packet packet, byte suspendPolicy, List<VirtualMachineEvent> events) {
+  private CompositeEventCommand(CommandPacket packet, byte suspendPolicy, List<VirtualMachineEvent> events) {
     super(packet, CommandIdentifier.COMPOSITE_EVENT_COMMAND);
     this.suspendPolicy = suspendPolicy;
     this.events = events;

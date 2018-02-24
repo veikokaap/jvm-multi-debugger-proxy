@@ -6,12 +6,12 @@ import kaap.veiko.debuggerforker.commands.MutableCommandPacket;
 import kaap.veiko.debuggerforker.commands.parser.CommandDataReader;
 import kaap.veiko.debuggerforker.commands.commandsets.CommandIdentifier;
 import kaap.veiko.debuggerforker.commands.util.CommandDataUtil;
-import kaap.veiko.debuggerforker.packet.Packet;
+import kaap.veiko.debuggerforker.packet.CommandPacket;
 import kaap.veiko.debuggerforker.types.DataWriter;
 import kaap.veiko.debuggerforker.types.VMInformation;
 import kaap.veiko.debuggerforker.types.jdwp.EventKind;
 
-public class ClearEventRequestCommand extends CommandBase {
+public class ClearEventRequestCommand extends CommandBase<CommandPacket> {
   private static final CommandIdentifier COMMAND_IDENTIFIER = CommandIdentifier.CLEAR_EVENT_REQUEST_COMMAND;
 
   private final EventKind eventKind;
@@ -29,10 +29,10 @@ public class ClearEventRequestCommand extends CommandBase {
     EventKind eventKind = EventKind.read(reader);
     int requestId = reader.readInt();
 
-    return new ClearEventRequestCommand(reader.getPacket(), eventKind, requestId);
+    return new ClearEventRequestCommand((CommandPacket) reader.getPacket(), eventKind, requestId);
   }
 
-  private ClearEventRequestCommand(Packet packet, EventKind eventKind, int requestId) {
+  private ClearEventRequestCommand(CommandPacket packet, EventKind eventKind, int requestId) {
     super(packet, COMMAND_IDENTIFIER);
     this.eventKind = eventKind;
     this.requestId = requestId;
