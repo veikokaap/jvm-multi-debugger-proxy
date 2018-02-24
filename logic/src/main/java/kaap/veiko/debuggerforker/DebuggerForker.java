@@ -29,8 +29,12 @@ public class DebuggerForker {
 
   private DebuggerForker(InetSocketAddress vmAddress, int debuggerPort, ProxyCommandStream proxyCommandStream) throws IOException {
     this.commandHandler = new CommandHandler(vmInformation, proxyCommandStream);
-    this.debuggerConnector = DebuggerConnector.create(debuggerPort, ps -> proxyCommandStream.addCommandStream(new CommandStream(ps, vmInformation)));
-    this.vmConnector = VMConnector.create(vmAddress, ps -> proxyCommandStream.addCommandStream(new CommandStream(ps, vmInformation)));
+    this.debuggerConnector = DebuggerConnector.create(debuggerPort, ps ->
+        proxyCommandStream.addCommandStream(new CommandStream(ps, vmInformation))
+    );
+    this.vmConnector = VMConnector.create(vmAddress, ps ->
+        proxyCommandStream.addCommandStream(new CommandStream(ps, vmInformation))
+    );
 
     this.proxyCommandStream = proxyCommandStream;
   }

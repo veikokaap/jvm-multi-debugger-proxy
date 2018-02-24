@@ -100,7 +100,9 @@ public class ProxyCommandStream {
   }
 
   private boolean markedForClosing(PacketSource source) {
-    return streamsMarkedForClosing.stream().map(CommandStream::getSource).anyMatch(source::equals);
+    return streamsMarkedForClosing.stream()
+        .map(CommandStream::getSource)
+        .anyMatch(source::equals);
   }
 
   private void readCommandConsumer(Command command) {
