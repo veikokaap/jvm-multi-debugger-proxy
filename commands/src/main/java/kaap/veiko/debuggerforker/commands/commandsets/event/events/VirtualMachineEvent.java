@@ -33,31 +33,43 @@ public abstract class VirtualMachineEvent implements DataType {
     EventKind eventKind = EventKind.read(reader);
     switch (eventKind) {
       case VM_START:
-        return VMStartEvent.read(reader);
+        return VmStartEvent.Companion.read(reader);
       case SINGLE_STEP:
-        return SingleStepEvent.read(reader);
+        return SingleStepEvent.Companion.read(reader);
       case BREAKPOINT:
-        return BreakPointEvent.read(reader);
+        return BreakPointEvent.Companion.read(reader);
       case METHOD_ENTRY:
-        return MethodEntryEvent.read(reader);
+        return MethodEntryEvent.Companion.read(reader);
       case THREAD_START:
-        return ThreadStartEvent.read(reader);
+        return ThreadStartEvent.Companion.read(reader);
       case METHOD_EXIT:
+        return MethodExitEvent.Companion.read(reader);
       case METHOD_EXIT_WITH_RETURN_VALUE:
+        return MethodExitWithReturnValueEvent.Companion.read(reader);
       case MONITOR_CONTENDED_ENTER:
+        return MonitorContendedEnterEvent.Companion.read(reader);
       case MONITOR_CONTENDED_ENTERED:
+        return MonitorContendedEnteredEvent.Companion.read(reader);
       case MONITOR_WAIT:
+        return MonitorWaitEvent.Companion.read(reader);
       case MONITOR_WAITED:
+        return MonitorWaitedEvent.Companion.read(reader);
       case EXCEPTION:
+        return ExceptionEvent.Companion.read(reader);
       case THREAD_DEATH:
+        return ThreadDeathEvent.Companion.read(reader);
+      case CLASS_PREPARE:
+        return ClassPrepareEvent.Companion.read(reader);
       case CLASS_UNLOAD:
+        return ClassUnloadEvent.Companion.read(reader);
       case FIELD_ACCESS:
+        return FieldAccessEvent.Companion.read(reader);
       case FIELD_MODIFICATION:
+        return FieldModificationEvent.Companion.read(reader);
       case VM_DEATH:
+        return VmDeathEvent.Companion.read(reader);
       default:
         throw new RuntimeException("Failed to parse");
-      case CLASS_PREPARE:
-        return ClassPrepareEvent.read(reader);
     }
   }
 
