@@ -34,14 +34,14 @@ public abstract class VirtualMachineEvent implements DataType {
     switch (eventKind) {
       case VM_START:
         return VMStartEvent.read(reader);
+      case SINGLE_STEP:
+        return SingleStepEvent.read(reader);
       case BREAKPOINT:
         return BreakPointEvent.read(reader);
+      case METHOD_ENTRY:
+        return MethodEntryEvent.read(reader);
       case THREAD_START:
         return ThreadStartEvent.read(reader);
-      case CLASS_PREPARE:
-        return ClassPrepareEvent.read(reader);
-      case SINGLE_STEP:
-      case METHOD_ENTRY:
       case METHOD_EXIT:
       case METHOD_EXIT_WITH_RETURN_VALUE:
       case MONITOR_CONTENDED_ENTER:
@@ -56,6 +56,8 @@ public abstract class VirtualMachineEvent implements DataType {
       case VM_DEATH:
       default:
         throw new RuntimeException("Failed to parse");
+      case CLASS_PREPARE:
+        return ClassPrepareEvent.read(reader);
     }
   }
 

@@ -29,7 +29,7 @@ public class CompositeEventCommand extends CommandBase {
 
   public static CompositeEventCommand read(CommandDataReader reader) {
     byte suspendPolicy = reader.readByte();
-    List<VirtualMachineEvent> events = reader.readList(VirtualMachineEvent.PARSER);
+    List<VirtualMachineEvent> events = VirtualMachineEvent.readList(reader);
 
     return new CompositeEventCommand(reader.getPacket(), suspendPolicy, events);
   }
@@ -43,7 +43,7 @@ public class CompositeEventCommand extends CommandBase {
   @Override
   public void writeCommand(CommandDataWriter writer) {
     writer.writeByte(suspendPolicy);
-    writer.writeList(VirtualMachineEvent.PARSER, events);
+    VirtualMachineEvent.writeList(writer, events);
   }
 
   public byte getSuspendPolicy() {
