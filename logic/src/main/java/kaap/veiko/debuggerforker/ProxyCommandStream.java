@@ -32,7 +32,7 @@ public class ProxyCommandStream {
   }
 
   private ProxyCommandStream() throws IOException {
-    this.channelSelectorRunnable = CommandStreamChannelSelectorRunnable.create(this::readFromRunnable, this::writeToRunnable);
+    this.channelSelectorRunnable = CommandStreamChannelSelectorRunnable.create(this::readCommandConsumer, this::writeCommandProducer);
     thread = new Thread(channelSelectorRunnable, "ProxyCommandStreamThread");
   }
 
@@ -103,11 +103,15 @@ public class ProxyCommandStream {
     return streamsMarkedForClosing.stream().map(CommandStream::getSource).anyMatch(source::equals);
   }
 
-  private void readFromRunnable(Command command) {
+  private void readCommandConsumer(Command command) {
     readQueue.addLast(command);
   }
 
-  private Command writeToRunnable(PacketSource source) {
+  private Command writeCommandProducer(PacketSource source) {
+    if (source.isHoldEvents()) {
+      return null;
+    }
+
     Deque<Command> writeQueue = writeQueues.get(source);
     if (writeQueue != null) {
       Command command = writeQueue.pollFirst();

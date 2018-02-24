@@ -6,6 +6,8 @@ public class PacketSource {
 
   private final SocketChannel socketChannel;
   private final SourceType sourceType;
+  
+  private boolean holdEvents;
 
   public PacketSource(SocketChannel socketChannel, SourceType sourceType) {
     this.socketChannel = socketChannel;
@@ -42,6 +44,14 @@ public class PacketSource {
   @Override
   public String toString() {
     return sourceType.toString();
+  }
+
+  public void setHoldEvents(boolean holdEvents) {
+    this.holdEvents = holdEvents;
+  }
+
+  public boolean isHoldEvents() {
+    return holdEvents;
   }
 
   public enum SourceType {

@@ -90,14 +90,12 @@ public class CommandHandler implements CommandVisitor {
 
   @Override
   public void visit(HoldEventsCommand command) {
-    // TODO: hold events only for the source which sent it
-    defaultHandle(command);
+    command.getSource().setHoldEvents(true);
   }
 
   @Override
   public void visit(ReleaseEventsCommand command) {
-    // TODO: release events only for the source which sent it
-    defaultHandle(command);
+    command.getSource().setHoldEvents(false);
   }
 
   @Override
