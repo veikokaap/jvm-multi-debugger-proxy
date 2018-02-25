@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import kaap.veiko.debuggerforker.packet.internal.PacketStreamBase;
+import kaap.veiko.debuggerforker.packet.internal.VmPacketTransformer;
 
 public class VirtualMachinePacketStream extends PacketStreamBase {
 
@@ -20,7 +21,7 @@ public class VirtualMachinePacketStream extends PacketStreamBase {
   private final ReplyPacketVisitor replyPacketVisitor = new ReplyPacketVisitor();
 
   public VirtualMachinePacketStream(SocketChannel socketChannel) throws IOException {
-    super(socketChannel, VIRTUAL_MACHINE);
+    super(socketChannel, VIRTUAL_MACHINE, new VmPacketTransformer());
   }
 
   @Override

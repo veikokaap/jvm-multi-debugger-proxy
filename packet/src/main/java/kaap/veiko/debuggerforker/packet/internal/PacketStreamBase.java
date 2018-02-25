@@ -3,6 +3,7 @@ package kaap.veiko.debuggerforker.packet.internal;
 import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SocketChannel;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,13 +19,15 @@ public abstract class PacketStreamBase implements PacketStream {
   private final PacketSource packetSource;
   private final PacketReader packetReader;
   private final PacketWriter packetWriter;
+  private final PacketTransformer packetTransformer;
 
-  public PacketStreamBase(SocketChannel socketChannel, PacketSource.SourceType sourceType) throws IOException {
+  public PacketStreamBase(SocketChannel socketChannel, PacketSource.SourceType sourceType, PacketTransformer packetTransformer) throws IOException {
     socketChannel.configureBlocking(false);
     this.socketChannel = socketChannel;
-    this.packetSource = new PacketSource(socketChannel, sourceType);
+    this.packetSource = new PacketSource(socketChannel, sourceType, packetTransformer);
     this.packetReader = new PacketReader(socketChannel, packetSource);
     this.packetWriter = new PacketWriter(socketChannel);
+    this.packetTransformer = packetTransformer;
   }
 
   public Packet read() throws IOException {
@@ -33,12 +36,18 @@ public abstract class PacketStreamBase implements PacketStream {
     }
 
     try {
-      return packetReader.read();
+      return readAndTransform();
     }
     catch (IOException e) {
       close();
       throw e;
     }
+  }
+
+  private Packet readAndTransform() throws IOException {
+    return Optional.ofNullable(packetReader.read())
+        .map(packetTransformer::transformReadPacket)
+        .orElse(null);
   }
 
   public void write(Packet packet) throws IOException {
@@ -47,12 +56,21 @@ public abstract class PacketStreamBase implements PacketStream {
     }
 
     try {
-      packetWriter.write(packet);
+      transformAndWrite(packet);
     }
     catch (IOException e) {
       close();
       throw e;
     }
+  }
+
+  private void transformAndWrite(Packet packet) throws IOException {
+    if (packet == null) {
+      return;
+    }
+
+    Packet transformedPacket = packetTransformer.transformWritePacket(packet);
+    packetWriter.write(transformedPacket);
   }
 
   public SocketChannel getSocketChannel() {

@@ -2,16 +2,24 @@ package kaap.veiko.debuggerforker.packet;
 
 import java.nio.channels.SocketChannel;
 
+import kaap.veiko.debuggerforker.packet.internal.PacketTransformer;
+
 public class PacketSource {
 
   private final SocketChannel socketChannel;
   private final SourceType sourceType;
-  
+  private final PacketTransformer packetTransformer;
+
   private boolean holdEvents;
 
-  public PacketSource(SocketChannel socketChannel, SourceType sourceType) {
+  public PacketSource(SocketChannel socketChannel, SourceType sourceType, PacketTransformer packetTransformer) {
     this.socketChannel = socketChannel;
     this.sourceType = sourceType;
+    this.packetTransformer = packetTransformer;
+  }
+
+  public int createNewId() {
+    return packetTransformer.createNewId();
   }
 
   public boolean isDebugger() {
