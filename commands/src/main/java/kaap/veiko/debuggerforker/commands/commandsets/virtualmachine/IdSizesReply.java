@@ -16,7 +16,7 @@ public class IdSizesReply extends CommandBase<ReplyPacket> {
 
   private final IdSizes idSizes;
 
-  public static IdSizesReply create(int packetId, VMInformation vmInformation, IdSizes idSizes) {
+  public static IdSizesReply create(int packetId, IdSizes idSizes, VMInformation vmInformation) {
     MutableReplyPacket packet = MutableReplyPacket.create(packetId);
     IdSizesReply command = new IdSizesReply(packet, idSizes);
     packet.setData(CommandDataUtil.getCommandDataBytes(command, vmInformation));

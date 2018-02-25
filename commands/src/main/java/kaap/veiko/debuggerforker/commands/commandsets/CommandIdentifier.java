@@ -3,6 +3,7 @@ package kaap.veiko.debuggerforker.commands.commandsets;
 import static kaap.veiko.debuggerforker.commands.parser.CommandType.COMMAND;
 import static kaap.veiko.debuggerforker.commands.parser.CommandType.REPLY;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,7 +35,7 @@ public enum CommandIdentifier {
     this.type = type;
   }
 
-  public static CommandIdentifier of(short commandSet, short command, boolean reply) throws Exception {
+  public static CommandIdentifier of(short commandSet, short command, boolean reply) throws IOException {
     List<CommandIdentifier> identifiers = Arrays.stream(values())
         .filter(ci -> ci.getCommandSetId() == commandSet)
         .filter(ci -> ci.getCommandId() == command)
@@ -42,7 +43,7 @@ public enum CommandIdentifier {
         .collect(Collectors.toList());
 
     if (identifiers.isEmpty()) {
-      throw new Exception("Couldn't find the identifier for commandSet=" + commandSet + ", command=" + command + ", reply=" + reply + ".");
+      throw new IOException("Couldn't find the identifier for commandSet=" + commandSet + ", command=" + command + ", reply=" + reply + ".");
     }
 
     return identifiers.get(0);

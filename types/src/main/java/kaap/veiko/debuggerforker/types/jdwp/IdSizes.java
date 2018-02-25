@@ -75,6 +75,42 @@ public class IdSizes implements DataType {
   }
 
   @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    IdSizes idSizes = (IdSizes) o;
+
+    if (fieldIdSize != idSizes.fieldIdSize) {
+      return false;
+    }
+    if (methodIdSize != idSizes.methodIdSize) {
+      return false;
+    }
+    if (objectIdSize != idSizes.objectIdSize) {
+      return false;
+    }
+    if (referenceTypeIdSize != idSizes.referenceTypeIdSize) {
+      return false;
+    }
+    return frameIdSize == idSizes.frameIdSize;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = fieldIdSize;
+    result = 31 * result + methodIdSize;
+    result = 31 * result + objectIdSize;
+    result = 31 * result + referenceTypeIdSize;
+    result = 31 * result + frameIdSize;
+    return result;
+  }
+
+  @Override
   public String toString() {
     return "IdSizes{" +
         "fieldIdSize=" + fieldIdSize +
