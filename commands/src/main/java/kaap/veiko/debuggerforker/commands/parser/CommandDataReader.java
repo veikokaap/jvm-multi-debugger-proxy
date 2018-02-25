@@ -37,16 +37,6 @@ public class CommandDataReader extends ByteBufferDataReader {
     return packet;
   }
 
-  public <T extends DataType> List<T> readList(DataTypeArrayParser<T> parser) {
-    try {
-      return parser.readList(this);
-    }
-    catch (Exception e) {
-      log.error("Failed to parse array.", e);
-      return Collections.emptyList();
-    }
-  }
-
   public Command readCommand(CommandIdentifier identifier, Packet packet) {
     switch (identifier) {
       /* Commands */

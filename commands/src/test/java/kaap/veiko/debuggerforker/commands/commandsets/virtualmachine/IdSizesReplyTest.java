@@ -18,12 +18,13 @@ public class IdSizesReplyTest extends CommandTestBase {
   @Test
   public void testCreate() {
     int packetId = generateRandomPacketId();
-    IdSizes idSizes = new IdSizes(1, 2, 3, 4, 5);
+    IdSizes expectedIdSizes = new IdSizes(1, 2, 3, 4, 5);
 
-    IdSizesReply reply = IdSizesReply.create(packetId, idSizes, getVmInformation());
+    IdSizesReply reply = IdSizesReply.create(packetId, expectedIdSizes, getVmInformation());
 
     assertEquals(packetId, reply.getPacket().getId());
     assertCommandIdentifier(ID_SIZES_REPLY, reply);
+    assertEquals(expectedIdSizes, reply.getIdSizes());
   }
 
   @Test
