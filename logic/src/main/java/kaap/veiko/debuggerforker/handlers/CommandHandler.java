@@ -1,12 +1,17 @@
-package kaap.veiko.debuggerforker;
+package kaap.veiko.debuggerforker.handlers;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import kaap.veiko.debuggerforker.ProxyCommandStream;
 import kaap.veiko.debuggerforker.commands.Command;
 import kaap.veiko.debuggerforker.commands.CommandVisitor;
 import kaap.veiko.debuggerforker.commands.UnknownCommand;
 import kaap.veiko.debuggerforker.commands.commandsets.event.CompositeEventCommand;
+import kaap.veiko.debuggerforker.commands.commandsets.event.events.BreakPointEvent;
+import kaap.veiko.debuggerforker.commands.commandsets.event.events.VirtualMachineEvent;
 import kaap.veiko.debuggerforker.commands.commandsets.eventrequest.ClearAllBreakpointsCommand;
 import kaap.veiko.debuggerforker.commands.commandsets.eventrequest.ClearEventRequestCommand;
 import kaap.veiko.debuggerforker.commands.commandsets.eventrequest.SetEventRequestCommand;
@@ -26,15 +31,31 @@ public class CommandHandler implements CommandVisitor {
 
   private final VMInformation vmInformation;
   private final ProxyCommandStream proxyCommandStream;
+  private final RequestHandler requestHandler;
 
   public CommandHandler(VMInformation vmInformation, ProxyCommandStream proxyCommandStream) {
     this.vmInformation = vmInformation;
     this.proxyCommandStream = proxyCommandStream;
+    requestHandler = new RequestHandler(this.vmInformation, this.proxyCommandStream);
   }
 
   @Override
   public void visit(CompositeEventCommand command) {
-    defaultHandle(command);
+    List<BreakPointEvent> breakpoints = command.getEvents().stream()
+        .filter(e -> e instanceof BreakPointEvent)
+        .map(e -> (BreakPointEvent)e)
+        .collect(Collectors.toList());
+
+    List<VirtualMachineEvent> otherEvents = command.getEvents().stream()
+        .filter(e -> !breakpoints.contains(e))
+        .collect(Collectors.toList());
+
+    breakpoints.forEach(requestHandler::handleBreakpointEvent);
+    if (!otherEvents.isEmpty()) {
+      proxyCommandStream.writeToAllDebuggers(CompositeEventCommand.create(
+          command.getSource().createNewOutputId(), (byte) 2, otherEvents, vmInformation
+      ));
+    }
   }
 
   @Override
@@ -44,17 +65,17 @@ public class CommandHandler implements CommandVisitor {
 
   @Override
   public void visit(ClearEventRequestCommand command) {
-    defaultHandle(command);
+    requestHandler.handleClearEventCommand(command);
   }
 
   @Override
   public void visit(SetEventRequestCommand command) {
-    defaultHandle(command);
+    requestHandler.handleSetEventCommand(command);
   }
 
   @Override
-  public void visit(SetEventRequestReply command) {
-    sendReplyToOriginalSource(command);
+  public void visit(SetEventRequestReply reply) {
+    requestHandler.handleSetEventReply(reply);
   }
 
   /**

@@ -17,7 +17,7 @@ public class ClearEventRequestCommand extends CommandBase<CommandPacket> {
   private final EventKind eventKind;
   private final int requestId;
 
-  public static ClearEventRequestCommand create(int packetId, VMInformation vmInformation, EventKind eventKind, int requestId) {
+  public static ClearEventRequestCommand create(int packetId, EventKind eventKind, int requestId, VMInformation vmInformation) {
     MutableCommandPacket packet = MutableCommandPacket.create(packetId, COMMAND_IDENTIFIER);
     ClearEventRequestCommand command = new ClearEventRequestCommand(packet, eventKind, requestId);
     packet.setData(CommandDataUtil.getCommandDataBytes(command, vmInformation));
@@ -36,6 +36,14 @@ public class ClearEventRequestCommand extends CommandBase<CommandPacket> {
     super(packet, COMMAND_IDENTIFIER);
     this.eventKind = eventKind;
     this.requestId = requestId;
+  }
+
+  public EventKind getEventKind() {
+    return eventKind;
+  }
+
+  public int getRequestId() {
+    return requestId;
   }
 
   @Override

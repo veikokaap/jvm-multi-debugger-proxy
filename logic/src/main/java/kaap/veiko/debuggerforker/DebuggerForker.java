@@ -9,6 +9,7 @@ import kaap.veiko.debuggerforker.commands.Command;
 import kaap.veiko.debuggerforker.commands.CommandStream;
 import kaap.veiko.debuggerforker.connections.DebuggerConnector;
 import kaap.veiko.debuggerforker.connections.VMConnector;
+import kaap.veiko.debuggerforker.handlers.CommandHandler;
 import kaap.veiko.debuggerforker.types.VMInformation;
 
 public class DebuggerForker {

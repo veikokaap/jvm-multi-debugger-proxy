@@ -27,6 +27,8 @@ public class ProxyCommandStream {
 
   private final Set<CommandStream> streamsMarkedForClosing = ConcurrentHashMap.newKeySet();
 
+  private PacketSource vmSource;
+
   public static ProxyCommandStream create() throws IOException {
     return new ProxyCommandStream();
   }
@@ -46,6 +48,10 @@ public class ProxyCommandStream {
     sourceStreamMap.put(source, commandStream);
     writeQueues.put(source, new ConcurrentLinkedDeque<>());
     channelSelectorRunnable.addCommandStream(commandStream);
+
+    if (source.isVirtualMachine()) {
+      vmSource = source;
+    }
   }
 
   public void markForClosingAfterAllPacketsWritten(PacketSource source) {
@@ -72,10 +78,9 @@ public class ProxyCommandStream {
   }
 
   public void writeToVm(Command command) {
-    writeQueues.keySet().stream()
-        .filter(PacketSource::isVirtualMachine)
-        .findFirst()
-        .ifPresent(s -> write(s, command));
+    if (vmSource != null) {
+      write(vmSource, command);
+    }
   }
 
   public void writeToAllDebuggers(Command command) {
@@ -97,6 +102,10 @@ public class ProxyCommandStream {
     } else {
       log.warn("Trying to write to a packet source which isn't registered: {}", source);
     }
+  }
+
+  public PacketSource getVmSource() {
+    return vmSource;
   }
 
   private boolean markedForClosing(PacketSource source) {

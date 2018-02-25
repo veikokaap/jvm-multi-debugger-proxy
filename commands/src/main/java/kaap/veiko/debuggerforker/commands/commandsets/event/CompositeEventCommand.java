@@ -19,7 +19,7 @@ public class CompositeEventCommand extends CommandBase<CommandPacket> {
   private final byte suspendPolicy;
   private final List<VirtualMachineEvent> events;
 
-  public static CompositeEventCommand create(int packetId, VMInformation vmInformation, byte suspendPolicy, List<VirtualMachineEvent> events) {
+  public static CompositeEventCommand create(int packetId, byte suspendPolicy, List<VirtualMachineEvent> events, VMInformation vmInformation) {
     MutableCommandPacket packet = MutableCommandPacket.create(packetId, COMMAND_IDENTIFIER);
     CompositeEventCommand command = new CompositeEventCommand(packet, suspendPolicy, events);
     packet.setData(CommandDataUtil.getCommandDataBytes(command, vmInformation));

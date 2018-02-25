@@ -18,7 +18,7 @@ public class PacketSource {
     this.packetTransformer = packetTransformer;
   }
 
-  public int createNewId() {
+  public int createNewOutputId() {
     return packetTransformer.createNewId();
   }
 
