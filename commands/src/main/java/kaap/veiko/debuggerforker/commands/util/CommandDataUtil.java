@@ -14,6 +14,7 @@ public class CommandDataUtil {
     command.writeCommand(writer);
 
     byte[] bytes = new byte[buffer.position()];
+    buffer.flip();
     buffer.get(bytes);
 
     return bytes;
