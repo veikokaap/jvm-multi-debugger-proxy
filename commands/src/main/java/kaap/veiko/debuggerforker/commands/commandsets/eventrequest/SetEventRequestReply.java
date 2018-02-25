@@ -15,7 +15,7 @@ public class SetEventRequestReply extends CommandBase<ReplyPacket> {
 
   private final int requestId;
 
-  public static SetEventRequestReply create(int packetId, VMInformation vmInformation, int requestId) {
+  public static SetEventRequestReply create(int packetId, int requestId, VMInformation vmInformation) {
     MutableReplyPacket packet = MutableReplyPacket.create(packetId);
     SetEventRequestReply command = new SetEventRequestReply(packet, requestId);
     packet.setData(CommandDataUtil.getCommandDataBytes(command, vmInformation));
