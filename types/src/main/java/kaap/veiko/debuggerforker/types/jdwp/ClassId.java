@@ -10,4 +10,8 @@ public class ClassId extends ReferenceTypeId {
   ClassId(DataReader reader) {
     super(reader);
   }
+
+  public ClassId(long value) {
+    super(value);
+  }
 }

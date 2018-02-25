@@ -10,4 +10,8 @@ public class ClassLoaderId extends ObjectId {
   ClassLoaderId(DataReader reader) {
     super(reader);
   }
+
+  public ClassLoaderId(long value) {
+    super(value);
+  }
 }

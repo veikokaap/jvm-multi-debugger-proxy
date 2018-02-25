@@ -12,15 +12,21 @@ public class IdSizes implements DataType {
   private final int frameIdSize;
 
   public static IdSizes read(DataReader reader) {
-    return new IdSizes(reader);
+    return new IdSizes(
+        reader.readInt(),
+        reader.readInt(),
+        reader.readInt(),
+        reader.readInt(),
+        reader.readInt()
+    );
   }
 
-  IdSizes(DataReader reader) {
-    this.fieldIdSize = reader.readInt();
-    this.methodIdSize = reader.readInt();
-    this.objectIdSize = reader.readInt();
-    this.referenceTypeIdSize = reader.readInt();
-    this.frameIdSize = reader.readInt();
+  public IdSizes(int fieldIdSize, int methodIdSize, int objectIdSize, int referenceTypeIdSize, int frameIdSize) {
+    this.fieldIdSize = fieldIdSize;
+    this.methodIdSize = methodIdSize;
+    this.objectIdSize = objectIdSize;
+    this.referenceTypeIdSize = referenceTypeIdSize;
+    this.frameIdSize = frameIdSize;
   }
 
   @Override

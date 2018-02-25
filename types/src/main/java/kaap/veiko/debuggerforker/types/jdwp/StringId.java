@@ -10,4 +10,8 @@ public class StringId extends ObjectId {
   StringId(DataReader reader) {
     super(reader);
   }
+
+  public StringId(long value) {
+    super(value);
+  }
 }

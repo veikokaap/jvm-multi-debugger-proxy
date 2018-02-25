@@ -18,6 +18,11 @@ abstract class DataTypeBase implements DataType {
     this.value = reader.readLongOfSize(sizeType);
   }
 
+  DataTypeBase(long value, IdSizes.SizeType sizeType) {
+    this.value = value;
+    this.sizeType = sizeType;
+  }
+
   @Override
   public void write(DataWriter writer) {
     writer.writeLongOfSize(value, sizeType);

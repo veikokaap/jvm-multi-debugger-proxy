@@ -21,6 +21,11 @@ public class Value implements DataType {
     value = type.read(reader);
   }
 
+  public Value(Type type, Object value) {
+    this.type = type;
+    this.value = value;
+  }
+
   public Type getType() {
     return type;
   }

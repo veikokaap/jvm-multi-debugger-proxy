@@ -10,4 +10,8 @@ public class ThreadId extends ObjectId {
   ThreadId(DataReader reader) {
     super(reader);
   }
+
+  public ThreadId(long value) {
+    super(value);
+  }
 }

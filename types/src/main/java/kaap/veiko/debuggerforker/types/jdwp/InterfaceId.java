@@ -10,4 +10,8 @@ public class InterfaceId extends ReferenceTypeId {
   InterfaceId(DataReader reader) {
     super(reader);
   }
+
+  public InterfaceId(long value) {
+    super(value);
+  }
 }

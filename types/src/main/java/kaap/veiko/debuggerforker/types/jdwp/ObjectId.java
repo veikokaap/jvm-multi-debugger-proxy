@@ -10,4 +10,8 @@ public class ObjectId extends DataTypeBase {
   ObjectId(DataReader reader) {
     super(reader, IdSizes.SizeType.OBJECT_ID_SIZE);
   }
+
+  public ObjectId(long value) {
+    super(value, IdSizes.SizeType.OBJECT_ID_SIZE);
+  }
 }

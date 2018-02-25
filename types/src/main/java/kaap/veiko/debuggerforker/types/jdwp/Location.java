@@ -21,6 +21,13 @@ public class Location implements DataType {
     index = reader.readLong();
   }
 
+  public Location(byte typeTag, ClassId classId, MethodId methodId, long index) {
+    this.typeTag = typeTag;
+    this.classId = classId;
+    this.methodId = methodId;
+    this.index = index;
+  }
+
   public byte getTypeTag() {
     return typeTag;
   }

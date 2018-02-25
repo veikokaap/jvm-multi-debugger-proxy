@@ -10,4 +10,8 @@ public class FrameId extends DataTypeBase {
   FrameId(DataReader reader) {
     super(reader, IdSizes.SizeType.FRAME_ID_SIZE);
   }
+
+  public FrameId(long value) {
+    super(value, IdSizes.SizeType.FRAME_ID_SIZE);
+  }
 }

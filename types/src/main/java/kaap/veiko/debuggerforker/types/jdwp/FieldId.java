@@ -10,4 +10,8 @@ public class FieldId extends DataTypeBase {
   FieldId(DataReader reader) {
     super(reader, IdSizes.SizeType.FIELD_ID_SIZE);
   }
+
+  public FieldId(long value) {
+    super(value, IdSizes.SizeType.FIELD_ID_SIZE);
+  }
 }

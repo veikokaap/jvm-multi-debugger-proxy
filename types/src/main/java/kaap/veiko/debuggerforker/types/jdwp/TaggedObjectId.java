@@ -18,6 +18,11 @@ public class TaggedObjectId implements DataType {
     objectId = new ObjectId(reader);
   }
 
+  public TaggedObjectId(byte tag, ObjectId objectId) {
+    this.tag = tag;
+    this.objectId = objectId;
+  }
+
   public byte getTag() {
     return tag;
   }

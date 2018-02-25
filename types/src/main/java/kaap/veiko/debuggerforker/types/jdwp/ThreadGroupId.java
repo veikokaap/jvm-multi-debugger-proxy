@@ -10,4 +10,8 @@ public class ThreadGroupId extends ObjectId {
   ThreadGroupId(DataReader reader) {
     super(reader);
   }
+
+  public ThreadGroupId(long value) {
+    super(value);
+  }
 }

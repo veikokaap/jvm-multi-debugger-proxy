@@ -10,4 +10,8 @@ public class UntaggedValue extends Value {
   UntaggedValue(DataReader reader, byte typeTag) {
     super(reader, typeTag);
   }
+
+  public UntaggedValue(Type type, Object value) {
+    super(type, value);
+  }
 }

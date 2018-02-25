@@ -10,4 +10,8 @@ public class MethodId extends DataTypeBase {
   MethodId(DataReader reader) {
     super(reader, IdSizes.SizeType.METHOD_ID_SIZE);
   }
+
+  public MethodId(long value) {
+    super(value, IdSizes.SizeType.METHOD_ID_SIZE);
+  }
 }

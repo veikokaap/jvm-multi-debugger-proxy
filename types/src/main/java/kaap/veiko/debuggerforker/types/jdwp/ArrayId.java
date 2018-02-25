@@ -10,4 +10,8 @@ public class ArrayId extends ObjectId {
   ArrayId(DataReader reader) {
     super(reader);
   }
+
+  public ArrayId(long value) {
+    super(value);
+  }
 }
