@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
     <artifactId>jvm-debugger-forker</artifactId>
@@ -9,18 +9,18 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>commands</artifactId>
+  <artifactId>integration-tests</artifactId>
 
   <dependencies>
     <dependency>
-      <groupId>kaap.veiko</groupId>
-      <artifactId>types</artifactId>
-      <version>${parent.version}</version>
+      <groupId>org.ow2.asm</groupId>
+      <artifactId>asm</artifactId>
+      <version>6.0</version>
     </dependency>
     <dependency>
-      <groupId>kaap.veiko</groupId>
-      <artifactId>packet</artifactId>
-      <version>${parent.version}</version>
+      <groupId>org.ow2.asm</groupId>
+      <artifactId>asm-commons</artifactId>
+      <version>6.0</version>
     </dependency>
   </dependencies>
 
