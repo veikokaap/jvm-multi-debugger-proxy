@@ -1,5 +1,6 @@
 package ee.veikokaap.debugproxy.testframework;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
@@ -15,20 +16,21 @@ import com.sun.jdi.connect.AttachingConnector;
 import com.sun.jdi.connect.Connector;
 import com.sun.jdi.connect.IllegalConnectorArgumentsException;
 import com.sun.jdi.event.Event;
-import com.sun.jdi.event.EventSet;
 import com.sun.jdi.request.BreakpointRequest;
 
 import ee.veikokaap.debugproxy.testframework.utils.BreakpointLocation;
 
-public class DebuggerProcess {
+public class DebuggerProcess implements Closeable {
 
   private final VirtualMachine virtualMachine;
   private final Map<BreakpointRequest, Set<Consumer<BreakpointManager>>> requestListenerMap = new ConcurrentHashMap<>();
   private final Map<BreakpointLocation, BreakpointRequest> locationRequestMap = new ConcurrentHashMap<>();
+  private final Thread thread;
 
   private DebuggerProcess(VirtualMachine virtualMachine) {
     this.virtualMachine = virtualMachine;
-    new Thread(() -> listenForEvents(virtualMachine)).start();
+    thread = new Thread(() -> listenForEvents(virtualMachine));
+    thread.start();
   }
 
   public static DebuggerProcess attach() throws IOException, IllegalConnectorArgumentsException {
@@ -36,7 +38,7 @@ public class DebuggerProcess {
   }
 
   private void listenForEvents(VirtualMachine virtualMachine) {
-    while (!Thread.interrupted()) {
+    while (!Thread.currentThread().isInterrupted()) {
       try {
         virtualMachine.eventQueue().remove().stream()
             .map(Event::request)
@@ -51,7 +53,7 @@ public class DebuggerProcess {
     }
   }
 
-  public AsyncTester<BreakpointManager> createBreakRequestAt(BreakpointLocation location, Consumer<BreakpointManager> onBreakListener) throws AbsentInformationException {
+  public AsyncTester<BreakpointManager> breakAt(BreakpointLocation location, Consumer<BreakpointManager> onBreakListener) throws AbsentInformationException {
     if (!locationRequestMap.containsKey(location)) {
       BreakpointRequest request = virtualMachine.eventRequestManager().createBreakpointRequest(findLocation(location));
       locationRequestMap.put(location, request);
@@ -67,10 +69,6 @@ public class DebuggerProcess {
 
   void resume() {
     virtualMachine.resume();
-  }
-
-  public void waitFor() throws InterruptedException {
-    virtualMachine.process().waitFor();
   }
 
   private Location findLocation(BreakpointLocation location) throws AbsentInformationException {
@@ -102,4 +100,8 @@ public class DebuggerProcess {
         .get();
   }
 
+  @Override
+  public void close() {
+    thread.interrupt();
+  }
 }

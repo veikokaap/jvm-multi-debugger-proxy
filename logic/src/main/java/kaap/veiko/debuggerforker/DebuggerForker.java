@@ -2,6 +2,7 @@ package kaap.veiko.debuggerforker;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,10 +23,15 @@ public class DebuggerForker {
   private final CommandHandler commandHandler;
   private final DebuggerConnector debuggerConnector;
   private final VMConnector vmConnector;
-  
-  public static DebuggerForker create(InetSocketAddress virtualMachineAddress, int debuggerPort) throws IOException {
+
+  private final AtomicBoolean running = new AtomicBoolean(true);
+
+  public static DebuggerForker start(InetSocketAddress virtualMachineAddress, int debuggerPort) throws IOException {
     ProxyCommandStream proxyCommandStream = ProxyCommandStream.create();
-    return new DebuggerForker(virtualMachineAddress, debuggerPort, proxyCommandStream);
+    DebuggerForker debuggerForker = new DebuggerForker(virtualMachineAddress, debuggerPort, proxyCommandStream);
+    debuggerForker.start();
+
+    return debuggerForker;
   }
 
   private DebuggerForker(InetSocketAddress vmAddress, int debuggerPort, ProxyCommandStream proxyCommandStream) throws IOException {
@@ -40,17 +46,22 @@ public class DebuggerForker {
     this.proxyCommandStream = proxyCommandStream;
   }
 
-  public void start() {
+  private void start() {
     proxyCommandStream.start();
     debuggerConnector.start();
     vmConnector.start();
 
-    while (true) {
+    while (running.get()) {
       Command command = proxyCommandStream.read();
       if (command != null) {
         command.visit(commandHandler);
       }
     }
   }
+
+  public void stop() {
+    running.set(false);
+  }
+
 
 }
