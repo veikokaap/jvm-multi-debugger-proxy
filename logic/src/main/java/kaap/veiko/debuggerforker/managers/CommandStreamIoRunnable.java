@@ -14,13 +14,13 @@ import kaap.veiko.debuggerforker.commands.Command;
 import kaap.veiko.debuggerforker.commands.CommandStream;
 import kaap.veiko.debuggerforker.packet.PacketSource;
 
-abstract class CommandStreamManager extends ChannelManager<CommandStream> {
+abstract class CommandStreamIoRunnable extends ChannelIoRunnable<CommandStream> {
 
-  private final Logger log = LoggerFactory.getLogger(CommandStreamManager.class);
+  private final Logger log = LoggerFactory.getLogger(CommandStreamIoRunnable.class);
 
   private final Set<PacketSource> sourcesMarkedForClosing = ConcurrentHashMap.newKeySet();
 
-  CommandStreamManager(Selector selector) {
+  CommandStreamIoRunnable(Selector selector) {
     super(selector);
   }
 

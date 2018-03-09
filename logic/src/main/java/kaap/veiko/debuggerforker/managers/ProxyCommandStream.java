@@ -15,7 +15,7 @@ import kaap.veiko.debuggerforker.commands.Command;
 import kaap.veiko.debuggerforker.commands.CommandStream;
 import kaap.veiko.debuggerforker.packet.PacketSource;
 
-public class ProxyCommandStream extends CommandStreamManager  {
+public class ProxyCommandStream extends CommandStreamIoRunnable {
 
   private final Logger log = LoggerFactory.getLogger(ProxyCommandStream.class);
 

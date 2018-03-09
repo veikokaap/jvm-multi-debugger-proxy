@@ -9,8 +9,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-abstract class ChannelManager<T extends AutoCloseable> implements Runnable, AutoCloseable {
-  private final Logger log = LoggerFactory.getLogger(ChannelManager.class);
+abstract class ChannelIoRunnable<T extends AutoCloseable> implements Runnable, AutoCloseable {
+  private final Logger log = LoggerFactory.getLogger(ChannelIoRunnable.class);
 
   private final Object selectLock = new Object();
   private final Object registerLock = new Object();
@@ -18,7 +18,7 @@ abstract class ChannelManager<T extends AutoCloseable> implements Runnable, Auto
 
   private final AtomicBoolean open = new AtomicBoolean(true);
 
-  ChannelManager(Selector selector) {
+  ChannelIoRunnable(Selector selector) {
     this.selector = selector;
   }
 
