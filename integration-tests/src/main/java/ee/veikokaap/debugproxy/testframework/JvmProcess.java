@@ -9,7 +9,7 @@ import java.util.Deque;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.TimeUnit;
 
-import kaap.veiko.debuggerforker.DebuggerForker;
+import kaap.veiko.debuggerforker.DebuggerProxy;
 
 public class JvmProcess implements Closeable {
 
@@ -21,7 +21,7 @@ public class JvmProcess implements Closeable {
   private final Deque<String> outputDeque = new ConcurrentLinkedDeque<>();
   private final Process process;
   private final Thread proxyThread;
-  private DebuggerForker debuggerForker;
+  private DebuggerProxy debuggerProxy;
 
   public static JvmProcess runClass(Class clazz) throws IOException {
     return new JvmProcess(startClassWithJvm(clazz));
@@ -31,7 +31,7 @@ public class JvmProcess implements Closeable {
     this.process = process;
     this.proxyThread = new Thread(() -> {
       try {
-        debuggerForker = DebuggerForker.start(new InetSocketAddress("127.0.0.1", DEBUGGER_PORT), PROXY_PORT);
+        debuggerProxy = DebuggerProxy.start(new InetSocketAddress("127.0.0.1", DEBUGGER_PORT), PROXY_PORT);
       }
       catch (IOException e) {
         throw new RuntimeException(e);
@@ -79,8 +79,8 @@ public class JvmProcess implements Closeable {
   }
 
   private void stopProxyAndWait() throws InterruptedException {
-    if (debuggerForker != null) {
-      debuggerForker.stop();
+    if (debuggerProxy != null) {
+      debuggerProxy.stop();
       proxyThread.join();
     }
   }

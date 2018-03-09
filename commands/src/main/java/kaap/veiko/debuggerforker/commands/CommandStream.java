@@ -14,7 +14,7 @@ import kaap.veiko.debuggerforker.packet.PacketSource;
 import kaap.veiko.debuggerforker.packet.PacketStream;
 import kaap.veiko.debuggerforker.types.VMInformation;
 
-public class CommandStream {
+public class CommandStream implements AutoCloseable {
 
   private static final Logger log = LoggerFactory.getLogger(CommandStream.class);
 

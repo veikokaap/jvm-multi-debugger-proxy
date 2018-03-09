@@ -1,6 +1,7 @@
 package kaap.veiko.debuggerforker;
 
 import java.io.IOException;
+import java.nio.channels.Selector;
 import java.util.Deque;
 import java.util.Map;
 import java.util.Set;
@@ -14,14 +15,12 @@ import kaap.veiko.debuggerforker.commands.Command;
 import kaap.veiko.debuggerforker.commands.CommandStream;
 import kaap.veiko.debuggerforker.packet.PacketSource;
 
-public class ProxyCommandStream {
+public class ProxyCommandStream extends CommandStreamManager  {
 
   private final Logger log = LoggerFactory.getLogger(ProxyCommandStream.class);
 
   private final ConcurrentLinkedDeque<Command> readQueue = new ConcurrentLinkedDeque<>();
   private final Map<PacketSource, Deque<Command>> writeQueues = new ConcurrentHashMap<>();
-  private final CommandStreamChannelSelectorRunnable channelSelectorRunnable;
-  private final Thread thread;
 
   private final Map<PacketSource, CommandStream> sourceStreamMap = new ConcurrentHashMap<>();
 
@@ -30,24 +29,19 @@ public class ProxyCommandStream {
   private PacketSource vmSource;
 
   public static ProxyCommandStream create() throws IOException {
-    return new ProxyCommandStream();
+    return new ProxyCommandStream(Selector.open());
   }
 
-  private ProxyCommandStream() throws IOException {
-    this.channelSelectorRunnable = CommandStreamChannelSelectorRunnable.create(this::readCommandConsumer, this::writeCommandProducer);
-    thread = new Thread(channelSelectorRunnable, "ProxyCommandStreamThread");
+  private ProxyCommandStream(Selector selector) throws IOException {
+    super(selector);
   }
 
-  public void start() {
-    thread.start();
-  }
-
-  public void addCommandStream(CommandStream commandStream) {
+  public void registerCommandStream(CommandStream commandStream) throws Exception {
     PacketSource source = commandStream.getSource();
 
     sourceStreamMap.put(source, commandStream);
     writeQueues.put(source, new ConcurrentLinkedDeque<>());
-    channelSelectorRunnable.addCommandStream(commandStream);
+    register(commandStream);
 
     if (source.isVirtualMachine()) {
       vmSource = source;
@@ -114,11 +108,13 @@ public class ProxyCommandStream {
         .anyMatch(source::equals);
   }
 
-  private void readCommandConsumer(Command command) {
+  @Override
+  protected void consumeInCommand(Command command) {
     readQueue.addLast(command);
   }
 
-  private Command writeCommandProducer(PacketSource source) {
+  @Override
+  protected Command produceSourceOutCommand(PacketSource source) {
     if (source.isHoldEvents()) {
       return null;
     }
@@ -140,21 +136,8 @@ public class ProxyCommandStream {
     CommandStream stream = sourceStreamMap.remove(source);
     streamsMarkedForClosing.remove(stream);
 
-    channelSelectorRunnable.markForClosing(source);
+    markForClosing(source);
     writeQueues.remove(source);
   }
 
-  public void close() {
-    channelSelectorRunnable.close();
-
-    try {
-      Thread.sleep(100);
-    }
-    catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
-    finally {
-      thread.interrupt();
-    }
-  }
 }
