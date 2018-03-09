@@ -36,7 +36,10 @@ public class DebuggerProxy {
   private DebuggerProxy(InetSocketAddress vmAddress, int debuggerPort, ProxyCommandStream proxyCommandStream) throws IOException {
     this.commandHandler = new CommandHandler(vmInformation, proxyCommandStream);
     this.debuggerConnector = DebuggerConnector.create(debuggerPort, this::registerStream);
-    this.vmConnector = VMConnector.create(vmAddress, this::registerStream);
+    this.vmConnector = VMConnector.create(vmAddress, ps -> {
+      registerStream(ps);
+      debuggerConnector.start();
+    });
 
     this.proxyCommandStream = proxyCommandStream;
   }
@@ -57,7 +60,6 @@ public class DebuggerProxy {
 
   private void start() {
     new Thread(proxyCommandStream).start();
-    debuggerConnector.start();
     vmConnector.start();
 
     while (proxyCommandStream.isOpen()) {
