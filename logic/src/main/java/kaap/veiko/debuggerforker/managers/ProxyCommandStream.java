@@ -109,12 +109,12 @@ public class ProxyCommandStream extends CommandStreamManager  {
   }
 
   @Override
-  void consumeInCommand(Command command) {
+  void consumeReadCommand(Command command) {
     readQueue.addLast(command);
   }
 
   @Override
-  Command produceSourceOutCommand(PacketSource source) {
+  Command getWriteCommand(PacketSource source) {
     if (source.isHoldEvents()) {
       return null;
     }

@@ -24,9 +24,9 @@ abstract class CommandStreamManager extends ChannelManager<CommandStream> {
     super(selector);
   }
 
-  abstract Command produceSourceOutCommand(PacketSource source);
+  abstract Command getWriteCommand(PacketSource source);
 
-  abstract void consumeInCommand(Command command);
+  abstract void consumeReadCommand(Command command);
 
   @Override
   SelectableChannel toChannel(CommandStream commandStream) {
@@ -51,12 +51,12 @@ abstract class CommandStreamManager extends ChannelManager<CommandStream> {
     if (key.isReadable()) {
       Command command = commandStream.read();
       if (command != null) {
-        consumeInCommand(command);
+        consumeReadCommand(command);
       }
     }
 
     if (key.isWritable()) {
-      Command command = produceSourceOutCommand(commandStream.getSource());
+      Command command = getWriteCommand(commandStream.getSource());
       if (command != null) {
         commandStream.write(command);
       }
