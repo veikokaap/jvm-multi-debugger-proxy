@@ -1,4 +1,4 @@
-package kaap.veiko.debuggerforker;
+package kaap.veiko.debuggerforker.managers;
 
 import java.io.IOException;
 import java.nio.channels.SelectableChannel;
@@ -24,17 +24,17 @@ abstract class CommandStreamManager extends ChannelManager<CommandStream> {
     super(selector);
   }
 
-  protected abstract Command produceSourceOutCommand(PacketSource source);
+  abstract Command produceSourceOutCommand(PacketSource source);
 
-  protected abstract void consumeInCommand(Command command);
+  abstract void consumeInCommand(Command command);
 
   @Override
-  protected SelectableChannel toChannel(CommandStream commandStream) {
+  SelectableChannel toChannel(CommandStream commandStream) {
     return commandStream.getSocketChannel();
   }
 
   @Override
-  protected void handleKey(SelectionKey key) {
+  void handleKey(SelectionKey key) {
     if (key.attachment() instanceof CommandStream) {
       CommandStream commandStream = (CommandStream) key.attachment();
       try {

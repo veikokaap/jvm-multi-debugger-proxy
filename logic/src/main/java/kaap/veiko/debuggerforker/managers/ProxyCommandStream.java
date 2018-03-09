@@ -1,4 +1,4 @@
-package kaap.veiko.debuggerforker;
+package kaap.veiko.debuggerforker.managers;
 
 import java.io.IOException;
 import java.nio.channels.Selector;
@@ -109,12 +109,12 @@ public class ProxyCommandStream extends CommandStreamManager  {
   }
 
   @Override
-  protected void consumeInCommand(Command command) {
+  void consumeInCommand(Command command) {
     readQueue.addLast(command);
   }
 
   @Override
-  protected Command produceSourceOutCommand(PacketSource source) {
+  Command produceSourceOutCommand(PacketSource source) {
     if (source.isHoldEvents()) {
       return null;
     }

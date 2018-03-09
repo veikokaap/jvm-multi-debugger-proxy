@@ -1,4 +1,4 @@
-package kaap.veiko.debuggerforker;
+package kaap.veiko.debuggerforker.managers;
 
 import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
@@ -26,7 +26,7 @@ abstract class ChannelManager<T extends AutoCloseable> implements Runnable, Auto
 
   abstract void handleKey(SelectionKey key);
 
-  public void register(T object) throws Exception {
+  void register(T object) throws Exception {
     if (!open.get()) {
       throw new IOException("Can't register object to closed runnable.");
     }
