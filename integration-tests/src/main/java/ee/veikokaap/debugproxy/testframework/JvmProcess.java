@@ -31,7 +31,8 @@ public class JvmProcess implements Closeable {
     this.process = process;
     this.proxyThread = new Thread(() -> {
       try {
-        debuggerProxy = DebuggerProxy.start(new InetSocketAddress("127.0.0.1", DEBUGGER_PORT), PROXY_PORT);
+        debuggerProxy = new DebuggerProxy(new InetSocketAddress("127.0.0.1", DEBUGGER_PORT), PROXY_PORT);
+        debuggerProxy.start();
       }
       catch (IOException e) {
         throw new RuntimeException(e);
@@ -106,7 +107,7 @@ public class JvmProcess implements Closeable {
   }
 
   private static String getDebuggerArgument() {
-    return "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=" + DEBUGGER_PORT;
+    return "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=" + DEBUGGER_PORT;
   }
 
   private void routeOutput() {

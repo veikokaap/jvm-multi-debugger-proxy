@@ -2,6 +2,7 @@ package kaap.veiko.debuggerforker;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,32 +16,20 @@ public class DebuggerProxy {
 
   private final CommandHandler commandHandler;
   private final DebugProxyServer proxyServer;
+  private AtomicBoolean debuggerConnected = new AtomicBoolean(false);
+  private final AtomicBoolean vmConnected = new AtomicBoolean(false);
 
-  private int debuggerCountBeforeResume = 0;
-  private int debuggerCount = 0;
-  private boolean vmConnected = false;
-
-  public static DebuggerProxy start(InetSocketAddress virtualMachineAddress, int debuggerPort) throws IOException {
-    DebuggerProxy debuggerProxy = new DebuggerProxy(virtualMachineAddress, debuggerPort);
-    debuggerProxy.start();
-    return debuggerProxy;
-  }
-
-  private DebuggerProxy(InetSocketAddress vmAddress, int debuggerPort) throws IOException {
+  public DebuggerProxy(InetSocketAddress vmAddress, int debuggerPort) throws IOException {
     proxyServer = new DebugProxyServer(vmAddress, debuggerPort);
     commandHandler = new CommandHandler(proxyServer.getVmInformation(), proxyServer.getProxyCommandStream());
   }
 
-  private void start() {
-    proxyServer.addVirtualMachineConnectedListener(vmStream -> vmConnected = true);
-    proxyServer.addDebuggerConnectedListener(debuggerStream -> {
-      debuggerCount += 1;
-      if (vmConnected && debuggerCountBeforeResume <= debuggerCount) {
-        proxyServer.getProxyCommandStream().writeToVm(ResumeCommand.create(debuggerStream.getSource().createNewOutputId()));
-      }
-    });
+  public void start() {
+    proxyServer.addVirtualMachineConnectedListener(vmStream -> vmConnected.set(true));
+    proxyServer.addDebuggerConnectedListener(debuggerStream -> debuggerConnected.set(true));
 
     proxyServer.start();
+    waitUntilConnected();
 
     while (proxyServer.getProxyCommandStream().isOpen()) {
       Command command = proxyServer.getProxyCommandStream().read();
@@ -50,8 +39,15 @@ public class DebuggerProxy {
     }
   }
 
-  public void setDebuggerCountBeforeResume(int count) {
-    this.debuggerCountBeforeResume = count;
+  private void waitUntilConnected() {
+    while (!vmConnected.get() || !debuggerConnected.get()) {
+      try {
+        Thread.sleep(10);
+      }
+      catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+    }
   }
 
   public void stop() {

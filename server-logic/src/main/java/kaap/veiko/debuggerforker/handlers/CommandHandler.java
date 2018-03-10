@@ -147,6 +147,8 @@ public class CommandHandler implements CommandVisitor {
 
   private void sendReplyToOriginalSource(Command<ReplyPacket> reply) {
     PacketSource originalSource = reply.getPacket().getCommandPacket().getSource();
-    proxyCommandStream.write(originalSource, reply);
+    if (originalSource != null) {
+      proxyCommandStream.write(originalSource, reply);
+    }
   }
 }
