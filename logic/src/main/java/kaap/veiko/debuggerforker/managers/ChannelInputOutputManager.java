@@ -2,27 +2,29 @@ package kaap.veiko.debuggerforker.managers;
 
 import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
-import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-abstract class ChannelIoRunnable<T extends AutoCloseable> implements Runnable, AutoCloseable {
-  private final Logger log = LoggerFactory.getLogger(ChannelIoRunnable.class);
+abstract class ChannelInputOutputManager<T extends AutoCloseable> implements Runnable, AutoCloseable {
+  private final Logger log = LoggerFactory.getLogger(ChannelInputOutputManager.class);
 
   private final Object selectLock = new Object();
   private final Object registerLock = new Object();
   private final Selector selector;
 
+  private final CountDownLatch startLatch = new CountDownLatch(1);
+
   private final AtomicBoolean open = new AtomicBoolean(true);
 
-  ChannelIoRunnable(Selector selector) {
+  ChannelInputOutputManager(Selector selector) {
     this.selector = selector;
   }
 
-  abstract SelectableChannel toChannel(T object);
+  abstract void internalRegister(T object, Selector selector) throws ClosedChannelException;
 
   abstract void handleKey(SelectionKey key);
 
@@ -49,7 +51,7 @@ abstract class ChannelIoRunnable<T extends AutoCloseable> implements Runnable, A
     synchronized (registerLock) {
       selector.wakeup();
       synchronized (selectLock) { // Wait until select has woken.
-        toChannel(object).register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE, object);
+        internalRegister(object, selector);
         log.info("Registered new channel: {}", object);
       }
     }

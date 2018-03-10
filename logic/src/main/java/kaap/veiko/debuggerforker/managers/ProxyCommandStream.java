@@ -11,27 +11,28 @@ import kaap.veiko.debuggerforker.commands.Command;
 import kaap.veiko.debuggerforker.commands.CommandStream;
 import kaap.veiko.debuggerforker.packet.PacketSource;
 
-public class ProxyCommandStream extends CommandStreamIoRunnable {
+public class ProxyCommandStream {
 
   private final Logger log = LoggerFactory.getLogger(ProxyCommandStream.class);
 
-  private final CommandStreamManager commandStreamManager = new CommandStreamManager();
+  private final CommandStreamInputOutputManager commandStreamManager;
+  private final Thread managerThread;
 
   public static ProxyCommandStream create() throws IOException {
     return new ProxyCommandStream(Selector.open());
   }
 
-  private ProxyCommandStream(Selector selector) throws IOException {
-    super(selector);
-  }
-
-  public void markForClosingAfterAllPacketsWritten(PacketSource source) {
-    commandStreamManager.markForClosingAfterAllPacketsWritten(source);
+  private ProxyCommandStream(Selector selector) {
+    commandStreamManager = new CommandStreamInputOutputManager(selector);
+    this.managerThread = new Thread(commandStreamManager);
   }
 
   public void registerCommandStream(CommandStream commandStream) throws Exception {
-    commandStreamManager.add(commandStream);
-    register(commandStream);
+    commandStreamManager.addCommandStream(commandStream);
+  }
+
+  public void markForClosingAfterAllPacketsWritten(PacketSource source) {
+    commandStreamManager.markForClosing(source);
   }
 
   public Command read() {
@@ -54,11 +55,6 @@ public class ProxyCommandStream extends CommandStreamIoRunnable {
   }
 
   public void write(PacketSource source, Command command) {
-    /* Don't add any new packets to be written to a stream marked for closing */
-    if (commandStreamManager.markedForClosing(source)) {
-      return;
-    }
-
     Deque<Command> writeQueue = commandStreamManager.getWriteQueue(source);
     if (writeQueue != null) {
       log.info("Adding command '{}' to writeQueue for source {}", command, source);
@@ -72,28 +68,15 @@ public class ProxyCommandStream extends CommandStreamIoRunnable {
     return commandStreamManager.getVmSource();
   }
 
-  @Override
-  void consumeReadCommand(Command command) {
-    commandStreamManager.getReadQueue().addLast(command);
+  public void start() {
+    managerThread.start();
   }
 
-  @Override
-  Command getWriteCommand(PacketSource source) {
-    if (source.isHoldEvents()) {
-      return null;
-    }
-
-    Deque<Command> writeQueue = commandStreamManager.getWriteQueue(source);
-    if (writeQueue != null) {
-      Command command = writeQueue.pollFirst();
-      if (commandStreamManager.checkSourceForRemoval(source)) {
-        markForClosing(source);
-      }
-      return command;
-    } else {
-      log.warn("Trying to find a writable command from a packet source which isn't registered: {}", source);
-      return null;
-    }
+  public boolean isOpen() {
+    return commandStreamManager.isOpen();
   }
 
+  public void close() {
+    commandStreamManager.close();
+  }
 }

@@ -60,7 +60,7 @@ public class DebuggerProxy {
   }
 
   private void start() {
-    new Thread(proxyCommandStream).start();
+    proxyCommandStream.start();
     vmConnector.start();
 
     while (proxyCommandStream.isOpen()) {
