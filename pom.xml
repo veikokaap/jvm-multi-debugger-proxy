@@ -15,7 +15,7 @@
   </properties>
 
   <modules>
-    <module>logic</module>
+    <module>server-logic</module>
     <module>types</module>
     <module>packet</module>
     <module>connections</module>
