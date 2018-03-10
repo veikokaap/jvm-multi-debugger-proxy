@@ -10,6 +10,7 @@ import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.DisposeRepl
 import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.HoldEventsCommand;
 import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.IdSizesReply;
 import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.ReleaseEventsCommand;
+import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.ResumeCommand;
 
 public interface CommandVisitor {
   void visit(CompositeEventCommand command);
@@ -33,4 +34,6 @@ public interface CommandVisitor {
   void visit(HoldEventsCommand holdEventsCommand);
 
   void visit(ReleaseEventsCommand releaseEventsCommand);
+
+  void visit(ResumeCommand resumeCommand);
 }

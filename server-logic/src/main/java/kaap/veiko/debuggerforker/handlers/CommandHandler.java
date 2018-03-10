@@ -21,6 +21,7 @@ import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.DisposeRepl
 import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.HoldEventsCommand;
 import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.IdSizesReply;
 import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.ReleaseEventsCommand;
+import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.ResumeCommand;
 import kaap.veiko.debuggerforker.packet.PacketSource;
 import kaap.veiko.debuggerforker.packet.ReplyPacket;
 import kaap.veiko.debuggerforker.types.VMInformation;
@@ -117,6 +118,11 @@ public class CommandHandler implements CommandVisitor {
   @Override
   public void visit(ReleaseEventsCommand command) {
     command.getSource().setHoldEvents(false);
+  }
+
+  @Override
+  public void visit(ResumeCommand resumeCommand) {
+    defaultHandle(resumeCommand);
   }
 
   @Override
