@@ -19,7 +19,7 @@ import kaap.veiko.debuggerforker.commands.Command;
 import kaap.veiko.debuggerforker.commands.CommandStream;
 import kaap.veiko.debuggerforker.packet.PacketSource;
 
-class CommandStreamInputOutputManager extends ChannelInputOutputManager<CommandStream> {
+public class CommandStreamInputOutputManager extends ChannelInputOutputManager<CommandStream> {
 
   private final Logger log = LoggerFactory.getLogger(CommandStreamInputOutputManager.class);
 

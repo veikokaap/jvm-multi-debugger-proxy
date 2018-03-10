@@ -1,4 +1,4 @@
-package kaap.veiko.debuggerforker.managers;
+package kaap.veiko.debuggerforker;
 
 import java.io.IOException;
 import java.nio.channels.Selector;
@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import kaap.veiko.debuggerforker.commands.Command;
 import kaap.veiko.debuggerforker.commands.CommandStream;
+import kaap.veiko.debuggerforker.managers.CommandStreamInputOutputManager;
 import kaap.veiko.debuggerforker.packet.PacketSource;
 
 public class ProxyCommandStream {
@@ -27,7 +28,7 @@ public class ProxyCommandStream {
     this.managerThread = new Thread(commandStreamManager);
   }
 
-  public void registerCommandStream(CommandStream commandStream) throws Exception {
+  void registerCommandStream(CommandStream commandStream) throws Exception {
     commandStreamManager.addCommandStream(commandStream);
   }
 
@@ -68,15 +69,15 @@ public class ProxyCommandStream {
     return commandStreamManager.getVmSource();
   }
 
-  public void start() {
+  void start() {
     managerThread.start();
   }
 
-  public boolean isOpen() {
+  boolean isOpen() {
     return commandStreamManager.isOpen();
   }
 
-  public void close() {
+  void close() {
     commandStreamManager.close();
   }
 }
