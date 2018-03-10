@@ -24,7 +24,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>logic</artifactId>
+      <artifactId>server-logic</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>
