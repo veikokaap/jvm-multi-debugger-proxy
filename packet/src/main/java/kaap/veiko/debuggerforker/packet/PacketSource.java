@@ -1,10 +1,15 @@
 package kaap.veiko.debuggerforker.packet;
 
 import java.nio.channels.SocketChannel;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import kaap.veiko.debuggerforker.packet.internal.PacketTransformer;
 
 public class PacketSource {
+
+  private final static AtomicInteger counter = new AtomicInteger(0);
+
+  private final int id;
 
   private final SocketChannel socketChannel;
   private final SourceType sourceType;
@@ -16,6 +21,7 @@ public class PacketSource {
     this.socketChannel = socketChannel;
     this.sourceType = sourceType;
     this.packetTransformer = packetTransformer;
+    id = counter.getAndIncrement();
   }
 
   public int createNewOutputId() {
@@ -51,7 +57,8 @@ public class PacketSource {
 
   @Override
   public String toString() {
-    return sourceType.toString();
+    return sourceType.toString() + "_" + id;
+
   }
 
   public void setHoldEvents(boolean holdEvents) {
