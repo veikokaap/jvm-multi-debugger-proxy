@@ -1,13 +1,12 @@
 package ee.veikokaap.debugproxy.testframework;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -33,7 +32,7 @@ import ee.veikokaap.debugproxy.testframework.utils.BreakpointLocation;
 public class DebuggerProcess implements AutoCloseable {
 
   private final VirtualMachine virtualMachine;
-  private final Map<EventRequest, Set<Consumer<SuspendManager>>> requestListenerMap = new ConcurrentHashMap<>();
+  private final Map<EventRequestIdentifier, List<Consumer<SuspendManager>>> requestListenerMap = new ConcurrentHashMap<>();
 
   private final Thread thread;
   private final AtomicReference<Exception> exception = new AtomicReference<>();
@@ -52,9 +51,7 @@ public class DebuggerProcess implements AutoCloseable {
   private void listenForEvents(VirtualMachine virtualMachine) {
     while (running.get() && !Thread.currentThread().isInterrupted()) {
       try {
-        getEventRequests(virtualMachine).stream()
-            .filter(requestListenerMap.keySet()::contains)
-            .forEach(request -> triggerSuspendEvent(request, requestListenerMap.get(request)));
+        getEventRequests(virtualMachine).forEach(this::triggerSuspendEvent);
       }
       catch (InterruptedException e) {
         markFailure(e);
@@ -75,7 +72,28 @@ public class DebuggerProcess implements AutoCloseable {
     }
   }
 
-  private void triggerSuspendEvent(EventRequest eventRequest, Set<Consumer<SuspendManager>> listeners) {
+  private void triggerSuspendEvent(EventRequest eventRequest) {
+    List<Consumer<SuspendManager>> listeners;
+    try {
+      EventRequestIdentifier key = EventRequestIdentifier.fromEventRequest(eventRequest);
+      System.out.println("XXX3: " + key + " -> " + key.hashCode());
+      listeners = requestListenerMap.get(key);
+    }
+    catch (ReflectiveOperationException e) {
+      markFailure(e);
+      return;
+    }
+
+    if (listeners == null) {
+      try {
+        throw new Exception("Listeners entry null");
+      }
+      catch (Exception e) {
+        markFailure(e);
+        return;
+      }
+    }
+
     CountDownLatch resumeLatch = new CountDownLatch(listeners.size());
     for (Consumer<SuspendManager> listener : listeners) {
       new Thread(() -> {
@@ -95,7 +113,7 @@ public class DebuggerProcess implements AutoCloseable {
     }
   }
 
-  private void markFailure(InterruptedException e) {
+  private void markFailure(Exception e) {
     exception.set(e);
   }
 
@@ -106,8 +124,15 @@ public class DebuggerProcess implements AutoCloseable {
 
     AsyncTester<SuspendManager> tester = new AsyncTester<>(onBreakListener);
 
-    requestListenerMap.putIfAbsent(classPrepareRequest, new HashSet<>());
-    requestListenerMap.get(classPrepareRequest).add(manager -> addBreakpoint(breakpointLocation, tester));
+    try {
+      EventRequestIdentifier identifier = EventRequestIdentifier.fromEventRequest(classPrepareRequest);
+      System.out.println("XXX1: " + identifier + " -> " + identifier.hashCode());
+      requestListenerMap.putIfAbsent(identifier, new ArrayList<>());
+      requestListenerMap.get(identifier).add(manager -> addBreakpoint(breakpointLocation, tester));
+    }
+    catch (ReflectiveOperationException e) {
+      markFailure(e);
+    }
 
     return tester;
   }
@@ -119,9 +144,11 @@ public class DebuggerProcess implements AutoCloseable {
         throw new AssertionError("Failed to find location");
       }
       BreakpointRequest breakPointRequest = virtualMachine.eventRequestManager().createBreakpointRequest(loc.get());
-      requestListenerMap.putIfAbsent(breakPointRequest, new HashSet<>());
-      requestListenerMap.get(breakPointRequest).add(tester);
       breakPointRequest.enable();
+
+      EventRequestIdentifier identifier = EventRequestIdentifier.fromEventRequest(breakPointRequest);
+      requestListenerMap.putIfAbsent(identifier, new ArrayList<>());
+      requestListenerMap.get(identifier).add(tester);
     }
     catch (Exception e) {
       tester.failTestWithException(e);

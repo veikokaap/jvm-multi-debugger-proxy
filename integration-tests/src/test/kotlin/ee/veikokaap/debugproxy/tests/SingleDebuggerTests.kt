@@ -27,7 +27,7 @@ open class SingleDebuggerTests {
         jvm.outputDeque.assertContainsOnly("After breakpoint 0", "After breakpoint 1")
     }
 
-    @Test(timeout = 5000)
+    @Test(timeout = 10000)
     fun `test 2 breakpoints with a single debugger`() = runTest(testClass) { jvm, debugger ->
         jvm.outputDeque.assertContainsOnly("Listening for transport dt_socket at address: 16789")
 
@@ -43,9 +43,9 @@ open class SingleDebuggerTests {
 
         debugger.allBreakpointSet()
 
-        firstBreak.joinAndTest(1, TimeUnit.SECONDS)
-        secondBreak.joinAndTest(1, TimeUnit.SECONDS)
-        jvm.waitForExit(1, TimeUnit.SECONDS)
+        firstBreak.joinAndTest(4, TimeUnit.SECONDS)
+        secondBreak.joinAndTest(4, TimeUnit.SECONDS)
+        jvm.waitForExit(4, TimeUnit.SECONDS)
 
         jvm.outputDeque.assertContainsOnly("After breakpoint 1")
     }
