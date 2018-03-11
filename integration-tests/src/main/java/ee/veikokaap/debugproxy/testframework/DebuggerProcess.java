@@ -76,7 +76,6 @@ public class DebuggerProcess implements AutoCloseable {
     List<Consumer<SuspendManager>> listeners;
     try {
       EventRequestIdentifier key = EventRequestIdentifier.fromEventRequest(eventRequest);
-      System.out.println("XXX3: " + key + " -> " + key.hashCode());
       listeners = requestListenerMap.get(key);
     }
     catch (ReflectiveOperationException e) {
@@ -126,7 +125,6 @@ public class DebuggerProcess implements AutoCloseable {
 
     try {
       EventRequestIdentifier identifier = EventRequestIdentifier.fromEventRequest(classPrepareRequest);
-      System.out.println("XXX1: " + identifier + " -> " + identifier.hashCode());
       requestListenerMap.putIfAbsent(identifier, new ArrayList<>());
       requestListenerMap.get(identifier).add(manager -> addBreakpoint(breakpointLocation, tester));
     }
