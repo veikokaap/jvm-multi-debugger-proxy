@@ -33,6 +33,8 @@ class RequestHandler {
   private final VMInformation vmInformation;
   private final ProxyCommandStream proxyCommandStream;
 
+  private final ConcurrentMap<SetEventRequestCommand, RequestIdentifier> requestIdentifierMap = new ConcurrentHashMap<>();
+
   private final ConcurrentMap<CommandPacket, SetEventRequestCommand> setEventRequestCommandMap = new ConcurrentHashMap<>();
   private final ConcurrentMap<RequestIdentifier, List<PacketSource>> eventRequestIdSourceMap = new ConcurrentHashMap<>();
   private final ConcurrentMap<PacketSource, List<Integer>> breakPointRequestIdMap = new ConcurrentHashMap<>();
@@ -44,7 +46,20 @@ class RequestHandler {
 
   public void handleSetEventCommand(SetEventRequestCommand command) {
     setEventRequestCommandMap.put(command.getPacket(), command);
-    proxyCommandStream.writeToVm(command);
+    if (requestIdentifierMap.containsKey(command)) {
+      handleSetEventReply(createReply(command));
+    }
+    else {
+      proxyCommandStream.writeToVm(command);
+    }
+  }
+
+  private SetEventRequestReply createReply(SetEventRequestCommand command) {
+    RequestIdentifier identifier = requestIdentifierMap.get(command);
+
+    SetEventRequestReply reply = SetEventRequestReply.create(command.getPacket().getId(), identifier.getRequestId(), vmInformation);
+    reply.getPacket().setCommandPacket(command.getPacket());
+    return reply;
   }
 
   public void handleCompositeEvent(CompositeEventCommand compositeEventCommand) {
@@ -86,6 +101,8 @@ class RequestHandler {
 
   public void handleSetEventReply(SetEventRequestReply reply) {
     RequestIdentifier requestIdentifier = new RequestIdentifier(findCommand(reply).getEventKind(), reply.getRequestId());
+    requestIdentifierMap.put(findCommand(reply), requestIdentifier);
+
     eventRequestIdSourceMap.computeIfAbsent(requestIdentifier, id -> new CopyOnWriteArrayList<>());
 
     PacketSource originalCommandSource = reply.getPacket().getCommandPacket().getSource();
