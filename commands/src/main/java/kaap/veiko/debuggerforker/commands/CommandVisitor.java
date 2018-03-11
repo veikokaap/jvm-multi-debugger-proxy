@@ -3,6 +3,7 @@ package kaap.veiko.debuggerforker.commands;
 import kaap.veiko.debuggerforker.commands.commandsets.event.CompositeEventCommand;
 import kaap.veiko.debuggerforker.commands.commandsets.eventrequest.ClearAllBreakpointsCommand;
 import kaap.veiko.debuggerforker.commands.commandsets.eventrequest.ClearEventRequestCommand;
+import kaap.veiko.debuggerforker.commands.commandsets.eventrequest.ClearEventRequestReply;
 import kaap.veiko.debuggerforker.commands.commandsets.eventrequest.SetEventRequestCommand;
 import kaap.veiko.debuggerforker.commands.commandsets.eventrequest.SetEventRequestReply;
 import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.DisposeCommand;
@@ -36,4 +37,6 @@ public interface CommandVisitor {
   void visit(ReleaseEventsCommand releaseEventsCommand);
 
   void visit(ResumeCommand resumeCommand);
+
+  void visit(ClearEventRequestReply clearEventRequestReply);
 }

@@ -43,6 +43,37 @@ public class CommandPacket extends PacketBase {
   }
 
   @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
+
+    CommandPacket that = (CommandPacket) o;
+
+    if (commandId != that.commandId) {
+      return false;
+    }
+    if (commandSetId != that.commandSetId) {
+      return false;
+    }
+    return replyPacket != null ? replyPacket.equals(that.replyPacket) : that.replyPacket == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = super.hashCode();
+    result = 31 * result + (int) commandId;
+    result = 31 * result + (int) commandSetId;
+    return result;
+  }
+
+  @Override
   public String toString() {
     return "CommandPacket{" +
         "length=" + getLength() +

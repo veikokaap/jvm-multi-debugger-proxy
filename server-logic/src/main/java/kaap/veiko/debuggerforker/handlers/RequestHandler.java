@@ -1,26 +1,30 @@
 package kaap.veiko.debuggerforker.handlers;
 
-import static kaap.veiko.debuggerforker.types.jdwp.EventKind.BREAKPOINT;
-
-import java.util.Collections;
-import java.util.Optional;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import kaap.veiko.debuggerforker.ProxyCommandStream;
-import kaap.veiko.debuggerforker.commands.Command;
 import kaap.veiko.debuggerforker.commands.commandsets.event.CompositeEventCommand;
 import kaap.veiko.debuggerforker.commands.commandsets.event.events.BreakPointEvent;
+import kaap.veiko.debuggerforker.commands.commandsets.event.events.ClassPrepareEvent;
+import kaap.veiko.debuggerforker.commands.commandsets.event.events.VirtualMachineEvent;
+import kaap.veiko.debuggerforker.commands.commandsets.event.events.VmDeathEvent;
+import kaap.veiko.debuggerforker.commands.commandsets.event.events.VmStartEvent;
+import kaap.veiko.debuggerforker.commands.commandsets.eventrequest.ClearAllBreakpointsCommand;
 import kaap.veiko.debuggerforker.commands.commandsets.eventrequest.ClearEventRequestCommand;
+import kaap.veiko.debuggerforker.commands.commandsets.eventrequest.ClearEventRequestReply;
 import kaap.veiko.debuggerforker.commands.commandsets.eventrequest.SetEventRequestCommand;
 import kaap.veiko.debuggerforker.commands.commandsets.eventrequest.SetEventRequestReply;
-import kaap.veiko.debuggerforker.commands.commandsets.eventrequest.filters.LocationOnlyEventRequestFilter;
+import kaap.veiko.debuggerforker.packet.CommandPacket;
 import kaap.veiko.debuggerforker.packet.PacketSource;
 import kaap.veiko.debuggerforker.types.VMInformation;
-import kaap.veiko.debuggerforker.types.jdwp.Location;
+import kaap.veiko.debuggerforker.types.jdwp.EventKind;
 
 class RequestHandler {
 
@@ -29,112 +33,100 @@ class RequestHandler {
   private final VMInformation vmInformation;
   private final ProxyCommandStream proxyCommandStream;
 
-  private final ConcurrentMap<Location, Breakpoint> breakpointMap = new ConcurrentHashMap<>();
-  private final ConcurrentMap<Integer, Location> packetIdLocationMap = new ConcurrentHashMap<>();
+  private final ConcurrentMap<CommandPacket, SetEventRequestCommand> setEventRequestCommandMap = new ConcurrentHashMap<>();
+  private final ConcurrentMap<RequestIdentifier, List<PacketSource>> eventRequestIdSourceMap = new ConcurrentHashMap<>();
+  private final ConcurrentMap<PacketSource, List<Integer>> breakPointRequestIdMap = new ConcurrentHashMap<>();
 
   RequestHandler(VMInformation vmInformation, ProxyCommandStream proxyCommandStream) {
     this.vmInformation = vmInformation;
     this.proxyCommandStream = proxyCommandStream;
   }
 
-  public void handleBreakpointEvent(BreakPointEvent event) {
-    Breakpoint breakpoint = breakpointMap.get(event.getLocation());
-    if (breakpoint == null) {
-      return;
-    }
-
-    for (PacketSource source : breakpoint.getSources()) {
-      sendBreakPointEventToSource(event, source);
-    }
+  public void handleSetEventCommand(SetEventRequestCommand command) {
+    setEventRequestCommandMap.put(command.getPacket(), command);
+    proxyCommandStream.writeToVm(command);
   }
 
-  private void sendBreakPointEventToSource(BreakPointEvent event, PacketSource source) {
-    PacketSource vmSource = proxyCommandStream.getVmSource();
-    if (vmSource == null) {
-      log.error("No VirtualMachine PacketSource");
-      return;
-    }
+  public void handleCompositeEvent(CompositeEventCommand compositeEventCommand) {
+    proxyCommandStream.getAllDebuggers().forEach(source -> sendEventsToSource(source, compositeEventCommand));
+  }
 
-    int packetId = vmSource.createNewOutputId();
-    CompositeEventCommand eventCommand = CompositeEventCommand.create(
-        packetId, (byte) 2, Collections.singletonList(event), vmInformation
+  private void sendEventsToSource(PacketSource source, CompositeEventCommand compositeEventCommand) {
+    List<VirtualMachineEvent> events = compositeEventCommand.getEvents().stream()
+        .filter(event -> isEventRequestedBySource(source, event))
+        .collect(Collectors.toList());
+
+    proxyCommandStream.write(
+        source,
+        CompositeEventCommand.create(proxyCommandStream.getVmSource().createNewOutputId(), compositeEventCommand.getSuspendPolicy(), events, vmInformation)
     );
+  }
 
-    proxyCommandStream.write(source, eventCommand);
+  //TODO: Fix VirtualMachineEvent and add getEventKind and getRequestId abstract methods
+  private boolean isEventRequestedBySource(PacketSource source, VirtualMachineEvent event) {
+    if (event instanceof VmStartEvent || event instanceof VmDeathEvent) {
+      return true;
+    }
+    else {
+      RequestIdentifier identifier;
+      if (event instanceof BreakPointEvent) {
+        identifier = new RequestIdentifier(EventKind.BREAKPOINT, ((BreakPointEvent) event).getRequestId());
+      }
+      else if (event instanceof ClassPrepareEvent) {
+        identifier = new RequestIdentifier(EventKind.CLASS_PREPARE, ((ClassPrepareEvent) event).getRequestId());
+      }
+      else {
+        log.warn("TODO at kaap.veiko.debuggerforker.handlers.RequestHandler#isEventRequestedBySource");
+        return false;
+      }
+      List<PacketSource> sources = eventRequestIdSourceMap.get(identifier);
+      return sources.contains(source);
+    }
   }
 
   public void handleSetEventReply(SetEventRequestReply reply) {
-    if (packetIdLocationMap.containsKey(reply.getPacket().getId())) {
-      Location location = packetIdLocationMap.get(reply.getPacket().getId());
-      breakpointMap.get(location).setRequestId(reply.getRequestId());
-    }
+    RequestIdentifier requestIdentifier = new RequestIdentifier(findCommand(reply).getEventKind(), reply.getRequestId());
+    eventRequestIdSourceMap.computeIfAbsent(requestIdentifier, id -> new CopyOnWriteArrayList<>());
 
     PacketSource originalCommandSource = reply.getPacket().getCommandPacket().getSource();
-    send(originalCommandSource, reply);
+    eventRequestIdSourceMap.get(requestIdentifier).add(originalCommandSource);
+    proxyCommandStream.write(originalCommandSource, reply);
+
+    saveBreakpoint(reply, requestIdentifier, originalCommandSource);
   }
 
-  public void handleSetEventCommand(SetEventRequestCommand command) {
-    if (command.getEventKind() == BREAKPOINT) {
-      Optional<LocationOnlyEventRequestFilter> locationFilter = command.getEventRequestFilters().stream()
-          .filter(f -> f instanceof LocationOnlyEventRequestFilter)
-          .map(f -> (LocationOnlyEventRequestFilter) f)
-          .findFirst();
-      if (locationFilter.isPresent()) {
-        addLocationFilteredBreakpoint(command, locationFilter.get().getLocation());
-      }
-      else {
-        proxyCommandStream.writeToVm(command);
-      }
-    }
-    else {
-      proxyCommandStream.writeToVm(command);
+  private void saveBreakpoint(SetEventRequestReply reply, RequestIdentifier requestIdentifier, PacketSource originalCommandSource) {
+    SetEventRequestCommand command = findCommand(reply);
+    if (command.getEventKind() == EventKind.BREAKPOINT) {
+      breakPointRequestIdMap.computeIfAbsent(originalCommandSource, source -> new CopyOnWriteArrayList<>());
+      breakPointRequestIdMap.get(originalCommandSource).add(requestIdentifier.getRequestId());
     }
   }
 
   public void handleClearEventCommand(ClearEventRequestCommand command) {
-    if (command.getEventKind() == BREAKPOINT) {
-      Optional<Breakpoint> breakpoint = breakpointMap.values().stream()
-          .filter(b -> b.getRequestId() == command.getRequestId())
-          .findFirst();
+    RequestIdentifier requestIdentifier = new RequestIdentifier(command.getEventKind(), command.getRequestId());
+    List<PacketSource> sources = eventRequestIdSourceMap.get(requestIdentifier);
+    sources.remove(command.getSource());
 
-      if (breakpoint.isPresent()) {
-        removeBreakPointSource(command, breakpoint.get());
-      }
-      else {
-        log.error("Breakpoint with requestId {} not present in breakpoint map", command.getRequestId());
-      }
-    }
-  }
-
-  private void removeBreakPointSource(ClearEventRequestCommand command, Breakpoint breakpoint) {
-    breakpoint.getSources().remove(command.getSource());
-
-    // If no debugger has a breakpoint in that location, then remove the breakpoint
-    if (breakpoint.getSources().isEmpty()) {
+    if (sources.isEmpty()) {
       proxyCommandStream.writeToVm(command);
-    }
-  }
-
-  private void addLocationFilteredBreakpoint(SetEventRequestCommand command, Location location) {
-    if (breakpointMap.containsKey(location)) {
-      Breakpoint breakpoint = breakpointMap.get(location);
-
-      int packetId = command.getPacket().getId();
-      int requestId = breakpoint.getRequestId();
-      send(command.getSource(), SetEventRequestReply.create(packetId, requestId, vmInformation));
     }
     else {
-      Breakpoint breakpoint = new Breakpoint(location);
-      breakpointMap.put(location, breakpoint);
-
-      breakpoint.getSources().add(command.getSource());
-      proxyCommandStream.writeToVm(command);
+      proxyCommandStream.write(command.getSource(), ClearEventRequestReply.create(proxyCommandStream.getVmSource().createNewOutputId()));
     }
-
-    packetIdLocationMap.put(command.getPacket().getId(), location);
   }
 
-  private void send(PacketSource source, Command command) {
-    proxyCommandStream.write(source, command);
+  private SetEventRequestCommand findCommand(SetEventRequestReply reply) {
+    return setEventRequestCommandMap.get(reply.getPacket().getCommandPacket());
+  }
+
+  public void handleClearAllBreakpointsCommand(ClearAllBreakpointsCommand command) {
+    PacketSource source = command.getSource();
+    List<Integer> breakpointRequestIds = breakPointRequestIdMap.get(source);
+    if (breakpointRequestIds != null) {
+      for (Integer requestId : breakpointRequestIds) {
+        proxyCommandStream.writeToVm(ClearEventRequestCommand.create(source.createNewOutputId(), EventKind.BREAKPOINT, requestId, vmInformation));
+      }
+    }
   }
 }

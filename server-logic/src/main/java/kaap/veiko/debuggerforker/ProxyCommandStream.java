@@ -3,6 +3,7 @@ package kaap.veiko.debuggerforker;
 import java.io.IOException;
 import java.nio.channels.Selector;
 import java.util.Deque;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,6 +68,10 @@ public class ProxyCommandStream {
 
   public PacketSource getVmSource() {
     return commandStreamManager.getVmSource();
+  }
+
+  public List<PacketSource> getAllDebuggers() {
+    return commandStreamManager.getAllDebuggers();
   }
 
   void start() {

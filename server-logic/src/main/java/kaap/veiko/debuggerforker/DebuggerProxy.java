@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import kaap.veiko.debuggerforker.commands.Command;
-import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.ResumeCommand;
 import kaap.veiko.debuggerforker.handlers.CommandHandler;
 
 public class DebuggerProxy {
@@ -15,7 +14,7 @@ public class DebuggerProxy {
   private final static Logger log = LoggerFactory.getLogger(DebuggerProxy.class);
 
   private final CommandHandler commandHandler;
-  private final DebugProxyServer proxyServer;
+  public final DebugProxyServer proxyServer;
   private AtomicBoolean debuggerConnected = new AtomicBoolean(false);
   private final AtomicBoolean vmConnected = new AtomicBoolean(false);
 

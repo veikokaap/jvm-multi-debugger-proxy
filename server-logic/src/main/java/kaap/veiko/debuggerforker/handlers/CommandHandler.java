@@ -10,10 +10,9 @@ import kaap.veiko.debuggerforker.commands.Command;
 import kaap.veiko.debuggerforker.commands.CommandVisitor;
 import kaap.veiko.debuggerforker.commands.UnknownCommand;
 import kaap.veiko.debuggerforker.commands.commandsets.event.CompositeEventCommand;
-import kaap.veiko.debuggerforker.commands.commandsets.event.events.BreakPointEvent;
-import kaap.veiko.debuggerforker.commands.commandsets.event.events.VirtualMachineEvent;
 import kaap.veiko.debuggerforker.commands.commandsets.eventrequest.ClearAllBreakpointsCommand;
 import kaap.veiko.debuggerforker.commands.commandsets.eventrequest.ClearEventRequestCommand;
+import kaap.veiko.debuggerforker.commands.commandsets.eventrequest.ClearEventRequestReply;
 import kaap.veiko.debuggerforker.commands.commandsets.eventrequest.SetEventRequestCommand;
 import kaap.veiko.debuggerforker.commands.commandsets.eventrequest.SetEventRequestReply;
 import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.DisposeCommand;
@@ -42,31 +41,22 @@ public class CommandHandler implements CommandVisitor {
 
   @Override
   public void visit(CompositeEventCommand command) {
-    List<BreakPointEvent> breakpoints = command.getEvents().stream()
-        .filter(e -> e instanceof BreakPointEvent)
-        .map(e -> (BreakPointEvent)e)
-        .collect(Collectors.toList());
-
-    List<VirtualMachineEvent> otherEvents = command.getEvents().stream()
-        .filter(e -> !breakpoints.contains(e))
-        .collect(Collectors.toList());
-
-    breakpoints.forEach(requestHandler::handleBreakpointEvent);
-    if (!otherEvents.isEmpty()) {
-      proxyCommandStream.writeToAllDebuggers(CompositeEventCommand.create(
-          command.getSource().createNewOutputId(), (byte) 2, otherEvents, vmInformation
-      ));
-    }
+    requestHandler.handleCompositeEvent(command);
   }
 
   @Override
   public void visit(ClearAllBreakpointsCommand command) {
-    defaultHandle(command);
+    requestHandler.handleClearAllBreakpointsCommand(command);
   }
 
   @Override
   public void visit(ClearEventRequestCommand command) {
     requestHandler.handleClearEventCommand(command);
+  }
+
+  @Override
+  public void visit(ClearEventRequestReply clearEventRequestReply) {
+    defaultHandle(clearEventRequestReply);
   }
 
   @Override
