@@ -3,22 +3,23 @@ package ee.veikokaap.debugproxy.testframework;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-import com.sun.jdi.request.BreakpointRequest;
 
-public class AsyncTester<T> implements Consumer<T> {
+public class AsyncTester<T> implements Tester<T> {
 
-  private final AtomicReference<AssertionError> exception = new AtomicReference<>(null);
+  private final AtomicReference<Throwable> exception = new AtomicReference<>(null);
   private final AtomicReference<Thread> thread = new AtomicReference<>(null);
   private final Consumer<T> consumer;
-  private final BreakpointRequest request;
 
-  AsyncTester(Consumer<T> consumer, BreakpointRequest request) {
+  AsyncTester(Consumer<T> consumer) {
     this.consumer = consumer;
-    this.request = request;
   }
 
   @Override
   public void accept(T t) {
+    if (exception.get() != null) {
+      return; // Test previously failed
+    }
+
     thread.set(Thread.currentThread());
     try {
       consumer.accept(t);
@@ -27,12 +28,8 @@ public class AsyncTester<T> implements Consumer<T> {
     }
   }
 
-  public AsyncTester<T> enable() {
-    request.enable();
-    return this;
-  }
-
-  public void joinAndTest(long time, TimeUnit timeUnit) throws InterruptedException {
+  @Override
+  public void joinAndTest(long time, TimeUnit timeUnit) throws Throwable {
     long millis = timeUnit.toMillis(time);
     long start = System.currentTimeMillis();
 
@@ -55,5 +52,9 @@ public class AsyncTester<T> implements Consumer<T> {
     while (thread.get() == null && (System.currentTimeMillis() - start < millis)) {
       Thread.sleep(100);
     }
+  }
+
+  public void failTestWithException(Exception e) {
+    exception.set(e);
   }
 }

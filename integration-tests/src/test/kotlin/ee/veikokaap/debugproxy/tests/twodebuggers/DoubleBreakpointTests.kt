@@ -3,14 +3,14 @@ package ee.veikokaap.debugproxy.tests.twodebuggers
 import ee.veikokaap.debugproxy.testframework.DebuggerProcess
 import ee.veikokaap.debugproxy.testframework.JvmProcess
 import ee.veikokaap.debugproxy.testframework.utils.BreakpointUtil
-import ee.veikokaap.debugproxy.tests.SingleBreakpointClass
+import ee.veikokaap.debugproxy.tests.DoubleBreakpointClass
 import org.junit.Test
 import java.util.concurrent.TimeUnit
 import kotlin.test.assertEquals
 
 open class DoubleBreakpointTests {
 
-    val testClass = SingleBreakpointClass::class.java
+    val testClass = DoubleBreakpointClass::class.java
     val firstLocation = BreakpointUtil.findBreakLocation(testClass, 0)
     val secondLocation = BreakpointUtil.findBreakLocation(testClass, 1)
 
@@ -33,8 +33,10 @@ open class DoubleBreakpointTests {
             it.resume()
         }
 
-        firstBreak.enable()
-        secondBreak.enable()
+        firstDebugger.allBreakpointSet()
+//        firstDebugger.resume()
+//        secondDebugger.resume()
+
         firstBreak.joinAndTest(15, TimeUnit.SECONDS)
         secondBreak.joinAndTest(15, TimeUnit.SECONDS)
 

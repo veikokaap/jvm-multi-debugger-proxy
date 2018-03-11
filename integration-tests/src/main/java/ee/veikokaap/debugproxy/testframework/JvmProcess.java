@@ -21,7 +21,7 @@ public class JvmProcess implements Closeable {
   private final Deque<String> outputDeque = new ConcurrentLinkedDeque<>();
   private final Process process;
   private final Thread proxyThread;
-  private DebuggerProxy debuggerProxy;
+  public DebuggerProxy debuggerProxy;
 
   public static JvmProcess runClass(Class clazz) throws IOException {
     return new JvmProcess(startClassWithJvm(clazz));
@@ -74,7 +74,7 @@ public class JvmProcess implements Closeable {
       process.destroy();
       process.waitFor(2, TimeUnit.SECONDS);
       process.destroyForcibly();
-      throw new AssertionError("JVM didn't exit on its own");
+      throw new AssertionError("JVM failed to exit on its own");
     }
     stopProxyAndWait();
   }
@@ -133,4 +133,5 @@ public class JvmProcess implements Closeable {
       throw new RuntimeException(e);
     }
   }
+
 }

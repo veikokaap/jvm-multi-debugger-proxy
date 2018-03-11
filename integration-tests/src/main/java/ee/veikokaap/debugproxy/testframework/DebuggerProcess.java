@@ -1,12 +1,19 @@
 package ee.veikokaap.debugproxy.testframework;
 
-import java.io.Closeable;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import com.sun.jdi.AbsentInformationException;
 import com.sun.jdi.Bootstrap;
 import com.sun.jdi.Location;
@@ -16,16 +23,21 @@ import com.sun.jdi.connect.AttachingConnector;
 import com.sun.jdi.connect.Connector;
 import com.sun.jdi.connect.IllegalConnectorArgumentsException;
 import com.sun.jdi.event.Event;
+import com.sun.jdi.event.EventSet;
 import com.sun.jdi.request.BreakpointRequest;
+import com.sun.jdi.request.ClassPrepareRequest;
+import com.sun.jdi.request.EventRequest;
 
 import ee.veikokaap.debugproxy.testframework.utils.BreakpointLocation;
 
-public class DebuggerProcess implements Closeable {
+public class DebuggerProcess implements AutoCloseable {
 
   private final VirtualMachine virtualMachine;
-  private final Map<BreakpointRequest, Set<Consumer<BreakpointManager>>> requestListenerMap = new ConcurrentHashMap<>();
-  private final Map<BreakpointLocation, BreakpointRequest> locationRequestMap = new ConcurrentHashMap<>();
+  private final Map<EventRequest, Set<Consumer<SuspendManager>>> requestListenerMap = new ConcurrentHashMap<>();
+
   private final Thread thread;
+  private final AtomicReference<Exception> exception = new AtomicReference<>();
+  private final AtomicBoolean running = new AtomicBoolean(true);
 
   private DebuggerProcess(VirtualMachine virtualMachine) {
     this.virtualMachine = virtualMachine;
@@ -38,49 +50,105 @@ public class DebuggerProcess implements Closeable {
   }
 
   private void listenForEvents(VirtualMachine virtualMachine) {
-    while (!Thread.currentThread().isInterrupted()) {
+    while (running.get() && !Thread.currentThread().isInterrupted()) {
       try {
-        virtualMachine.eventQueue().remove().stream()
-            .map(Event::request)
+        getEventRequests(virtualMachine).stream()
             .filter(requestListenerMap.keySet()::contains)
-            .map(requestListenerMap::get)
-            .flatMap(Set::stream)
-            .forEach(listener -> new Thread(() -> listener.accept(new BreakpointManager(this))).start());
+            .forEach(request -> triggerSuspendEvent(request, requestListenerMap.get(request)));
       }
       catch (InterruptedException e) {
-        throw new RuntimeException(e);
+        markFailure(e);
       }
     }
   }
 
-  public AsyncTester<BreakpointManager> breakAt(BreakpointLocation location, Consumer<BreakpointManager> onBreakListener) throws AbsentInformationException {
-    if (!locationRequestMap.containsKey(location)) {
-      BreakpointRequest request = virtualMachine.eventRequestManager().createBreakpointRequest(findLocation(location));
-      locationRequestMap.put(location, request);
-      requestListenerMap.put(request, new HashSet<>());
+  private List<EventRequest> getEventRequests(VirtualMachine virtualMachine) throws InterruptedException {
+    EventSet set = virtualMachine.eventQueue().remove(10);
+    if (set == null) {
+      return Collections.emptyList();
+    }
+    else {
+      return set.stream()
+          .map(Event::request)
+          .filter(Objects::nonNull)
+          .collect(Collectors.toList());
+    }
+  }
+
+  private void triggerSuspendEvent(EventRequest eventRequest, Set<Consumer<SuspendManager>> listeners) {
+    CountDownLatch resumeLatch = new CountDownLatch(listeners.size());
+    for (Consumer<SuspendManager> listener : listeners) {
+      new Thread(() -> {
+        listener.accept(new SuspendManager(this));
+        resumeLatch.countDown();
+      }).start();
     }
 
-    BreakpointRequest request = locationRequestMap.get(location);
-    AsyncTester<BreakpointManager> tester = new AsyncTester<>(onBreakListener, request);
-    requestListenerMap.get(request).add(tester);
+    try {
+      if (eventRequest instanceof ClassPrepareRequest) {
+        resumeLatch.await();
+        resume();
+      }
+    }
+    catch (InterruptedException e) {
+      markFailure(e);
+    }
+  }
+
+  private void markFailure(InterruptedException e) {
+    exception.set(e);
+  }
+
+  public AsyncTester<SuspendManager> breakAt(BreakpointLocation breakpointLocation, Consumer<SuspendManager> onBreakListener) {
+    ClassPrepareRequest classPrepareRequest = virtualMachine.eventRequestManager().createClassPrepareRequest();
+    classPrepareRequest.addClassFilter(breakpointLocation.getClassName());
+    classPrepareRequest.enable();
+
+    AsyncTester<SuspendManager> tester = new AsyncTester<>(onBreakListener);
+
+    requestListenerMap.putIfAbsent(classPrepareRequest, new HashSet<>());
+    requestListenerMap.get(classPrepareRequest).add(manager -> addBreakpoint(breakpointLocation, tester));
 
     return tester;
+  }
+
+  private void addBreakpoint(BreakpointLocation breakpointLocation, AsyncTester<SuspendManager> tester) {
+    try {
+      Optional<Location> loc = findLocation(breakpointLocation);
+      if (!loc.isPresent()) {
+        throw new AssertionError("Failed to find location");
+      }
+      BreakpointRequest breakPointRequest = virtualMachine.eventRequestManager().createBreakpointRequest(loc.get());
+      requestListenerMap.putIfAbsent(breakPointRequest, new HashSet<>());
+      requestListenerMap.get(breakPointRequest).add(tester);
+      breakPointRequest.enable();
+    }
+    catch (Exception e) {
+      tester.failTestWithException(e);
+    }
+  }
+
+  public void allBreakpointSet() {
+    resume();
   }
 
   void resume() {
     virtualMachine.resume();
   }
 
-  private Location findLocation(BreakpointLocation location) throws AbsentInformationException {
-    ReferenceType classRef = virtualMachine.allClasses().stream()
+  private Optional<Location> findLocation(BreakpointLocation location) throws AbsentInformationException {
+    Optional<ReferenceType> classRef = virtualMachine.allClasses().stream()
         .filter(c -> c.name().equals(location.getClassName()))
-        .findFirst()
-        .get();
+        .findFirst();
 
-    return classRef.allLineLocations().stream()
-        .filter(loc -> loc.lineNumber() == location.getLineNumber())
-        .findFirst()
-        .get();
+    if (!classRef.isPresent()) {
+      return Optional.empty();
+    }
+    else {
+      return classRef.get().allLineLocations().stream()
+          .filter(loc -> loc.lineNumber() == location.getLineNumber())
+          .findFirst();
+    }
   }
 
   private static VirtualMachine connect() throws IOException, IllegalConnectorArgumentsException {
@@ -101,7 +169,23 @@ public class DebuggerProcess implements Closeable {
   }
 
   @Override
-  public void close() {
-    thread.interrupt();
+  public void close() throws Exception {
+    running.set(false);
+    try {
+      thread.join(100);
+    }
+    catch (InterruptedException e) {
+      markFailure(e);
+      thread.interrupt();
+    }
+    finally {
+      checkForExceptions();
+    }
+  }
+
+  private void checkForExceptions() throws Exception {
+    if (exception.get() != null) {
+      throw exception.get();
+    }
   }
 }

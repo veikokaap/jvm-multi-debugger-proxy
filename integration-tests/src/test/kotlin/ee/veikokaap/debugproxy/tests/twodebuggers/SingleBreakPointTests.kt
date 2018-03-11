@@ -31,8 +31,7 @@ class SingleBreakPointTests {
             it.resume()
         }
 
-        firstBreak.enable()
-        secondBreak.enable()
+        debugger.allBreakpointSet()
         secondBreak.joinAndTest(5, TimeUnit.SECONDS)
 
         jvm.waitForExit(2, TimeUnit.SECONDS)

@@ -1,9 +1,9 @@
 package ee.veikokaap.debugproxy.testframework;
 
-public class BreakpointManager {
+public class SuspendManager {
   private final DebuggerProcess parentDebugger;
 
-  public BreakpointManager(DebuggerProcess parentDebugger) {
+  public SuspendManager(DebuggerProcess parentDebugger) {
     this.parentDebugger = parentDebugger;
   }
 
