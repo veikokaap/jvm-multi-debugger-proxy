@@ -40,7 +40,6 @@ public class MarkerFinder {
   }
 
   private class TestMethodVisitor extends MethodVisitor {
-    private boolean callsMark;
     private int lineNr;
     private int id = -1;
 
@@ -49,7 +48,6 @@ public class MarkerFinder {
     }
 
     public void visitCode() {
-      callsMark = false;
     }
 
     public void visitLineNumber(int line, Label start) {
