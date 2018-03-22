@@ -10,8 +10,8 @@ open class SingleDebuggerTests {
     val firstBreakpoint = BreakpointUtil.findBreakLocation(testClass, 0)
     val secondBreakpoint = BreakpointUtil.findBreakLocation(testClass, 1)
 
-    @Test(timeout = 5000)
-    fun `test a single breakpoint with a single debugger`() = runTest(testClass) { jvm, debugger ->
+    @Test
+    fun `test a single breakpoint with a single debugger`() = runTest(testClass, 10, TimeUnit.SECONDS) { jvm, debugger ->
         jvm.outputDeque.assertContainsOnly("Listening for transport dt_socket at address: 16789")
 
         val breakpoint = debugger.breakAt(firstBreakpoint) { breakpoint ->
@@ -21,14 +21,14 @@ open class SingleDebuggerTests {
 
         debugger.allBreakpointSet()
 
-        breakpoint.joinAndTest(1, TimeUnit.SECONDS)
-        jvm.waitForExit(1, TimeUnit.SECONDS)
+        breakpoint.joinAndTest(2, TimeUnit.SECONDS)
+        jvm.waitForExit(2, TimeUnit.SECONDS)
 
         jvm.outputDeque.assertContainsOnly("After breakpoint 0", "After breakpoint 1")
     }
 
-    @Test(timeout = 10000)
-    fun `test 2 breakpoints with a single debugger`() = runTest(testClass) { jvm, debugger ->
+    @Test
+    fun `test 2 breakpoints with a single debugger`() = runTest(testClass, 10, TimeUnit.SECONDS) { jvm, debugger ->
         jvm.outputDeque.assertContainsOnly("Listening for transport dt_socket at address: 16789")
 
         val firstBreak = debugger.breakAt(firstBreakpoint) {

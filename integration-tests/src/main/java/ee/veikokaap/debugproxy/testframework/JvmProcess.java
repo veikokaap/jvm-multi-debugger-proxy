@@ -69,14 +69,18 @@ public class JvmProcess implements Closeable {
    * @throws InterruptedException
    */
   public void waitForExit(long timeout, TimeUnit unit) throws InterruptedException {
-    boolean exited = process.waitFor(timeout, unit);
-    if (!exited) {
-      process.destroy();
-      process.waitFor(2, TimeUnit.SECONDS);
-      process.destroyForcibly();
-      throw new AssertionError("JVM failed to exit on its own");
+    try {
+      boolean exited = process.waitFor(timeout, unit);
+      if (!exited) {
+        process.destroy();
+        process.waitFor(2, TimeUnit.SECONDS);
+        process.destroyForcibly();
+        throw new AssertionError("JVM failed to exit on its own");
+      }
     }
-    stopProxyAndWait();
+    finally {
+      stopProxyAndWait();
+    }
   }
 
   private void stopProxyAndWait() throws InterruptedException {
