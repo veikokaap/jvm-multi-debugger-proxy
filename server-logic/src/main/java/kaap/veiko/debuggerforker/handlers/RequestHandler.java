@@ -1,6 +1,9 @@
 package kaap.veiko.debuggerforker.handlers;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -21,6 +24,8 @@ import kaap.veiko.debuggerforker.commands.commandsets.eventrequest.ClearEventReq
 import kaap.veiko.debuggerforker.commands.commandsets.eventrequest.ClearEventRequestReply;
 import kaap.veiko.debuggerforker.commands.commandsets.eventrequest.SetEventRequestCommand;
 import kaap.veiko.debuggerforker.commands.commandsets.eventrequest.SetEventRequestReply;
+import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.ResumeCommand;
+import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.ResumeReply;
 import kaap.veiko.debuggerforker.packet.CommandPacket;
 import kaap.veiko.debuggerforker.packet.PacketSource;
 import kaap.veiko.debuggerforker.types.VMInformation;
@@ -38,6 +43,9 @@ class RequestHandler {
   private final ConcurrentMap<CommandPacket, SetEventRequestCommand> setEventRequestCommandMap = new ConcurrentHashMap<>();
   private final ConcurrentMap<RequestIdentifier, List<PacketSource>> eventRequestIdSourceMap = new ConcurrentHashMap<>();
   private final ConcurrentMap<PacketSource, List<Integer>> breakPointRequestIdMap = new ConcurrentHashMap<>();
+
+  private final ConcurrentMap<PacketSource, List<VirtualMachineEvent>> suspendedSourceEventMap = new ConcurrentHashMap<>();
+  private final ConcurrentMap<VirtualMachineEvent, List<PacketSource>> suspendedEventSourceMap = new ConcurrentHashMap<>();
 
   RequestHandler(VMInformation vmInformation, ProxyCommandStream proxyCommandStream) {
     this.vmInformation = vmInformation;
@@ -66,10 +74,51 @@ class RequestHandler {
     proxyCommandStream.getAllDebuggers().forEach(source -> sendEventsToSource(source, compositeEventCommand));
   }
 
+  public void handleResume(ResumeCommand command) {
+    PacketSource source = command.getSource();
+
+    log.info("Removing events: {}", suspendedSourceEventMap.get(source));
+    log.info("Before eventMap {}", suspendedEventSourceMap.entrySet());
+    Optional.ofNullable(suspendedSourceEventMap.remove(source))
+        .ifPresent(events -> events.forEach(event -> suspendedEventSourceMap.get(event).remove(source)));
+
+    suspendedEventSourceMap.entrySet().stream()
+        .filter(entry -> entry.getValue() == null || entry.getValue().isEmpty())
+        .map(Map.Entry::getKey)
+        .forEach(suspendedEventSourceMap::remove);
+
+    long suspendedSourceCount = suspendedEventSourceMap.values().stream()
+        .flatMap(List::stream)
+        .distinct()
+        .count();
+
+    log.info("Remaining suspended sources count: {}", suspendedSourceCount);
+    log.info("Remaining eventMap {}", suspendedEventSourceMap.entrySet());
+
+    if (suspendedSourceCount == 0) {
+      proxyCommandStream.writeToVm(command);
+    }
+    else {
+      proxyCommandStream.write(source, ResumeReply.create(command.getPacket().getId()));
+    }
+  }
+
   private void sendEventsToSource(PacketSource source, CompositeEventCommand compositeEventCommand) {
     List<VirtualMachineEvent> events = compositeEventCommand.getEvents().stream()
         .filter(event -> isEventRequestedBySource(source, event))
         .collect(Collectors.toList());
+
+    if (events.isEmpty()) {
+      return;
+    }
+
+    if (compositeEventCommand.getSuspendPolicy() == 2) {
+      suspendedSourceEventMap.computeIfAbsent(source, key -> new ArrayList<>());
+      events.forEach(event -> suspendedEventSourceMap.computeIfAbsent(event, key -> new ArrayList<>()));
+
+      suspendedSourceEventMap.get(source).addAll(events);
+      events.forEach(event -> suspendedEventSourceMap.get(event).add(source));
+    }
 
     proxyCommandStream.write(
         source,

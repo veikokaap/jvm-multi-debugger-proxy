@@ -12,6 +12,7 @@ import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.HoldEventsC
 import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.IdSizesReply;
 import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.ReleaseEventsCommand;
 import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.ResumeCommand;
+import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.ResumeReply;
 
 public interface CommandVisitor {
   void visit(CompositeEventCommand command);
@@ -39,4 +40,6 @@ public interface CommandVisitor {
   void visit(ResumeCommand resumeCommand);
 
   void visit(ClearEventRequestReply clearEventRequestReply);
+
+  void visit(ResumeReply resumeReply);
 }
