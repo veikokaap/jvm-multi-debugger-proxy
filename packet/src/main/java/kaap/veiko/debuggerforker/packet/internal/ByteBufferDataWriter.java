@@ -54,6 +54,16 @@ public class ByteBufferDataWriter implements DataWriter {
   }
 
   @Override
+  public void writeFloat(float f) {
+    byteBuffer.putFloat(f);
+  }
+
+  @Override
+  public void writeDouble(double d) {
+    byteBuffer.putDouble(d);
+  }
+
+  @Override
   public void writeLongOfSize(long l, IdSizes.SizeType sizeType) {
     IdSizes idSizes = vmInformation.getIdSizes();
     int size;

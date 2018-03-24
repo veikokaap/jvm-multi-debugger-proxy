@@ -13,6 +13,10 @@ public interface DataWriter {
 
   void writeLong(long l);
 
+  void writeFloat(float f);
+
+  void writeDouble(double d);
+
   void writeLongOfSize(long l, IdSizes.SizeType sizeType);
 
   void writeString(String string);

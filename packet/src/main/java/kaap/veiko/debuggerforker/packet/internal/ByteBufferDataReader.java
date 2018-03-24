@@ -44,6 +44,16 @@ public class ByteBufferDataReader implements DataReader {
   }
 
   @Override
+  public float readFloat() {
+    return byteBuffer.getFloat();
+  }
+
+  @Override
+  public double readDouble() {
+    return byteBuffer.getDouble();
+  }
+
+  @Override
   public long readLongOfSize(IdSizes.SizeType sizeType) {
     IdSizes idSizes = vmInformation.getIdSizes();
     int size;

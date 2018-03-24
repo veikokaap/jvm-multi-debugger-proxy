@@ -15,5 +15,9 @@ public interface DataReader {
 
   boolean readBoolean();
 
+  float readFloat();
+
+  double readDouble();
+
   String readString();
 }
