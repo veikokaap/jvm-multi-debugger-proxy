@@ -3,28 +3,14 @@ package kaap.veiko.debuggerforker.commands.commandsets;
 import static org.junit.Assert.*;
 
 import java.util.concurrent.ThreadLocalRandom;
-import org.junit.Before;
 
 import kaap.veiko.debuggerforker.commands.Command;
 import kaap.veiko.debuggerforker.commands.parser.CommandType;
 import kaap.veiko.debuggerforker.packet.CommandPacket;
 import kaap.veiko.debuggerforker.packet.Packet;
 import kaap.veiko.debuggerforker.packet.ReplyPacket;
-import kaap.veiko.debuggerforker.types.VMInformation;
-import kaap.veiko.debuggerforker.types.jdwp.IdSizes;
 
-public abstract class CommandTestBase {
-
-  private final VMInformation vmInformation = new VMInformation();
-
-  @Before
-  public void setup() {
-    vmInformation.setIdSizes(new IdSizes(6,5,7,6,7));
-  }
-
-  protected VMInformation getVmInformation() {
-    return vmInformation;
-  }
+public abstract class CommandTestBase extends TestBase {
 
   protected int generateRandomPacketId() {
     return ThreadLocalRandom.current().nextInt();

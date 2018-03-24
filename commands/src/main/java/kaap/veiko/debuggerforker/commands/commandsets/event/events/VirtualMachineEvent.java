@@ -17,6 +17,9 @@ public abstract class VirtualMachineEvent implements DataType {
 
   private static Logger log = LoggerFactory.getLogger(VirtualMachineEvent.class);
 
+  public abstract int getRequestId();
+  public abstract EventKind getEventKind();
+
   public static List<VirtualMachineEvent> readList(CommandDataReader reader) {
     int length = reader.readInt();
     try {

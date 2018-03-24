@@ -132,17 +132,7 @@ class RequestHandler {
       return true;
     }
     else {
-      RequestIdentifier identifier;
-      if (event instanceof BreakPointEvent) {
-        identifier = new RequestIdentifier(EventKind.BREAKPOINT, ((BreakPointEvent) event).getRequestId());
-      }
-      else if (event instanceof ClassPrepareEvent) {
-        identifier = new RequestIdentifier(EventKind.CLASS_PREPARE, ((ClassPrepareEvent) event).getRequestId());
-      }
-      else {
-        log.warn("TODO at kaap.veiko.debuggerforker.handlers.RequestHandler#isEventRequestedBySource");
-        return false;
-      }
+      RequestIdentifier identifier = new RequestIdentifier(event.getEventKind(), event.getRequestId());
       List<PacketSource> sources = eventRequestIdSourceMap.get(identifier);
       return sources.contains(source);
     }

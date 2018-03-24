@@ -91,6 +91,12 @@
   </build>
 
   <dependencies>
+    <!--Code generation-->
+    <dependency>
+      <groupId>com.google.auto.value</groupId>
+      <artifactId>auto-value</artifactId>
+      <version>1.5.4</version>
+    </dependency>
     <!--Tests-->
     <dependency>
       <groupId>junit</groupId>
