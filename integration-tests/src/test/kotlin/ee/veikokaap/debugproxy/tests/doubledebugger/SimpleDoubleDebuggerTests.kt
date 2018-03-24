@@ -28,7 +28,6 @@ open class SimpleDoubleDebuggerTests {
 
         val secondBreak = secondDebugger.breakAt(firstLocation) {
             firstBreak.joinAndTest(4, TimeUnit.SECONDS)
-            assertThat(jvm.outputDeque, `is`(empty()))
             assertTrue(jvm.outputDeque.isEmpty())
             it.resume()
         }
