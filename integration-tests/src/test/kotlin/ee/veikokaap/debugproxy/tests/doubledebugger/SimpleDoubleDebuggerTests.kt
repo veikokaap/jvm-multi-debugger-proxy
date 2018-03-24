@@ -11,7 +11,7 @@ import org.junit.Test
 import java.util.concurrent.TimeUnit
 import kotlin.test.assertTrue
 
-open class DoubleDebuggerTests {
+open class SimpleDoubleDebuggerTests {
 
     val testClass = SimpleBreakpointClass::class.java
     val firstLocation = BreakpointUtil.findBreakLocation(testClass, 0)

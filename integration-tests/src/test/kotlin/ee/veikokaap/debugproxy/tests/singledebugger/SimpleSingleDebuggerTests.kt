@@ -7,7 +7,7 @@ import ee.veikokaap.debugproxy.tests.runTest
 import org.junit.Test
 import java.util.concurrent.TimeUnit
 
-open class SingleDebuggerTests {
+open class SimpleSingleDebuggerTests {
 
     val testClass = SimpleBreakpointClass::class.java
     val firstBreakpoint = BreakpointUtil.findBreakLocation(testClass, 0)
