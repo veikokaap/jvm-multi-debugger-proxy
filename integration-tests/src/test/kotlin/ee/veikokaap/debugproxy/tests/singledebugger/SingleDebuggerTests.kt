@@ -1,6 +1,9 @@
-package ee.veikokaap.debugproxy.tests
+package ee.veikokaap.debugproxy.tests.singledebugger
 
 import ee.veikokaap.debugproxy.testframework.utils.BreakpointUtil
+import ee.veikokaap.debugproxy.tests.SimpleBreakpointClass
+import ee.veikokaap.debugproxy.tests.assertContainsOnly
+import ee.veikokaap.debugproxy.tests.runTest
 import org.junit.Test
 import java.util.concurrent.TimeUnit
 

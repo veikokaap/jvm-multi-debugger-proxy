@@ -1,6 +1,9 @@
-package ee.veikokaap.debugproxy.tests
+package ee.veikokaap.debugproxy.tests.doubledebugger
 
 import ee.veikokaap.debugproxy.testframework.utils.BreakpointUtil
+import ee.veikokaap.debugproxy.tests.SimpleBreakpointClass
+import ee.veikokaap.debugproxy.tests.assertContainsOnly
+import ee.veikokaap.debugproxy.tests.runTest
 import org.hamcrest.Matchers.`is`
 import org.hamcrest.Matchers.empty
 import org.junit.Assert.assertThat
