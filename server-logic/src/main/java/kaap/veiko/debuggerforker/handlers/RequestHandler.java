@@ -139,8 +139,9 @@ class RequestHandler {
   }
 
   public void handleSetEventReply(SetEventRequestReply reply) {
-    RequestIdentifier requestIdentifier = new RequestIdentifier(findCommand(reply).getEventKind(), reply.getRequestId());
-    requestIdentifierMap.put(findCommand(reply), requestIdentifier);
+    SetEventRequestCommand command = findCommand(reply);
+    RequestIdentifier requestIdentifier = new RequestIdentifier(command.getEventKind(), reply.getRequestId());
+    requestIdentifierMap.put(command, requestIdentifier);
 
     eventRequestIdSourceMap.computeIfAbsent(requestIdentifier, id -> new CopyOnWriteArrayList<>());
 
@@ -148,11 +149,10 @@ class RequestHandler {
     eventRequestIdSourceMap.get(requestIdentifier).add(originalCommandSource);
     proxyCommandStream.write(originalCommandSource, reply);
 
-    saveBreakpoint(reply, requestIdentifier, originalCommandSource);
+    saveBreakpoint(command, requestIdentifier, originalCommandSource);
   }
 
-  private void saveBreakpoint(SetEventRequestReply reply, RequestIdentifier requestIdentifier, PacketSource originalCommandSource) {
-    SetEventRequestCommand command = findCommand(reply);
+  private void saveBreakpoint(SetEventRequestCommand command, RequestIdentifier requestIdentifier, PacketSource originalCommandSource) {
     if (command.getEventKind() == EventKind.BREAKPOINT) {
       breakPointRequestIdMap.computeIfAbsent(originalCommandSource, source -> new CopyOnWriteArrayList<>());
       breakPointRequestIdMap.get(originalCommandSource).add(requestIdentifier.getRequestId());
@@ -165,6 +165,13 @@ class RequestHandler {
     sources.remove(command.getSource());
 
     if (sources.isEmpty()) {
+      requestIdentifierMap.entrySet().stream()
+          .filter(entry -> entry.getValue().equals(requestIdentifier))
+          .map(Map.Entry::getKey)
+          .collect(Collectors.toList())
+          .forEach(requestIdentifierMap::remove);
+
+      eventRequestIdSourceMap.remove(requestIdentifier);
       proxyCommandStream.writeToVm(command);
     }
     else {
@@ -173,7 +180,7 @@ class RequestHandler {
   }
 
   private SetEventRequestCommand findCommand(SetEventRequestReply reply) {
-    return setEventRequestCommandMap.get(reply.getPacket().getCommandPacket());
+    return setEventRequestCommandMap.remove(reply.getPacket().getCommandPacket());
   }
 
   public void handleClearAllBreakpointsCommand(ClearAllBreakpointsCommand command) {

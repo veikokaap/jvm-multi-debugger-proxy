@@ -9,7 +9,7 @@ import kaap.veiko.debuggerforker.packet.ReplyPacket;
 import kaap.veiko.debuggerforker.types.DataWriter;
 
 public class ClearEventRequestReply extends CommandBase<ReplyPacket> {
-  private static final CommandIdentifier COMMAND_IDENTIFIER = CommandIdentifier.CLEAR_EVENT_REQUEST_COMMAND;
+  private static final CommandIdentifier COMMAND_IDENTIFIER = CommandIdentifier.CLEAR_EVENT_REQUEST_REPLY;
 
   public static ClearEventRequestReply create(int packetId) {
     MutableReplyPacket packet = MutableReplyPacket.create(packetId);

@@ -11,6 +11,7 @@ import kaap.veiko.debuggerforker.commands.commandsets.CommandIdentifier;
 import kaap.veiko.debuggerforker.commands.commandsets.event.CompositeEventCommand;
 import kaap.veiko.debuggerforker.commands.commandsets.eventrequest.ClearAllBreakpointsCommand;
 import kaap.veiko.debuggerforker.commands.commandsets.eventrequest.ClearEventRequestCommand;
+import kaap.veiko.debuggerforker.commands.commandsets.eventrequest.ClearEventRequestReply;
 import kaap.veiko.debuggerforker.commands.commandsets.eventrequest.SetEventRequestCommand;
 import kaap.veiko.debuggerforker.commands.commandsets.eventrequest.SetEventRequestReply;
 import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.DisposeCommand;
@@ -48,6 +49,8 @@ public class CommandDataReader extends ByteBufferDataReader {
         return ClearAllBreakpointsCommand.read(this);
       case CLEAR_EVENT_REQUEST_COMMAND:
         return ClearEventRequestCommand.read(this);
+      case CLEAR_EVENT_REQUEST_REPLY:
+        return ClearEventRequestReply.read(this);
       case SET_EVENT_REQUEST_COMMAND:
         return SetEventRequestCommand.read(this);
       case DISPOSE_COMMAND:
