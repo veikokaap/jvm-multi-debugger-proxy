@@ -3,10 +3,12 @@ package ee.veikokaap.debugproxy.tests
 import ee.veikokaap.debugproxy.testframework.AsyncTester
 import ee.veikokaap.debugproxy.testframework.DebuggerProcess
 import ee.veikokaap.debugproxy.testframework.JvmProcess
+import ee.veikokaap.debugproxy.testframework.SuspendManager
 import org.hamcrest.Matchers
 import org.junit.Assert
 import java.util.*
 import java.util.concurrent.TimeUnit
+import java.util.function.Consumer
 import kotlin.test.assertEquals
 
 fun Deque<String>.assertContainsOnly(vararg lines: String) {
@@ -17,7 +19,7 @@ fun Deque<String>.assertContainsOnly(vararg lines: String) {
 fun runTest(testClass: Class<*>, timeout: Long, timeUnit: TimeUnit, test: (JvmProcess, DebuggerProcess) -> Unit) {
     JvmProcess.runClass(testClass).use { jvm ->
         DebuggerProcess.attach().use { debugger ->
-            val tester = AsyncTester<Unit> { test(jvm, debugger) }
+            val tester = asyncTester<Unit?> { test(jvm, debugger) }
             Thread { tester.accept(null) }.start()
             tester.joinAndTest(timeout, timeUnit)
         }
@@ -28,13 +30,19 @@ fun runTest(testClass: Class<*>, timeout: Long, timeUnit: TimeUnit, test: (JvmPr
     JvmProcess.runClass(testClass).use { jvm ->
         DebuggerProcess.attach().use { firstDebugger ->
             DebuggerProcess.attach().use { secondDebugger ->
-                val tester = AsyncTester<Unit> { test(jvm, firstDebugger, secondDebugger) }
+                val tester = asyncTester<Unit?> { test(jvm, firstDebugger, secondDebugger) }
                 Thread { tester.accept(null) }.start()
                 tester.joinAndTest(timeout, timeUnit)
             }
         }
     }
 }
+
+fun <T> asyncTester(f: (T) -> Unit) = AsyncTester(object : Consumer<T> {
+    override fun accept(t: T) {
+        f(t)
+    }
+})
 
 fun toRunnable(f: () -> Unit): Runnable = object : Runnable {
     override fun run() {

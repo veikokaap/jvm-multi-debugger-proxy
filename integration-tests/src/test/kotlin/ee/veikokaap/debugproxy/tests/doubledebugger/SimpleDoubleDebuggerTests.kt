@@ -23,14 +23,12 @@ open class SimpleDoubleDebuggerTests {
 
         val firstBreak = firstDebugger.breakAt(firstLocation) {
             jvm.outputDeque.assertContainsOnly("Before breakpoints")
-            it.resume()
-        }
+        } thenResume {}
 
         val secondBreak = secondDebugger.breakAt(firstLocation) {
             firstBreak.joinAndTest(4, TimeUnit.SECONDS)
             assertTrue(jvm.outputDeque.isEmpty())
-            it.resume()
-        }
+        } thenResume {}
 
         firstDebugger.allBreakpointSet()
 
@@ -46,13 +44,11 @@ open class SimpleDoubleDebuggerTests {
 
         val firstBreak = firstDebugger.breakAt(firstLocation) {
             jvm.outputDeque.assertContainsOnly("Before breakpoints")
-            it.resume()
-        }
+        } thenResume {}
 
         val secondBreak = secondDebugger.breakAt(secondLocation) {
             jvm.outputDeque.assertContainsOnly("After breakpoint 0")
-            it.resume()
-        }
+        } thenResume {}
 
         firstDebugger.allBreakpointSet()
         secondDebugger.allBreakpointSet()

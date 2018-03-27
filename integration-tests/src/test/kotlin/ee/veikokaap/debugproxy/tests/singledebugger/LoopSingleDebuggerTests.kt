@@ -25,8 +25,7 @@ open class LoopSingleDebuggerTests {
                 jvm.outputDeque.assertContainsOnly(LoopBreakpointClass.getBreakpointMessage(count))
             }
             count++;
-            breakpoint.resume()
-        }
+        } thenResume  {}
 
         debugger.allBreakpointSet()
 

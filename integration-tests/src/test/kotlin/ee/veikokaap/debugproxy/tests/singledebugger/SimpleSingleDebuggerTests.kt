@@ -19,8 +19,7 @@ open class SimpleSingleDebuggerTests {
 
         val breakpoint = debugger.breakAt(firstBreakpoint) { breakpoint ->
             jvm.outputDeque.assertContainsOnly("Before breakpoints")
-            breakpoint.resume()
-        }
+        } thenResume {}
 
         debugger.allBreakpointSet()
 
@@ -36,13 +35,11 @@ open class SimpleSingleDebuggerTests {
 
         val firstBreak = debugger.breakAt(firstBreakpoint) {
             jvm.outputDeque.assertContainsOnly("Before breakpoints")
-            it.resume()
-        }
+        } thenResume {}
 
         val secondBreak = debugger.breakAt(secondBreakpoint) {
             jvm.outputDeque.assertContainsOnly("After breakpoint 0")
-            it.resume()
-        }
+        } thenResume {}
 
         debugger.allBreakpointSet()
 

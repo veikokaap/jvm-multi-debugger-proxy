@@ -21,11 +21,13 @@ import com.sun.jdi.VirtualMachine;
 import com.sun.jdi.connect.AttachingConnector;
 import com.sun.jdi.connect.Connector;
 import com.sun.jdi.connect.IllegalConnectorArgumentsException;
+import com.sun.jdi.event.BreakpointEvent;
 import com.sun.jdi.event.Event;
 import com.sun.jdi.event.EventSet;
 import com.sun.jdi.request.BreakpointRequest;
 import com.sun.jdi.request.ClassPrepareRequest;
 import com.sun.jdi.request.EventRequest;
+import com.sun.jdi.request.StepRequest;
 
 import ee.veikokaap.debugproxy.testframework.utils.BreakpointLocation;
 
@@ -51,7 +53,7 @@ public class DebuggerProcess implements AutoCloseable {
   private void listenForEvents(VirtualMachine virtualMachine) {
     while (running.get() && !Thread.currentThread().isInterrupted()) {
       try {
-        getEventRequests(virtualMachine).forEach(this::triggerSuspendEvent);
+        getEvents(virtualMachine).forEach(this::triggerSuspendEvent);
       }
       catch (InterruptedException e) {
         markFailure(e);
@@ -59,29 +61,29 @@ public class DebuggerProcess implements AutoCloseable {
     }
   }
 
-  private List<EventRequest> getEventRequests(VirtualMachine virtualMachine) throws InterruptedException {
+  private List<Event> getEvents(VirtualMachine virtualMachine) throws InterruptedException {
     EventSet set = virtualMachine.eventQueue().remove(10);
     if (set == null) {
       return Collections.emptyList();
     }
     else {
       return set.stream()
-          .map(Event::request)
           .filter(Objects::nonNull)
           .collect(Collectors.toList());
     }
   }
 
-  private void triggerSuspendEvent(EventRequest eventRequest) {
+  private void triggerSuspendEvent(Event event) {
+    if (event.request() == null) {
+      return;
+    }
+
     List<Consumer<SuspendManager>> listeners;
     try {
-      EventRequestIdentifier key = EventRequestIdentifier.fromEventRequest(eventRequest);
-      System.out.println("YYYYYYY" + key.hashCode() + " " + key);
-
+      EventRequestIdentifier key = EventRequestIdentifier.fromEventRequest(event.request());
       listeners = requestListenerMap.get(key);
     }
     catch (ReflectiveOperationException e) {
-      System.out.println("ZZZZZZ: " + e);
       markFailure(e);
       return;
     }
@@ -96,40 +98,43 @@ public class DebuggerProcess implements AutoCloseable {
       }
     }
 
+    if (event.request() instanceof StepRequest) {
+      event.request().disable();
+    }
+
     CountDownLatch resumeLatch = new CountDownLatch(listeners.size());
     for (Consumer<SuspendManager> listener : listeners) {
       new Thread(() -> {
-        listener.accept(new SuspendManager(this));
+        listener.accept(new SuspendManager(this, event));
         resumeLatch.countDown();
       }).start();
     }
 
-    try {
-      if (eventRequest instanceof ClassPrepareRequest) {
+    if (event.request() instanceof ClassPrepareRequest) {
+      try {
         resumeLatch.await();
         resume();
       }
+      catch (InterruptedException e) {
+        markFailure(e);
+      }
     }
-    catch (InterruptedException e) {
-      markFailure(e);
-    }
+
   }
 
   private void markFailure(Exception e) {
     exception.set(e);
   }
 
-  public AsyncTester<SuspendManager> breakAt(BreakpointLocation breakpointLocation, Consumer<SuspendManager> onBreakListener) {
+  public SuspendManagerAsyncTester breakAt(BreakpointLocation breakpointLocation, Consumer<SuspendManager> onBreakListener) {
     ClassPrepareRequest classPrepareRequest = virtualMachine.eventRequestManager().createClassPrepareRequest();
     classPrepareRequest.addClassFilter(breakpointLocation.getClassName());
     classPrepareRequest.enable();
 
-    AsyncTester<SuspendManager> tester = new AsyncTester<>(onBreakListener);
+    SuspendManagerAsyncTester tester = new SuspendManagerAsyncTester(onBreakListener);
 
     try {
-      EventRequestIdentifier identifier = EventRequestIdentifier.fromEventRequest(classPrepareRequest);
-      requestListenerMap.putIfAbsent(identifier, new ArrayList<>());
-      requestListenerMap.get(identifier).add(manager -> addBreakpoint(breakpointLocation, tester));
+      registerRequest(classPrepareRequest, manager -> addBreakpoint(breakpointLocation, tester));
     }
     catch (ReflectiveOperationException e) {
       markFailure(e);
@@ -138,7 +143,7 @@ public class DebuggerProcess implements AutoCloseable {
     return tester;
   }
 
-  private void addBreakpoint(BreakpointLocation breakpointLocation, AsyncTester<SuspendManager> tester) {
+  private void addBreakpoint(BreakpointLocation breakpointLocation, SuspendManagerAsyncTester tester) {
     try {
       Optional<Location> loc = findLocation(breakpointLocation);
       if (!loc.isPresent()) {
@@ -146,16 +151,18 @@ public class DebuggerProcess implements AutoCloseable {
       }
       BreakpointRequest breakPointRequest = virtualMachine.eventRequestManager().createBreakpointRequest(loc.get());
       breakPointRequest.enable();
-//      resume();
 
-      EventRequestIdentifier identifier = EventRequestIdentifier.fromEventRequest(breakPointRequest);
-      requestListenerMap.putIfAbsent(identifier, new ArrayList<>());
-      System.out.println("XXXXXX" + identifier.hashCode() + " " + identifier);
-      requestListenerMap.get(identifier).add(tester);
+      registerRequest(breakPointRequest, tester);
     }
     catch (Exception e) {
       tester.failTestWithException(e);
     }
+  }
+
+  private void registerRequest(EventRequest request, Consumer<SuspendManager> listener) throws ReflectiveOperationException {
+    EventRequestIdentifier identifier = EventRequestIdentifier.fromEventRequest(request);
+    requestListenerMap.putIfAbsent(identifier, new ArrayList<>());
+    requestListenerMap.get(identifier).add(listener);
   }
 
   public void allBreakpointSet() {
@@ -217,5 +224,27 @@ public class DebuggerProcess implements AutoCloseable {
     if (exception.get() != null) {
       throw exception.get();
     }
+  }
+
+  public SuspendManagerAsyncTester stepOver(BreakpointEvent event, Consumer<SuspendManager> listener) throws ReflectiveOperationException {
+    SuspendManagerAsyncTester tester = new SuspendManagerAsyncTester(listener);
+
+    StepRequest request = virtualMachine.eventRequestManager().createStepRequest(event.thread(), StepRequest.STEP_LINE, StepRequest.STEP_OVER);
+    request.addCountFilter(1);
+    request.enable();
+    registerRequest(request, tester);
+
+    return tester;
+  }
+
+  public SuspendManagerAsyncTester stepInto(BreakpointEvent event, Consumer<SuspendManager> listener) throws ReflectiveOperationException {
+    SuspendManagerAsyncTester tester = new SuspendManagerAsyncTester(listener);
+
+    StepRequest request = virtualMachine.eventRequestManager().createStepRequest(event.thread(), StepRequest.STEP_LINE, StepRequest.STEP_INTO);
+    request.addCountFilter(1);
+    request.enable();
+    registerRequest(request, tester);
+
+    return tester;
   }
 }
