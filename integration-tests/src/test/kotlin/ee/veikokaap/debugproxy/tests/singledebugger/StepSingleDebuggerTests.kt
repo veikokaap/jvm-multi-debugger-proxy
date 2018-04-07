@@ -2,12 +2,11 @@ package ee.veikokaap.debugproxy.tests.singledebugger
 
 import ee.veikokaap.debugproxy.testframework.utils.BreakpointUtil
 import ee.veikokaap.debugproxy.tests.StepBreakpointClass
-import ee.veikokaap.debugproxy.tests.assertContainsOnly
+import ee.veikokaap.debugproxy.tests.assertAddedOutput
 import ee.veikokaap.debugproxy.tests.runTest
 import org.junit.Test
 import java.util.concurrent.TimeUnit
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 open class StepSingleDebuggerTests {
 
@@ -16,57 +15,53 @@ open class StepSingleDebuggerTests {
     val secondBreakpoint = BreakpointUtil.findBreakLocation(testClass, 1)
 
     @Test
-    fun `test two breakpoints that step to next line with a single debugger`() = runTest(testClass, 20, TimeUnit.SECONDS) { jvm, debugger ->
-        jvm.outputDeque.assertContainsOnly("Listening for transport dt_socket at address: 16789")
-
+    fun `test two breakpoints that step to next line with a single debugger`() = runTest(testClass) { jvm, debugger ->
         val firstBreak = debugger.breakAt(firstBreakpoint) {
-            jvm.outputDeque.assertContainsOnly(StepBreakpointClass.BEFORE_MESSAGE)
+            jvm.outputDeque.assertAddedOutput(StepBreakpointClass.BEFORE_MESSAGE)
         } thenStepOver {
-            jvm.outputDeque.assertContainsOnly(StepBreakpointClass.AFTER_BREAKPOINT_0)
+            jvm.outputDeque.assertAddedOutput(StepBreakpointClass.AFTER_BREAKPOINT_0)
         } thenResume {}
 
         val secondBreak = debugger.breakAt(secondBreakpoint) {
-            jvm.outputDeque.assertContainsOnly(StepBreakpointClass.STEPPED_OVER)
+            jvm.outputDeque.assertAddedOutput(StepBreakpointClass.STEPPED_OVER)
         } thenStepOver {
-            jvm.outputDeque.assertContainsOnly(StepBreakpointClass.AFTER_BREAKPOINT_1)
+            jvm.outputDeque.assertAddedOutput(StepBreakpointClass.AFTER_BREAKPOINT_1)
         } thenResume {}
 
         debugger.allBreakpointSet()
 
-        firstBreak.joinAndTest(8, TimeUnit.SECONDS)
-        secondBreak.joinAndTest(8, TimeUnit.SECONDS)
-        jvm.waitForExit(8, TimeUnit.SECONDS)
+        firstBreak.joinAndTest()
+        secondBreak.joinAndTest()
+        jvm.waitForExit()
 
-        jvm.outputDeque.assertContainsOnly(StepBreakpointClass.LAST_MESSAGE)
+        jvm.outputDeque.assertAddedOutput(StepBreakpointClass.LAST_MESSAGE)
     }
 
     @Test
-    fun `test stepping onto a existing breakpoint with a single debugger`() = runTest(testClass, 20, TimeUnit.SECONDS) { jvm, debugger ->
-        jvm.outputDeque.assertContainsOnly("Listening for transport dt_socket at address: 16789")
-
+    fun `test stepping onto a existing breakpoint with a single debugger`() = runTest(testClass) { jvm, debugger ->
         val firstBreak = debugger.breakAt(firstBreakpoint) {
-            jvm.outputDeque.assertContainsOnly(StepBreakpointClass.BEFORE_MESSAGE)
+            jvm.outputDeque.assertAddedOutput(StepBreakpointClass.BEFORE_MESSAGE)
         } thenStepOver {
-            jvm.outputDeque.assertContainsOnly(StepBreakpointClass.AFTER_BREAKPOINT_0)
+            jvm.outputDeque.assertAddedOutput(StepBreakpointClass.AFTER_BREAKPOINT_0)
         } thenStepOver {
-            assertEquals(StepBreakpointClass.STEPPED_OVER, jvm.outputDeque.peekFirst())
+            jvm.outputDeque.assertAddedOutput(StepBreakpointClass.STEPPED_OVER, remove = false)
         }
 
         val secondBreak = debugger.breakAt(secondBreakpoint) {
-            assertEquals(StepBreakpointClass.STEPPED_OVER, jvm.outputDeque.peekFirst())
+            jvm.outputDeque.assertAddedOutput(StepBreakpointClass.STEPPED_OVER, remove = false)
             firstBreak.joinAndTest() // wait until first breakpoint and steps have resumed
-            jvm.outputDeque.assertContainsOnly(StepBreakpointClass.STEPPED_OVER)
+            jvm.outputDeque.assertAddedOutput(StepBreakpointClass.STEPPED_OVER)
         } thenStepOver {
-            jvm.outputDeque.assertContainsOnly(StepBreakpointClass.AFTER_BREAKPOINT_1)
+            jvm.outputDeque.assertAddedOutput(StepBreakpointClass.AFTER_BREAKPOINT_1)
         } thenResume {}
 
         debugger.allBreakpointSet()
 
-        firstBreak.joinAndTest(8, TimeUnit.SECONDS)
-        secondBreak.joinAndTest(8, TimeUnit.SECONDS)
-        jvm.waitForExit(8, TimeUnit.SECONDS)
+        firstBreak.joinAndTest()
+        secondBreak.joinAndTest()
+        jvm.waitForExit()
 
-        jvm.outputDeque.assertContainsOnly(StepBreakpointClass.LAST_MESSAGE)
+        jvm.outputDeque.assertAddedOutput(StepBreakpointClass.LAST_MESSAGE)
     }
 
 

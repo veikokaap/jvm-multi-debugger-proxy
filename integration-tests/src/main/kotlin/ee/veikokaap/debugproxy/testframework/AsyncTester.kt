@@ -37,19 +37,28 @@ open class AsyncTester<T>(private val consumer: Consumer<T>): Consumer<T> {
         if (thread.get() == null) {
             throw AssertionError("Consumer hasn't been run in $time $timeUnit")
         }
-        thread.get().join(timeLeft(millis, start))
 
-        if (thread.get().isAlive()) {
-            thread.get().interrupt()
-            val timeoutException = TimeoutException("Thread should have finished work in $time $timeUnit")
-            if (exception.get() != null) {
-                timeoutException.addSuppressed(exception.get())
-            }
-            throw timeoutException
+        val timeLeft = timeLeft(millis, start)
+        if (timeLeft <= 0) {
+            throwTimeoutException(time, timeUnit)
+        }
+        thread.get().join(timeLeft)
+
+        if (thread.get().isAlive) {
+            throwTimeoutException(time, timeUnit)
         }
         if (exception.get() != null) {
             throw exception.get()
         }
+    }
+
+    private fun throwTimeoutException(time: Long, timeUnit: TimeUnit) {
+        thread.get().interrupt()
+        val timeoutException = TimeoutException("Thread should have finished work in $time $timeUnit")
+        if (exception.get() != null) {
+            timeoutException.addSuppressed(exception.get())
+        }
+        throw timeoutException
     }
 
     private fun timeLeft(millis: Long, start: Long) = millis - (System.currentTimeMillis() - start)

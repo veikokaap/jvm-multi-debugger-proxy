@@ -2,11 +2,8 @@ package ee.veikokaap.debugproxy.tests.doubledebugger
 
 import ee.veikokaap.debugproxy.testframework.utils.BreakpointUtil
 import ee.veikokaap.debugproxy.tests.SimpleBreakpointClass
-import ee.veikokaap.debugproxy.tests.assertContainsOnly
+import ee.veikokaap.debugproxy.tests.assertAddedOutput
 import ee.veikokaap.debugproxy.tests.runTest
-import org.hamcrest.Matchers.`is`
-import org.hamcrest.Matchers.empty
-import org.junit.Assert.assertThat
 import org.junit.Test
 import java.util.concurrent.TimeUnit
 import kotlin.test.assertTrue
@@ -18,11 +15,9 @@ open class SimpleDoubleDebuggerTests {
     val secondLocation = BreakpointUtil.findBreakLocation(testClass, 1)
 
     @Test
-    fun `test single breakpoint with 2 debuggers`() = runTest(testClass, 10, TimeUnit.SECONDS) { jvm, firstDebugger, secondDebugger ->
-        jvm.outputDeque.assertContainsOnly("Listening for transport dt_socket at address: 16789")
-
+    fun `test single breakpoint with 2 debuggers`() = runTest(testClass) { jvm, firstDebugger, secondDebugger ->
         val firstBreak = firstDebugger.breakAt(firstLocation) {
-            jvm.outputDeque.assertContainsOnly("Before breakpoints")
+            jvm.outputDeque.assertAddedOutput("Before breakpoints")
         } thenResume {}
 
         val secondBreak = secondDebugger.breakAt(firstLocation) {
@@ -32,32 +27,30 @@ open class SimpleDoubleDebuggerTests {
 
         firstDebugger.allBreakpointSet()
 
-        secondBreak.joinAndTest(4, TimeUnit.SECONDS)
-        jvm.waitForExit(4, TimeUnit.SECONDS)
+        secondBreak.joinAndTest()
+        jvm.waitForExit()
 
-        jvm.outputDeque.assertContainsOnly("After breakpoint 0", "After breakpoint 1")
+        jvm.outputDeque.assertAddedOutput("After breakpoint 0", "After breakpoint 1")
     }
 
     @Test
-    fun `test 2 breakpoints with 2 debuggers`() = runTest(testClass, 10, TimeUnit.SECONDS) { jvm, firstDebugger, secondDebugger ->
-        jvm.outputDeque.assertContainsOnly("Listening for transport dt_socket at address: 16789")
-
+    fun `test 2 breakpoints with 2 debuggers`() = runTest(testClass) { jvm, firstDebugger, secondDebugger ->
         val firstBreak = firstDebugger.breakAt(firstLocation) {
-            jvm.outputDeque.assertContainsOnly("Before breakpoints")
+            jvm.outputDeque.assertAddedOutput("Before breakpoints")
         } thenResume {}
 
         val secondBreak = secondDebugger.breakAt(secondLocation) {
-            jvm.outputDeque.assertContainsOnly("After breakpoint 0")
+            jvm.outputDeque.assertAddedOutput("After breakpoint 0")
         } thenResume {}
 
         firstDebugger.allBreakpointSet()
         secondDebugger.allBreakpointSet()
 
-        firstBreak.joinAndTest(5, TimeUnit.SECONDS)
-        secondBreak.joinAndTest(5, TimeUnit.SECONDS)
-        jvm.waitForExit(5, TimeUnit.SECONDS)
+        firstBreak.joinAndTest()
+        secondBreak.joinAndTest()
+        jvm.waitForExit()
 
-        jvm.outputDeque.assertContainsOnly("After breakpoint 1")
+        jvm.outputDeque.assertAddedOutput("After breakpoint 1")
     }
 
 

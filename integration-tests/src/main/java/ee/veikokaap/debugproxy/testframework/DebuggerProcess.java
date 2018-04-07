@@ -37,6 +37,7 @@ public class DebuggerProcess implements AutoCloseable {
   private final Map<EventRequestIdentifier, List<Consumer<SuspendManager>>> requestListenerMap = new ConcurrentHashMap<>();
 
   private final Thread thread;
+  private final List<Thread> spawnedThreads = Collections.synchronizedList(new ArrayList<>());
   private final AtomicReference<Exception> exception = new AtomicReference<>();
   private final AtomicBoolean running = new AtomicBoolean(true);
 
@@ -104,10 +105,13 @@ public class DebuggerProcess implements AutoCloseable {
 
     CountDownLatch resumeLatch = new CountDownLatch(listeners.size());
     for (Consumer<SuspendManager> listener : listeners) {
-      new Thread(() -> {
+      Thread thread = new Thread(() -> {
         listener.accept(new SuspendManager(this, event));
         resumeLatch.countDown();
-      }).start();
+      });
+      thread.setDaemon(true);
+      spawnedThreads.add(thread);
+      thread.start();
     }
 
     if (event.request() instanceof ClassPrepareRequest) {
@@ -209,6 +213,7 @@ public class DebuggerProcess implements AutoCloseable {
   public void close() throws Exception {
     running.set(false);
     try {
+      spawnedThreads.forEach(Thread::interrupt);
       thread.join(100);
     }
     catch (InterruptedException e) {

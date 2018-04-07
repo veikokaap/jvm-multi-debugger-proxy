@@ -61,26 +61,10 @@ public class JvmProcess implements Closeable {
   }
 
   /**
-   *
-   * @param timeout the maximum time to wait
-   * @param unit the time unit of the {@code timeout} argument
-   * @return {@code true} if the subprocess has exited and {@code false} if
-   *         the waiting time elapsed before the subprocess has exited.
    * @throws InterruptedException
    */
-  public void waitForExit(long timeout, TimeUnit unit) throws InterruptedException {
-    try {
-      boolean exited = process.waitFor(timeout, unit);
-      if (!exited) {
-        process.destroy();
-        process.waitFor(2, TimeUnit.SECONDS);
-        process.destroyForcibly();
-        throw new AssertionError("JVM failed to exit on its own");
-      }
-    }
-    finally {
-      stopProxyAndWait();
-    }
+  public void waitForExit() throws InterruptedException {
+    process.waitFor();
   }
 
   private void stopProxyAndWait() throws InterruptedException {
@@ -130,11 +114,23 @@ public class JvmProcess implements Closeable {
   @Override
   public void close() {
     try {
-      waitForExit(1, TimeUnit.SECONDS);
+      if (process.isAlive()) {
+        process.destroy();
+        process.waitFor(2, TimeUnit.SECONDS);
+        process.destroyForcibly();
+        throw new AssertionError("JVM failed to exit on its own");
+      }
     }
     catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       throw new RuntimeException(e);
+    }
+    finally {
+      try {
+        stopProxyAndWait();
+      }
+      catch (InterruptedException ignored) {
+      }
     }
   }
 
