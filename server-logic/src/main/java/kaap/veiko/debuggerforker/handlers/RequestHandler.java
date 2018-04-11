@@ -175,7 +175,7 @@ class RequestHandler {
       proxyCommandStream.writeToVm(command);
     }
     else {
-      proxyCommandStream.write(command.getSource(), ClearEventRequestReply.create(proxyCommandStream.getVmSource().createNewOutputId()));
+      proxyCommandStream.write(command.getSource(), ClearEventRequestReply.create(command.getPacket().getId()));
     }
   }
 

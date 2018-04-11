@@ -77,7 +77,7 @@ public class CommandHandler implements CommandVisitor {
   public void visit(DisposeCommand command) {
     PacketSource debugger = command.getSource();
 
-    int id = command.getCommandId();
+    int id = command.getPacket().getId();
     proxyCommandStream.write(debugger, DisposeReply.create(id));
     proxyCommandStream.markForClosingAfterAllPacketsWritten(debugger);
   }
