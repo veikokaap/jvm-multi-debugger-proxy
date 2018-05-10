@@ -36,14 +36,14 @@ open class StepDoubleDebuggerTests {
     }
 
     @Test
-    fun `test stepping onto a existing breakpoint with a single debugger`() = runTest(testClass) { jvm, firstDebugger, secondDebugger ->
+    fun `test stepping onto a existing breakpoint with two debuggers`() = runTest(testClass) { jvm, firstDebugger, secondDebugger ->
         val firstBreak = firstDebugger.breakAt(firstBreakpoint) {
             jvm.outputDeque.assertAddedOutput(StepBreakpointClass.BEFORE_MESSAGE)
         } thenStepOver {
             jvm.outputDeque.assertAddedOutput(StepBreakpointClass.AFTER_BREAKPOINT_0)
         } thenStepOver {
             jvm.outputDeque.assertAddedOutput(StepBreakpointClass.STEPPED_OVER, remove = false)
-        }
+        } thenResume {}
 
         val secondBreak = secondDebugger.breakAt(secondBreakpoint) {
             jvm.outputDeque.assertAddedOutput(StepBreakpointClass.STEPPED_OVER, remove = false)

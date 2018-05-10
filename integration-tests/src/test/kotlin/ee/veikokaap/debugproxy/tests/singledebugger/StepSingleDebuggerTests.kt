@@ -5,8 +5,6 @@ import ee.veikokaap.debugproxy.tests.StepBreakpointClass
 import ee.veikokaap.debugproxy.tests.assertAddedOutput
 import ee.veikokaap.debugproxy.tests.runTest
 import org.junit.Test
-import java.util.concurrent.TimeUnit
-import kotlin.test.assertEquals
 
 open class StepSingleDebuggerTests {
 
@@ -15,27 +13,26 @@ open class StepSingleDebuggerTests {
     val secondBreakpoint = BreakpointUtil.findBreakLocation(testClass, 1)
 
     @Test
-    fun `test two breakpoints that step to next line with a single debugger`() = runTest(testClass) { jvm, debugger ->
-        val firstBreak = debugger.breakAt(firstBreakpoint) {
-            jvm.outputDeque.assertAddedOutput(StepBreakpointClass.BEFORE_MESSAGE)
-        } thenStepOver {
-            jvm.outputDeque.assertAddedOutput(StepBreakpointClass.AFTER_BREAKPOINT_0)
-        } thenResume {}
+    fun `test two breakpoints that step to next line with a single debugger`() =
+            runTest(testClass) { jvm, debugger ->
+                val firstBreak = debugger.breakAt(firstBreakpoint) {
+                    jvm.outputDeque.assertAddedOutput(StepBreakpointClass.BEFORE_MESSAGE)
+                } thenStepOver {
+                    jvm.outputDeque.assertAddedOutput(StepBreakpointClass.AFTER_BREAKPOINT_0)
+                } thenResume {}
 
-        val secondBreak = debugger.breakAt(secondBreakpoint) {
-            jvm.outputDeque.assertAddedOutput(StepBreakpointClass.STEPPED_OVER)
-        } thenStepOver {
-            jvm.outputDeque.assertAddedOutput(StepBreakpointClass.AFTER_BREAKPOINT_1)
-        } thenResume {}
+                val secondBreak = debugger.breakAt(secondBreakpoint) {
+                    jvm.outputDeque.assertAddedOutput(StepBreakpointClass.STEPPED_OVER)
+                } thenStepOver {
+                    jvm.outputDeque.assertAddedOutput(StepBreakpointClass.AFTER_BREAKPOINT_1)
+                } thenResume {}
 
-        debugger.allBreakpointSet()
-
-        firstBreak.joinAndTest()
-        secondBreak.joinAndTest()
-        jvm.waitForExit()
-
-        jvm.outputDeque.assertAddedOutput(StepBreakpointClass.LAST_MESSAGE)
-    }
+                debugger.allBreakpointSet()
+                firstBreak.joinAndTest()
+                secondBreak.joinAndTest()
+                jvm.waitForExit()
+                jvm.outputDeque.assertAddedOutput(StepBreakpointClass.LAST_MESSAGE)
+            }
 
     @Test
     fun `test stepping onto a existing breakpoint with a single debugger`() = runTest(testClass) { jvm, debugger ->

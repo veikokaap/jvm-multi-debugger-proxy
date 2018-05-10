@@ -10,7 +10,7 @@ public class StepBreakpointClass {
   public static final String AFTER_BREAKPOINT_1 = "After breakpoint 1";
   public static final String LAST_MESSAGE = "After breakpoints";
 
-  public static void main(String[] args) throws InterruptedException {
+  public static void main(String[] args) {
     System.out.println(BEFORE_MESSAGE);
     BreakpointUtil.mark(0); System.out.println(AFTER_BREAKPOINT_0);
     System.out.println(STEPPED_OVER);
