@@ -10,6 +10,7 @@ public class MutableReplyPacket extends ReplyPacket {
     return new MutableReplyPacket(packetId, (short) 0);
   }
 
+  @SuppressWarnings("argument.type.incompatible") // TODO: Mutable packets shouldn't use null for PacketSource
   private MutableReplyPacket(int id, short errorCode) {
     super(id, errorCode, new byte[0], null);
     this.data = super.getData();

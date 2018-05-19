@@ -9,7 +9,7 @@ data class ExceptionOnlyEventRequestFilter(
         val caught: Boolean,
         val uncaught: Boolean
 ) : EventRequestFilter() {
-    override fun write(writer: DataWriter?) = writer!!.run {
+    override fun write(writer: DataWriter) = writer.run {
         writeByte(IDENTIFIER)
         writeType(exceptionOrNull)
         writeBoolean(caught)

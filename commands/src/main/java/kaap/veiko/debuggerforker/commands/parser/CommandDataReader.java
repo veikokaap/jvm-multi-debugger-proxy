@@ -1,8 +1,6 @@
 package kaap.veiko.debuggerforker.commands.parser;
 
 import java.nio.ByteBuffer;
-import java.util.Collections;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +21,6 @@ import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.ResumeComma
 import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.ResumeReply;
 import kaap.veiko.debuggerforker.packet.Packet;
 import kaap.veiko.debuggerforker.packet.internal.ByteBufferDataReader;
-import kaap.veiko.debuggerforker.types.DataType;
 import kaap.veiko.debuggerforker.types.VMInformation;
 
 public class CommandDataReader extends ByteBufferDataReader {
@@ -71,8 +68,7 @@ public class CommandDataReader extends ByteBufferDataReader {
       case DISPOSE_REPLY:
         return DisposeReply.read(this);
       default:
-        log.warn("Found CommandIdentifier which doesn't have a rule for creating a command. {}", identifier);
-        return null;
+        throw new UnsupportedOperationException("No rule for creating a command for command identified: " + identifier);
     }
   }
 }

@@ -5,7 +5,7 @@ import kaap.veiko.debuggerforker.types.DataWriter
 import kaap.veiko.debuggerforker.types.jdwp.ReferenceTypeId
 
 data class ClassOnlyEventRequestFilter(val clazz: ReferenceTypeId) : EventRequestFilter() {
-    override fun write(writer: DataWriter?) = writer!!.run {
+    override fun write(writer: DataWriter) = writer.run {
         writeByte(IDENTIFIER)
         writeType(clazz)
     }

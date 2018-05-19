@@ -25,6 +25,7 @@ public class DisposeReplyTest extends CommandTestBase {
   }
 
   @Test
+  @SuppressWarnings("argument.type.incompatible") // TODO: Don't use null for PacketSource
   public void testParse() {
     int packetId = generateRandomPacketId();
     DisposeReply originalReply = DisposeReply.create(packetId);

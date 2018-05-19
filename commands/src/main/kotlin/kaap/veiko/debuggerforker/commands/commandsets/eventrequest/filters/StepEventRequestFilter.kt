@@ -9,7 +9,7 @@ data class StepEventRequestFilter(
         val size: Int,
         val depth: Int
 ) : EventRequestFilter() {
-    override fun write(writer: DataWriter?) = writer!!.run {
+    override fun write(writer: DataWriter) = writer.run {
         writeByte(IDENTIFIER)
         writeType(thread)
         writeInt(size)

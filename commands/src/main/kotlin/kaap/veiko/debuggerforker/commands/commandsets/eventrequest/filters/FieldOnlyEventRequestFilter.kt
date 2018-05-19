@@ -9,7 +9,7 @@ data class FieldOnlyEventRequestFilter(
         val declaring: ReferenceTypeId,
         val fieldId: FieldId
 ) : EventRequestFilter() {
-    override fun write(writer: DataWriter?) = writer!!.run {
+    override fun write(writer: DataWriter) = writer.run {
         writeByte(IDENTIFIER)
         writeType(declaring)
         writeType(fieldId)

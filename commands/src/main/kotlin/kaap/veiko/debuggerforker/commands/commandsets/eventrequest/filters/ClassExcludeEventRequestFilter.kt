@@ -4,7 +4,7 @@ import kaap.veiko.debuggerforker.types.DataReader
 import kaap.veiko.debuggerforker.types.DataWriter
 
 data class ClassExcludeEventRequestFilter(val classPattern: String) : EventRequestFilter() {
-    override fun write(writer: DataWriter?) = writer!!.run {
+    override fun write(writer: DataWriter) = writer.run {
         writeByte(IDENTIFIER)
         writeString(classPattern)
     }

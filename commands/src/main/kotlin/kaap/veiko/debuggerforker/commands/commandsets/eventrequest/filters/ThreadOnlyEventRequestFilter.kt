@@ -5,7 +5,7 @@ import kaap.veiko.debuggerforker.types.DataWriter
 import kaap.veiko.debuggerforker.types.jdwp.ThreadId
 
 data class ThreadOnlyEventRequestFilter(val thread: ThreadId) : EventRequestFilter() {
-    override fun write(writer: DataWriter?) = writer!!.run {
+    override fun write(writer: DataWriter) = writer.run {
         writeByte(IDENTIFIER)
         writeType(thread)
     }

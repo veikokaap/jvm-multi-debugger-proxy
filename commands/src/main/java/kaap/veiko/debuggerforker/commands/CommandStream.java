@@ -1,15 +1,14 @@
 package kaap.veiko.debuggerforker.commands;
 
 import java.io.IOException;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
-import java.util.Optional;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import kaap.veiko.debuggerforker.commands.parser.CommandParser;
+import kaap.veiko.debuggerforker.packet.Packet;
 import kaap.veiko.debuggerforker.packet.PacketSource;
 import kaap.veiko.debuggerforker.packet.PacketStream;
 import kaap.veiko.debuggerforker.types.VMInformation;
@@ -28,10 +27,13 @@ public class CommandStream implements AutoCloseable {
     this.commandParser = new CommandParser(vmInformation);
   }
 
-  public Command read() throws IOException {
-    return Optional.ofNullable(packetStream.read())
-        .map(commandParser::parse)
-        .orElse(null);
+  public @Nullable Command read() throws IOException {
+    Packet packet = packetStream.read();
+    if (packet == null) {
+      return null;
+    }
+
+    return commandParser.parse(packet);
   }
 
   public void write(Command command) throws IOException {

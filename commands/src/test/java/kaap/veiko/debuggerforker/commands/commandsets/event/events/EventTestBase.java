@@ -39,7 +39,7 @@ public abstract class EventTestBase extends TestBase {
   }
 
   <T extends VirtualMachineEvent> T readEvent(ByteBuffer buffer, Class<T> dataTypeClass) throws ReflectiveOperationException {
-    return (T) dataTypeClass.getMethod("read", DataReader.class).invoke(null, createReader(buffer));
+    return (T) dataTypeClass.getMethod("read", DataReader.class).invoke(new Object(), createReader(buffer));
   }
 
   void writeEvent(ByteBuffer buffer, VirtualMachineEvent event) {
@@ -99,7 +99,7 @@ public abstract class EventTestBase extends TestBase {
       case 3:
         return new Value(Type.DOUBLE, random.nextDouble());
       case 4:
-        return new Value(Type.VOID, null);
+        return new Value(Type.VOID, new Object());
       default:
         throw new IllegalStateException("Default switch");
     }

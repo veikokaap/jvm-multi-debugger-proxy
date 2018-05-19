@@ -11,6 +11,7 @@ public class MutableCommandPacket extends CommandPacket {
     return new MutableCommandPacket(packetId, commandIdentifier.getCommandSetId(), commandIdentifier.getCommandId());
   }
 
+  @SuppressWarnings("argument.type.incompatible") // TODO: Mutable packets shouldn't use null for PacketSource
   private MutableCommandPacket(int id, short commandSetId, short commandId) {
     super(id, commandSetId, commandId, new byte[0], null);
     this.data = super.getData();

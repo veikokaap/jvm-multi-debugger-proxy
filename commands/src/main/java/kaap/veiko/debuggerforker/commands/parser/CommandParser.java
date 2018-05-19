@@ -31,7 +31,7 @@ public class CommandParser {
       CommandIdentifier identifier = CommandIdentifier.of(commandPacket.getCommandSetId(), commandPacket.getCommandId(), packet.isReply());
       return commandDataReader.readCommand(identifier, packet);
     }
-    catch (IOException e) {
+    catch (Exception e) {
       log.warn(e.getMessage());
       return new UnknownCommand(packet, commandPacket.getCommandSetId(), commandPacket.getCommandId(), packet.isReply());
     }

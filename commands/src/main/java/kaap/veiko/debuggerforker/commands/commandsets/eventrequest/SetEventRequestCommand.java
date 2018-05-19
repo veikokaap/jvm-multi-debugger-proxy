@@ -2,6 +2,10 @@ package kaap.veiko.debuggerforker.commands.commandsets.eventrequest;
 
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import kaap.veiko.debuggerforker.commands.CommandBase;
 import kaap.veiko.debuggerforker.commands.CommandVisitor;
 import kaap.veiko.debuggerforker.commands.MutableCommandPacket;
@@ -21,7 +25,7 @@ public class SetEventRequestCommand extends CommandBase<CommandPacket> {
   private final byte suspendPolicy;
   private final List<EventRequestFilter> eventRequestFilters;
 
-  private SetEventRequestReply eventRequestReply;
+  private @MonotonicNonNull SetEventRequestReply eventRequestReply = null;
 
   public static SetEventRequestCommand create(int packetId, VMInformation vmInformation, EventKind eventKind, byte suspendPolicy, List<EventRequestFilter> eventRequestFilters) {
     MutableCommandPacket packet = MutableCommandPacket.create(packetId, COMMAND_IDENTIFIER);
@@ -65,10 +69,11 @@ public class SetEventRequestCommand extends CommandBase<CommandPacket> {
     return eventRequestFilters;
   }
 
-  public SetEventRequestReply getEventRequestReply() {
+  public @Nullable SetEventRequestReply getEventRequestReply() {
     return eventRequestReply;
   }
 
+  @EnsuresNonNull("this.eventRequestReply")
   public void setEventRequestReply(SetEventRequestReply eventRequestReply) {
     this.eventRequestReply = eventRequestReply;
   }
