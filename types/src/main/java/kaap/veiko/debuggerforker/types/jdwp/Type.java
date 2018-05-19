@@ -17,7 +17,11 @@ public enum Type {
   INT(73, DataReader::readInt, DataWriter::writeInt),
   LONG(74, DataReader::readLong, DataWriter::writeLong),
   SHORT(83, DataReader::readShort, DataWriter::writeShort),
-  VOID(86, reader -> null, (writer, o) -> {}),
+  VOID(86, reader -> {
+    throw new UnsupportedOperationException("Can't read void type");
+  }, (writer, o) -> {
+    throw new UnsupportedOperationException("Can't write void type");
+  }),
   BOOLEAN(90, DataReader::readBoolean, DataWriter::writeBoolean),
   STRING(115, ObjectId::read, DataWriter::writeType),
   THREAD(116, ObjectId::read, DataWriter::writeType),
