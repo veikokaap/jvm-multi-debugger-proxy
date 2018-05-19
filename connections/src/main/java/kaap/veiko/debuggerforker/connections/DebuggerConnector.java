@@ -8,6 +8,8 @@ import java.nio.channels.SocketChannel;
 import java.util.Arrays;
 import java.util.function.Consumer;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import kaap.veiko.debuggerforker.packet.DebuggerPacketStream;
 import kaap.veiko.debuggerforker.packet.internal.DebuggerPacketTransformer;
 import kaap.veiko.debuggerforker.packet.internal.PacketTransformer;
@@ -28,7 +30,7 @@ public class DebuggerConnector extends ConnectorBase<DebuggerPacketStream> {
   }
 
   @Override
-  protected DebuggerPacketStream getConnectionBlocking() throws IOException {
+  protected @Nullable DebuggerPacketStream getConnectionBlocking() throws IOException {
     SocketChannel socketChannel = serverChannel.accept();
     socketChannel.configureBlocking(true);
     if (!socketChannel.finishConnect()) {

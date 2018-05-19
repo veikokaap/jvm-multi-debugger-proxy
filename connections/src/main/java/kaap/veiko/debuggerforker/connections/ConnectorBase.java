@@ -6,6 +6,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import kaap.veiko.debuggerforker.packet.PacketStream;
 
 public abstract class ConnectorBase<T extends PacketStream> implements AutoCloseable {
@@ -15,6 +17,7 @@ public abstract class ConnectorBase<T extends PacketStream> implements AutoClose
   private final Set<T> connectionHistory = ConcurrentHashMap.newKeySet();
   private final int maxOpenConnections;
 
+  @SuppressWarnings("method.invocation.invalid") // Using fields under initialization in thread runnable
   protected ConnectorBase(Consumer<T> listener, int maxOpenConnections, String threadName) {
     this.maxOpenConnections = maxOpenConnections;
     thread = new Thread(() -> {
@@ -63,7 +66,7 @@ public abstract class ConnectorBase<T extends PacketStream> implements AutoClose
     return open.get() && !Thread.currentThread().isInterrupted();
   }
 
-  protected abstract T getConnectionBlocking() throws IOException;
+  protected abstract @Nullable T getConnectionBlocking() throws IOException;
   
   public void start() {
     thread.start();

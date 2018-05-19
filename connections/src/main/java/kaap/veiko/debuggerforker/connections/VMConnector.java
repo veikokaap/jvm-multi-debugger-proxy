@@ -8,6 +8,8 @@ import java.nio.channels.SocketChannel;
 import java.util.Arrays;
 import java.util.function.Consumer;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import kaap.veiko.debuggerforker.packet.VirtualMachinePacketStream;
 
 public class VMConnector extends ConnectorBase<VirtualMachinePacketStream> {
@@ -24,7 +26,7 @@ public class VMConnector extends ConnectorBase<VirtualMachinePacketStream> {
   }
 
   @Override
-  protected VirtualMachinePacketStream getConnectionBlocking() throws IOException {
+  protected @Nullable VirtualMachinePacketStream getConnectionBlocking() throws IOException {
     SocketChannel socketChannel = connect(socketAddress);
     if (socketChannel == null) {
       return null;
@@ -34,7 +36,7 @@ public class VMConnector extends ConnectorBase<VirtualMachinePacketStream> {
     return new VirtualMachinePacketStream(socketChannel);
   }
 
-  private SocketChannel connect(InetSocketAddress address) throws IOException {
+  private @Nullable SocketChannel connect(InetSocketAddress address) throws IOException {
     try {
       SocketChannel channel = SocketChannel.open(address);
       channel.configureBlocking(true);
