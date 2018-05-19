@@ -12,9 +12,9 @@ public class StepBreakpointClass {
 
   public static void main(String[] args) {
     System.out.println(BEFORE_MESSAGE);
-    BreakpointUtil.mark(0); System.out.println(AFTER_BREAKPOINT_0);
+    System.out.println(AFTER_BREAKPOINT_0); BreakpointUtil.mark(0);
     System.out.println(STEPPED_OVER);
-    BreakpointUtil.mark(1); System.out.println(AFTER_BREAKPOINT_1);
+    System.out.println(AFTER_BREAKPOINT_1); BreakpointUtil.mark(1);
     System.out.println(LAST_MESSAGE);
   }
 }

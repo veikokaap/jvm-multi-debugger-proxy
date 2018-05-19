@@ -231,21 +231,10 @@ public class DebuggerProcess implements AutoCloseable {
     }
   }
 
-  public SuspendManagerAsyncTester stepOver(BreakpointEvent event, Consumer<SuspendManager> listener) throws ReflectiveOperationException {
+  public SuspendManagerAsyncTester step(BreakpointEvent event, Consumer<SuspendManager> listener, int size, int depth) throws ReflectiveOperationException {
     SuspendManagerAsyncTester tester = new SuspendManagerAsyncTester(listener);
 
-    StepRequest request = virtualMachine.eventRequestManager().createStepRequest(event.thread(), StepRequest.STEP_LINE, StepRequest.STEP_OVER);
-    request.addCountFilter(1);
-    request.enable();
-    registerRequest(request, tester);
-
-    return tester;
-  }
-
-  public SuspendManagerAsyncTester stepInto(BreakpointEvent event, Consumer<SuspendManager> listener) throws ReflectiveOperationException {
-    SuspendManagerAsyncTester tester = new SuspendManagerAsyncTester(listener);
-
-    StepRequest request = virtualMachine.eventRequestManager().createStepRequest(event.thread(), StepRequest.STEP_LINE, StepRequest.STEP_INTO);
+    StepRequest request = virtualMachine.eventRequestManager().createStepRequest(event.thread(), size, depth);
     request.addCountFilter(1);
     request.enable();
     registerRequest(request, tester);

@@ -19,17 +19,11 @@ public class SuspendManager {
     parentDebugger.resume();
   }
 
-  void stepOver(@Nullable Consumer<SuspendManager> listener) throws Throwable {
+  void step(@Nullable Consumer<SuspendManager> listener, int size, int depth) throws Throwable {
     BreakpointEvent event = (BreakpointEvent) this.event;
-    AsyncTester tester = parentDebugger.stepOver(event, listener);
+    AsyncTester tester = parentDebugger.step(event, listener, size, depth);
     resume();
     tester.joinAndTest();
   }
 
-  void stepInto(@Nullable Consumer<SuspendManager> listener) throws Throwable {
-    BreakpointEvent event = (BreakpointEvent) this.event;
-    AsyncTester tester = parentDebugger.stepInto(event, listener);
-    resume();
-    tester.joinAndTest();
-  }
 }

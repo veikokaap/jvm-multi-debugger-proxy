@@ -7,6 +7,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.function.Consumer
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 fun Deque<String>.assertAddedOutput(vararg lines: String, remove: Boolean = true) {
     val expectedList = lines.toList()
@@ -19,6 +20,8 @@ fun Deque<String>.assertAddedOutput(vararg lines: String, remove: Boolean = true
         assertEquals(expectedList, actualPolledList)
     }
 }
+
+fun Deque<String>.assertNoOutputAdded() = assertTrue(this.isEmpty())
 
 fun runTest(testClass: Class<*>, timeout: Long = 10, timeUnit: TimeUnit = TimeUnit.SECONDS, test: (JvmProcess, DebuggerProcess) -> Unit) {
     JvmProcess.runClass(testClass).use { jvm ->

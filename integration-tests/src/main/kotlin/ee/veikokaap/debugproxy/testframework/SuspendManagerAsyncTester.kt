@@ -1,5 +1,6 @@
 package ee.veikokaap.debugproxy.testframework
 
+import com.sun.jdi.request.StepRequest
 import java.util.*
 import java.util.function.Consumer
 
@@ -14,8 +15,9 @@ class SuspendManagerAsyncTester(consumer: Consumer<SuspendManager?>): AsyncTeste
             afterQueue.forEach{
                 when (it.afterAction) {
                     AfterAction.RESUME -> t!!.resume()
-                    AfterAction.STEP_OVER -> t!!.stepOver(it.listener)
-                    AfterAction.STEP_INTO -> t!!.stepInto(it.listener)
+                    AfterAction.STEP_OVER -> t!!.step(it.listener, StepRequest.STEP_LINE, StepRequest.STEP_OVER)
+                    AfterAction.STEP_INTO -> t!!.step(it.listener, StepRequest.STEP_LINE, StepRequest.STEP_INTO)
+                    AfterAction.STEP_OUT -> t!!.step(it.listener, StepRequest.STEP_LINE, StepRequest.STEP_OUT)
                 }
             }
         }
@@ -31,10 +33,20 @@ class SuspendManagerAsyncTester(consumer: Consumer<SuspendManager?>): AsyncTeste
         return this
     }
 
+    infix fun thenStepInto(listener: ((SuspendManager) -> Unit)?): SuspendManagerAsyncTester {
+        afterQueue.addLast(AfterBreak(AfterAction.STEP_INTO, listener))
+        return this
+    }
+
+    infix fun thenStepOut(listener: ((SuspendManager) -> Unit)?): SuspendManagerAsyncTester {
+        afterQueue.addLast(AfterBreak(AfterAction.STEP_OUT, listener))
+        return this
+    }
+
     private data class AfterBreak(val afterAction: AfterAction, val listener: ((SuspendManager) -> Unit)?)
 
     private enum class AfterAction {
-        RESUME, STEP_OVER, STEP_INTO
+        RESUME, STEP_OVER, STEP_INTO, STEP_OUT
     }
 
 }
