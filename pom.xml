@@ -61,6 +61,28 @@
         <configuration>
           <source>1.8</source>
           <target>1.8</target>
+          <compilerArguments>
+            <Xmaxerrs>10000</Xmaxerrs>
+            <Xmaxwarns>10000</Xmaxwarns>
+          </compilerArguments>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>org.checkerframework</groupId>
+              <artifactId>checker</artifactId>
+              <version>2.5.1</version>
+            </path>
+          </annotationProcessorPaths>
+          <annotationProcessors>
+            <!-- Add all the checkers you want to enable here -->
+            <annotationProcessor>org.checkerframework.checker.nullness.NullnessChecker</annotationProcessor>
+          </annotationProcessors>
+          <compilerArgs>
+            <arg>-AprintErrorStack</arg>
+            <!-- location of the annotated JDK, which comes from a Maven dependency -->
+            <arg>-Xbootclasspath/p:${annotatedJdk}</arg>
+            <!-- Uncomment the following line to turn type-checking warnings into errors. -->
+            <!-- <arg>-Awarns</arg> -->
+          </compilerArgs>
         </configuration>
         <executions>
           <execution>
@@ -142,6 +164,17 @@
       <groupId>org.jetbrains.kotlin</groupId>
       <artifactId>kotlin-stdlib-jdk8</artifactId>
       <version>${kotlin.version}</version>
+    </dependency>
+    <!--Checker Framework-->
+    <dependency>
+      <groupId>org.checkerframework</groupId>
+      <artifactId>checker-qual</artifactId>
+      <version>2.5.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.checkerframework</groupId>
+      <artifactId>jdk8</artifactId>
+      <version>2.5.1</version>
     </dependency>
   </dependencies>
 
