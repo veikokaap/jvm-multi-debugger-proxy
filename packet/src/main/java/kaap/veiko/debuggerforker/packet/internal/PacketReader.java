@@ -3,10 +3,10 @@ package kaap.veiko.debuggerforker.packet.internal;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import kaap.veiko.debuggerforker.packet.Packet;
 import kaap.veiko.debuggerforker.packet.PacketSource;
-import kaap.veiko.debuggerforker.packet.PacketStream;
 
 class PacketReader {
 
@@ -18,14 +18,14 @@ class PacketReader {
   private boolean doneReading = false;
   private int length;
   private ByteBuffer lengthBuffer = ByteBuffer.allocate(4);
-  private ByteBuffer dataBuffer = null;
+  private @Nullable ByteBuffer dataBuffer = null;
 
   PacketReader(SocketChannel socketChannel, PacketSource source) {
     this.socketChannel = socketChannel;
     this.source = source;
   }
 
-  public Packet read() throws IOException {
+  public @Nullable Packet read() throws IOException {
     if (readingLength) {
       readLength();
     }
@@ -36,16 +36,21 @@ class PacketReader {
     if (doneReading) {
       doneReading = false;
       readingLength = true;
+      if (dataBuffer == null) {
+        throw new IllegalStateException("Data buffer is null.");
+      }
       dataBuffer.flip();
       byte[] array;
       if (dataBuffer.hasArray()) {
         array = dataBuffer.array();
-      } else {
+      }
+      else {
         array = new byte[length];
         dataBuffer.get(array);
       }
 
       return PacketParser.parse(length, array, source);
+
     }
     return null;
   }
@@ -69,6 +74,9 @@ class PacketReader {
   }
 
   private void readData() throws IOException {
+    if (dataBuffer == null) {
+      throw new IllegalStateException("Data buffer is null.");
+    }
     while (dataBuffer.hasRemaining()) {
       int read = socketChannel.read(dataBuffer);
       if (read == 0) {

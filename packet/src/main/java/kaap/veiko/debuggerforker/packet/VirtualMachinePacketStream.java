@@ -7,6 +7,7 @@ import java.nio.channels.SocketChannel;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +26,7 @@ public class VirtualMachinePacketStream extends PacketStreamBase {
   }
 
   @Override
-  public Packet read() throws IOException {
+  public @Nullable Packet read() throws IOException {
     Packet packet = super.read();
     if (packet == null) {
       return null;

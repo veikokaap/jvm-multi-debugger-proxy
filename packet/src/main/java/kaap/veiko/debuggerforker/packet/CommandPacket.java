@@ -2,13 +2,16 @@ package kaap.veiko.debuggerforker.packet;
 
 import java.util.Arrays;
 
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import kaap.veiko.debuggerforker.packet.internal.PacketBase;
 
 public class CommandPacket extends PacketBase {
 
   private final short commandId;
   private final short commandSetId;
-  private ReplyPacket replyPacket;
+  private @MonotonicNonNull ReplyPacket replyPacket = null;
 
   public CommandPacket(int id, short commandSetId, short commandId, byte[] data, PacketSource source) {
     super(id, data, source);
@@ -24,7 +27,7 @@ public class CommandPacket extends PacketBase {
     return commandSetId;
   }
 
-  public ReplyPacket getReplyPacket() {
+  public @Nullable ReplyPacket getReplyPacket() {
     return replyPacket;
   }
 
@@ -59,10 +62,7 @@ public class CommandPacket extends PacketBase {
     if (commandId != that.commandId) {
       return false;
     }
-    if (commandSetId != that.commandSetId) {
-      return false;
-    }
-    return replyPacket != null ? replyPacket.equals(that.replyPacket) : that.replyPacket == null;
+    return commandSetId == that.commandSetId;
   }
 
   @Override

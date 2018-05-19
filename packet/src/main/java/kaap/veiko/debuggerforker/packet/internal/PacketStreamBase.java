@@ -3,7 +3,7 @@ package kaap.veiko.debuggerforker.packet.internal;
 import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SocketChannel;
-import java.util.Optional;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +30,7 @@ public abstract class PacketStreamBase implements PacketStream {
     this.packetTransformer = packetTransformer;
   }
 
-  public Packet read() throws IOException {
+  public @Nullable Packet read() throws IOException {
     if (isClosed()) {
       throw new ClosedChannelException();
     }
@@ -44,10 +44,13 @@ public abstract class PacketStreamBase implements PacketStream {
     }
   }
 
-  private Packet readAndTransform() throws IOException {
-    return Optional.ofNullable(packetReader.read())
-        .map(packetTransformer::transformReadPacket)
-        .orElse(null);
+  private @Nullable Packet readAndTransform() throws IOException {
+    Packet packet = packetReader.read();
+    if (packet == null) {
+      return null;
+    }
+
+    return packetTransformer.transformReadPacket(packet);
   }
 
   public void write(Packet packet) throws IOException {
