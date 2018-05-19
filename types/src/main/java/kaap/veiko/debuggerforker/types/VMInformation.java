@@ -7,11 +7,10 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import kaap.veiko.debuggerforker.types.jdwp.IdSizes;
 
 public class VMInformation {
-  @MonotonicNonNull
-  private IdSizes idSizes = null;
 
-  @Nullable
-  public IdSizes getIdSizes() {
+  private @MonotonicNonNull IdSizes idSizes = null;
+
+  public @Nullable IdSizes getIdSizes() {
     return idSizes;
   }
 
