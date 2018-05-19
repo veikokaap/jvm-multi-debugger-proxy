@@ -170,11 +170,13 @@
       <groupId>org.checkerframework</groupId>
       <artifactId>checker-qual</artifactId>
       <version>2.5.1</version>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.checkerframework</groupId>
       <artifactId>jdk8</artifactId>
       <version>2.5.1</version>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
 
