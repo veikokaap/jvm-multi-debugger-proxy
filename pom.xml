@@ -71,17 +71,19 @@
               <artifactId>checker</artifactId>
               <version>2.5.1</version>
             </path>
+            <path>
+              <groupId>com.google.auto.value</groupId>
+              <artifactId>auto-value</artifactId>
+              <version>1.5.4</version>
+            </path>
           </annotationProcessorPaths>
           <annotationProcessors>
-            <!-- Add all the checkers you want to enable here -->
+            <annotationProcessor>com.google.auto.value.processor.AutoValueProcessor</annotationProcessor>
             <annotationProcessor>org.checkerframework.checker.nullness.NullnessChecker</annotationProcessor>
           </annotationProcessors>
           <compilerArgs>
             <arg>-AprintErrorStack</arg>
-            <!-- location of the annotated JDK, which comes from a Maven dependency -->
             <arg>-Xbootclasspath/p:${annotatedJdk}</arg>
-            <!-- Uncomment the following line to turn type-checking warnings into errors. -->
-            <!-- <arg>-Awarns</arg> -->
           </compilerArgs>
         </configuration>
         <executions>
@@ -118,6 +120,7 @@
       <groupId>com.google.auto.value</groupId>
       <artifactId>auto-value</artifactId>
       <version>1.5.4</version>
+      <scope>compile</scope>
     </dependency>
     <!--Tests-->
     <dependency>
