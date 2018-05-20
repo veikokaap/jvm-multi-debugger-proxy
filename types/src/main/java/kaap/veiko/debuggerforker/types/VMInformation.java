@@ -1,7 +1,7 @@
 package kaap.veiko.debuggerforker.types;
 
+import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import kaap.veiko.debuggerforker.types.jdwp.IdSizes;
@@ -14,7 +14,8 @@ public class VMInformation {
     return idSizes;
   }
 
-  public void setIdSizes(@NonNull IdSizes idSizes) {
+  @EnsuresNonNull("this.idSizes")
+  public void setIdSizes(IdSizes idSizes) {
     this.idSizes = idSizes;
   }
 }

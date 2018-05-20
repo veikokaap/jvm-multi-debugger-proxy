@@ -1,12 +1,14 @@
 package kaap.veiko.debuggerforker.types.jdwp;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import kaap.veiko.debuggerforker.types.DataReader;
 import kaap.veiko.debuggerforker.types.DataType;
 import kaap.veiko.debuggerforker.types.DataWriter;
 
 public class Value implements DataType {
   private final Type type;
-  private final Object value;
+  private final @Nullable Object value;
 
   public static Value read(DataReader reader) {
     return new Value(reader);
@@ -30,7 +32,7 @@ public class Value implements DataType {
     return type;
   }
 
-  public Object getValue() {
+  public @Nullable Object getValue() {
     return value;
   }
 
@@ -41,7 +43,7 @@ public class Value implements DataType {
   }
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(@Nullable Object o) {
     if (this == o) {
       return true;
     }
@@ -51,15 +53,15 @@ public class Value implements DataType {
 
     Value value1 = (Value) o;
 
-    if (type != value1.type) {
+    if (!type.equals(value1.type)) {
       return false;
     }
-    return value != null ? value.equals(value1.value) : value1.value == null;
+    return value != null && value.equals(value1.value) || value == null && value1.value == null;
   }
 
   @Override
   public int hashCode() {
-    int result = type != null ? type.hashCode() : 0;
+    int result = type.hashCode();
     result = 31 * result + (value != null ? value.hashCode() : 0);
     return result;
   }
