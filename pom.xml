@@ -84,14 +84,9 @@
               <version>2.5.1</version>
             </path>
             <path>
-              <groupId>org.checkerframework</groupId>
-              <artifactId>jdk8</artifactId>
-              <version>2.5.1</version>
-            </path>
-            <path>
               <groupId>com.google.auto.value</groupId>
               <artifactId>auto-value</artifactId>
-              <version>1.5.4</version>
+              <version>1.6</version>
             </path>
           </annotationProcessorPaths>
           <annotationProcessors>
@@ -135,7 +130,7 @@
     <!--Code generation-->
     <dependency>
       <groupId>com.google.auto.value</groupId>
-      <artifactId>auto-value</artifactId>
+      <artifactId>auto-value-annotations</artifactId>
       <version>1.6</version>
       <scope>compile</scope>
     </dependency>
