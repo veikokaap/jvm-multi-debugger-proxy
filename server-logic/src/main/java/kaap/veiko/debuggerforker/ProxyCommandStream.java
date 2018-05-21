@@ -5,6 +5,7 @@ import java.nio.channels.Selector;
 import java.util.Deque;
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +38,7 @@ public class ProxyCommandStream {
     commandStreamManager.markForClosing(source);
   }
 
-  public Command read() {
+  public @Nullable Command read() {
     Command readCommand = commandStreamManager.getReadQueue().pollFirst();
     if (readCommand != null) {
       log.info("Command from readQueue: {}", readCommand);

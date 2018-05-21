@@ -1,6 +1,5 @@
 package kaap.veiko.debuggerforker.commands.parser;
 
-import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +31,7 @@ public class CommandParser {
       return commandDataReader.readCommand(identifier, packet);
     }
     catch (Exception e) {
-      log.warn(e.getMessage());
+      log.warn("", e);
       return new UnknownCommand(packet, commandPacket.getCommandSetId(), commandPacket.getCommandId(), packet.isReply());
     }
   }
@@ -40,7 +39,12 @@ public class CommandParser {
   private class CommandPacketFinder implements PacketVisitor<CommandPacket> {
     @Override
     public CommandPacket visit(ReplyPacket replyPacket) {
-      return replyPacket.getCommandPacket();
+      CommandPacket commandPacket = replyPacket.getCommandPacket();
+      if (commandPacket == null) {
+        throw new IllegalStateException("No command packet found for reply packet");
+      }
+
+      return commandPacket;
     }
 
     @Override

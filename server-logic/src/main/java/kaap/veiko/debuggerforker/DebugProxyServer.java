@@ -28,6 +28,7 @@ public class DebugProxyServer implements AutoCloseable {
   private final List<Consumer<CommandStream>> debuggerConnectListeners = new CopyOnWriteArrayList<>();
   private final List<Consumer<CommandStream>> vmConnectListeners = new CopyOnWriteArrayList<>();
 
+  @SuppressWarnings("methodref.receiver.bound.invalid") // TODO: Using methods under initialization in thread runnable
   public DebugProxyServer(InetSocketAddress virtualMachineAddress, int debuggerPort) throws IOException {
     proxyCommandStream = ProxyCommandStream.create();
     debuggerConnector = DebuggerConnector.create(debuggerPort, this::registerDebuggerStream);

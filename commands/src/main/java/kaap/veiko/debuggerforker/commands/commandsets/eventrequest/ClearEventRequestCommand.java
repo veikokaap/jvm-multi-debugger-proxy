@@ -1,5 +1,7 @@
 package kaap.veiko.debuggerforker.commands.commandsets.eventrequest;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import kaap.veiko.debuggerforker.commands.CommandBase;
 import kaap.veiko.debuggerforker.commands.CommandVisitor;
 import kaap.veiko.debuggerforker.commands.MutableCommandPacket;
@@ -58,7 +60,7 @@ public class ClearEventRequestCommand extends CommandBase<CommandPacket> {
   }
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(@Nullable Object o) {
     if (this == o) {
       return true;
     }

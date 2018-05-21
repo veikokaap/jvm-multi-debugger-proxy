@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,4 +85,6 @@ public abstract class VirtualMachineEvent implements DataType {
     }
   }
 
+  @Override
+  public abstract boolean equals(@Nullable Object o);
 }

@@ -1,5 +1,6 @@
-package kaap.veiko.debuggerforker.handlers;
+ package kaap.veiko.debuggerforker.handlers;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +21,7 @@ import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.IdSizesRepl
 import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.ReleaseEventsCommand;
 import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.ResumeCommand;
 import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.ResumeReply;
+import kaap.veiko.debuggerforker.packet.CommandPacket;
 import kaap.veiko.debuggerforker.packet.PacketSource;
 import kaap.veiko.debuggerforker.packet.ReplyPacket;
 import kaap.veiko.debuggerforker.types.VMInformation;
@@ -140,7 +142,11 @@ public class CommandHandler implements CommandVisitor {
   }
 
   private void sendReplyToOriginalSource(Command<ReplyPacket> reply) {
-    PacketSource originalSource = reply.getPacket().getCommandPacket().getSource();
+    CommandPacket commandPacket = reply.getPacket().getCommandPacket();
+    if (commandPacket == null) {
+      throw new IllegalStateException("No original command for a reply: " + reply);
+    }
+    PacketSource originalSource = commandPacket.getSource();
     if (originalSource != null) {
       proxyCommandStream.write(originalSource, reply);
     }

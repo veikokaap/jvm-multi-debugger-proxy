@@ -3,6 +3,8 @@ package kaap.veiko.debuggerforker.packet;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import kaap.veiko.debuggerforker.packet.internal.PacketTransformer;
 
 public class PacketSource {
@@ -37,7 +39,7 @@ public class PacketSource {
   }
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(@Nullable Object o) {
     if (this == o) {
       return true;
     }

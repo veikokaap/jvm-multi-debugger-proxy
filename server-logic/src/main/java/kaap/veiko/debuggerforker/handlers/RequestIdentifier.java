@@ -1,5 +1,7 @@
 package kaap.veiko.debuggerforker.handlers;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import kaap.veiko.debuggerforker.types.jdwp.EventKind;
 
 final public class RequestIdentifier {
@@ -20,7 +22,7 @@ final public class RequestIdentifier {
   }
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(@Nullable Object o) {
     if (this == o) {
       return true;
     }

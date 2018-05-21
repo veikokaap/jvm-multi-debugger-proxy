@@ -5,6 +5,7 @@ import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class Main {
 
@@ -26,7 +27,7 @@ public class Main {
     proxy.start();
   }
 
-  private static InetSocketAddress getJvmAddress(List<String> args) {
+  private static @Nullable InetSocketAddress getJvmAddress(List<String> args) {
     String host = args.stream()
         .filter(s -> s.startsWith(JVM_HOST_ARG))
         .map(s -> s.substring(JVM_HOST_ARG.length()))
@@ -54,7 +55,7 @@ public class Main {
     }
   }
 
-  private static Integer getProxyPort(List<String> args) {
+  private static @Nullable Integer getProxyPort(List<String> args) {
     Optional<String> port = args.stream()
         .filter(s -> s.startsWith(PROXY_PORT_ARG))
         .map(s -> s.substring(PROXY_PORT_ARG.length()))

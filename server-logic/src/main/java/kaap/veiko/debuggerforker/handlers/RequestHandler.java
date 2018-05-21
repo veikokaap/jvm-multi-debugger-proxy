@@ -14,8 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import kaap.veiko.debuggerforker.ProxyCommandStream;
 import kaap.veiko.debuggerforker.commands.commandsets.event.CompositeEventCommand;
-import kaap.veiko.debuggerforker.commands.commandsets.event.events.BreakPointEvent;
-import kaap.veiko.debuggerforker.commands.commandsets.event.events.ClassPrepareEvent;
 import kaap.veiko.debuggerforker.commands.commandsets.event.events.VirtualMachineEvent;
 import kaap.veiko.debuggerforker.commands.commandsets.event.events.VmDeathEvent;
 import kaap.veiko.debuggerforker.commands.commandsets.event.events.VmStartEvent;
@@ -31,6 +29,7 @@ import kaap.veiko.debuggerforker.packet.PacketSource;
 import kaap.veiko.debuggerforker.types.VMInformation;
 import kaap.veiko.debuggerforker.types.jdwp.EventKind;
 
+@SuppressWarnings({"dereference.of.nullable", "argument.type.incompatible", "return.type.incompatible"}) // TODO: This whole class is trash and needs to be replaced
 class RequestHandler {
 
   private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -63,6 +62,9 @@ class RequestHandler {
   }
 
   private SetEventRequestReply createReply(SetEventRequestCommand command) {
+    if (!requestIdentifierMap.containsKey(command)) {
+      throw new IllegalStateException("No command " + command + " in requestIdentifierMap.");
+    }
     RequestIdentifier identifier = requestIdentifierMap.get(command);
 
     SetEventRequestReply reply = SetEventRequestReply.create(command.getPacket().getId(), identifier.getRequestId(), vmInformation);

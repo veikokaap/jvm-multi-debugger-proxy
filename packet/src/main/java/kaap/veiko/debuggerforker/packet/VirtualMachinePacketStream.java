@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,12 +45,17 @@ public class VirtualMachinePacketStream extends PacketStreamBase {
     }
   }
 
-  private class ReplyPacketVisitor implements PacketVisitor<Packet> {
+  private class ReplyPacketVisitor implements PacketVisitor<@Nullable Packet> {
     @Override
-    public Packet visit(ReplyPacket replyPacket) {
+    public @Nullable Packet visit(ReplyPacket replyPacket) {
       CommandPacket commandPacket = writtenCommands.get(replyPacket.getId());
-      commandPacket.setReplyPacket(replyPacket);
-      replyPacket.setCommandPacket(commandPacket);
+      if (commandPacket != null) {
+        commandPacket.setReplyPacket(replyPacket);
+        replyPacket.setCommandPacket(commandPacket);
+      }
+      else {
+        log.warn("No command packet found for {}", replyPacket);
+      }
 
       return replyPacket;
     }

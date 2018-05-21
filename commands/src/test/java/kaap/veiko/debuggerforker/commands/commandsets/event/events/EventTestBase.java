@@ -6,6 +6,8 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import kaap.veiko.debuggerforker.commands.commandsets.TestBase;
 import kaap.veiko.debuggerforker.packet.internal.ByteBufferDataReader;
 import kaap.veiko.debuggerforker.packet.internal.ByteBufferDataWriter;
@@ -14,6 +16,7 @@ import kaap.veiko.debuggerforker.types.DataReader;
 import kaap.veiko.debuggerforker.types.jdwp.ClassId;
 import kaap.veiko.debuggerforker.types.jdwp.EventKind;
 import kaap.veiko.debuggerforker.types.jdwp.FieldId;
+import kaap.veiko.debuggerforker.types.jdwp.IdSizes;
 import kaap.veiko.debuggerforker.types.jdwp.Location;
 import kaap.veiko.debuggerforker.types.jdwp.MethodId;
 import kaap.veiko.debuggerforker.types.jdwp.ObjectId;
@@ -56,19 +59,19 @@ public abstract class EventTestBase extends TestBase {
   }
 
   ObjectId randomObjectId() {
-    return new ObjectId(randomLongOfBytes(getVmInformation().getIdSizes().getObjectIdSize()));
+    return new ObjectId(randomLongOfBytes(getIdSizes().getObjectIdSize()));
   }
 
   ThreadId randomThreadId() {
-    return new ThreadId(randomLongOfBytes(getVmInformation().getIdSizes().getObjectIdSize()));
+    return new ThreadId(randomLongOfBytes(getIdSizes().getObjectIdSize()));
   }
 
   ClassId randomClassId() {
-    return new ClassId(randomLongOfBytes(getVmInformation().getIdSizes().getObjectIdSize()));
+    return new ClassId(randomLongOfBytes(getIdSizes().getObjectIdSize()));
   }
 
   MethodId randomMethodId() {
-    return new MethodId(randomLongOfBytes(getVmInformation().getIdSizes().getMethodIdSize()));
+    return new MethodId(randomLongOfBytes(getIdSizes().getMethodIdSize()));
   }
 
   Location randomLocation() {
@@ -76,11 +79,11 @@ public abstract class EventTestBase extends TestBase {
   }
 
   ReferenceTypeId randomReferenceTypeId() {
-    return new ReferenceTypeId(randomLongOfBytes(getVmInformation().getIdSizes().getReferenceTypeIdSize()));
+    return new ReferenceTypeId(randomLongOfBytes(getIdSizes().getReferenceTypeIdSize()));
   }
 
   FieldId randomFieldId() {
-    return new FieldId(randomLongOfBytes(getVmInformation().getIdSizes().getFieldIdSize()));
+    return new FieldId(randomLongOfBytes(getIdSizes().getFieldIdSize()));
   }
 
   TaggedObjectId randomTaggedObjectId() {
@@ -99,7 +102,7 @@ public abstract class EventTestBase extends TestBase {
       case 3:
         return new Value(Type.DOUBLE, random.nextDouble());
       case 4:
-        return new Value(Type.VOID, new Object());
+        return new Value(Type.VOID, null);
       default:
         throw new IllegalStateException("Default switch");
     }

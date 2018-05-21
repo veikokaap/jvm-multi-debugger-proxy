@@ -1,8 +1,8 @@
 package ee.veikokaap.debugproxy.testframework;
 
 import java.util.function.Consumer;
-import org.jetbrains.annotations.Nullable;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import com.sun.jdi.event.BreakpointEvent;
 import com.sun.jdi.event.Event;
 
@@ -19,7 +19,7 @@ public class SuspendManager {
     parentDebugger.resume();
   }
 
-  void step(@Nullable Consumer<SuspendManager> listener, int size, int depth) throws Throwable {
+  void step(Consumer<SuspendManager> listener, int size, int depth) throws Throwable {
     BreakpointEvent event = (BreakpointEvent) this.event;
     AsyncTester tester = parentDebugger.step(event, listener, size, depth);
     resume();

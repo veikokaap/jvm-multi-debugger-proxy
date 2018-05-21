@@ -9,6 +9,9 @@ import java.util.Deque;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.TimeUnit;
 
+import org.checkerframework.checker.initialization.qual.UnderInitialization;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+
 import kaap.veiko.debuggerforker.DebuggerProxy;
 
 public class JvmProcess implements Closeable {
@@ -21,10 +24,12 @@ public class JvmProcess implements Closeable {
   private final Deque<String> outputDeque = new ConcurrentLinkedDeque<>();
   private final Process process;
   private final Thread proxyThread;
-  public DebuggerProxy debuggerProxy;
+  private @MonotonicNonNull DebuggerProxy debuggerProxy = null;
 
   public static JvmProcess runClass(Class clazz) throws IOException {
-    return new JvmProcess(startClassWithJvm(clazz));
+    JvmProcess process = new JvmProcess(startClassWithJvm(clazz));
+    process.start();
+    return process;
   }
 
   private JvmProcess(Process process) {
@@ -38,6 +43,9 @@ public class JvmProcess implements Closeable {
         throw new RuntimeException(e);
       }
     });
+  }
+
+  private void start() {
     startDebugProxy();
     startVmOutputRouter();
   }

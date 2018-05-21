@@ -1,5 +1,7 @@
 package ee.veikokaap.debugproxy.testframework.utils;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 public class BreakpointLocation {
   private final String className;
   private final int lineNumber;
@@ -18,7 +20,7 @@ public class BreakpointLocation {
   }
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(@Nullable Object o) {
     if (this == o) {
       return true;
     }

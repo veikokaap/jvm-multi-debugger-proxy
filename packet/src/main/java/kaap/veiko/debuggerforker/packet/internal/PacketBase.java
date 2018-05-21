@@ -3,6 +3,8 @@ package kaap.veiko.debuggerforker.packet.internal;
 import java.util.Arrays;
 import java.util.Objects;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import kaap.veiko.debuggerforker.packet.Packet;
 import kaap.veiko.debuggerforker.packet.PacketSource;
 import kaap.veiko.debuggerforker.packet.PacketStream;
@@ -50,7 +52,7 @@ public abstract class PacketBase implements Packet {
   }
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(@Nullable Object o) {
     if (this == o) {
       return true;
     }

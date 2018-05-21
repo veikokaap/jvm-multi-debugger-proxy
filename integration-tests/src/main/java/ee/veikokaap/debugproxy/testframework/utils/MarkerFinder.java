@@ -11,6 +11,8 @@ import static org.objectweb.asm.Opcodes.ICONST_5;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Label;
@@ -28,7 +30,11 @@ public class MarkerFinder {
   public static HashMap<Integer, BreakpointLocation> findLocations(Class clazz) {
     MarkerFinder markerFinder = new MarkerFinder();
 
-    try (InputStream stream = clazz.getResourceAsStream(clazz.getSimpleName() + ".class")) {
+    String resourceName = clazz.getSimpleName() + ".class";
+    try (InputStream stream = clazz.getResourceAsStream(resourceName)) {
+      if (stream == null) {
+        throw new IllegalStateException("No class resource found with name " + resourceName);
+      }
       ClassReader classReader = new ClassReader(stream);
       classReader.accept(markerFinder.classVisitor, 0);
     }
@@ -95,7 +101,7 @@ public class MarkerFinder {
   private class TestClassVisitor extends ClassVisitor {
     private TestMethodVisitor methodVisitor = new TestMethodVisitor();
 
-    private String className;
+    private @NonNull String className = "";
 
     private TestClassVisitor() {
       super(ASM6);

@@ -1,5 +1,7 @@
 package kaap.veiko.debuggerforker.commands.commandsets.eventrequest;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import kaap.veiko.debuggerforker.commands.CommandBase;
 import kaap.veiko.debuggerforker.commands.CommandVisitor;
 import kaap.veiko.debuggerforker.commands.MutableReplyPacket;
@@ -48,7 +50,7 @@ public class SetEventRequestReply extends CommandBase<ReplyPacket> {
   }
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(@Nullable Object o) {
     if (this == o) {
       return true;
     }

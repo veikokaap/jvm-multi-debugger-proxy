@@ -23,7 +23,7 @@ public class Value implements DataType {
     value = type.read(reader);
   }
 
-  public Value(Type type, Object value) {
+  public Value(Type type, @Nullable Object value) {
     this.type = type;
     this.value = value;
   }

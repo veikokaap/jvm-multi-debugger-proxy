@@ -1,6 +1,7 @@
 package ee.veikokaap.debugproxy.testframework;
 
 import java.lang.reflect.Field;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import com.sun.jdi.request.EventRequest;
 
 final class EventRequestIdentifier {
@@ -28,7 +29,7 @@ final class EventRequestIdentifier {
   }
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(@Nullable Object o) {
     if (this == o) {
       return true;
     }
@@ -59,7 +60,7 @@ final class EventRequestIdentifier {
         '}';
   }
 
-  private static Field getDeclaredField(Class<?> clazz, String fieldName) throws NoSuchFieldException {
+  private static Field getDeclaredField(@Nullable Class<?> clazz, String fieldName) throws NoSuchFieldException {
     if (clazz == null) {
       throw new NoSuchFieldException(fieldName);
     }

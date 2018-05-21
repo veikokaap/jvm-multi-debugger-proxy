@@ -24,26 +24,26 @@ class SuspendManagerAsyncTester(consumer: Consumer<SuspendManager?>): AsyncTeste
     }
 
     infix fun thenResume(u: () -> Unit): SuspendManagerAsyncTester {
-        afterQueue.addLast(AfterBreak(AfterAction.RESUME, null))
+        afterQueue.addLast(AfterBreak(AfterAction.RESUME))
         return this
     }
 
-    infix fun thenStepOver(listener: ((SuspendManager) -> Unit)?): SuspendManagerAsyncTester {
+    infix fun thenStepOver(listener: ((SuspendManager) -> Unit)): SuspendManagerAsyncTester {
         afterQueue.addLast(AfterBreak(AfterAction.STEP_OVER, listener))
         return this
     }
 
-    infix fun thenStepInto(listener: ((SuspendManager) -> Unit)?): SuspendManagerAsyncTester {
+    infix fun thenStepInto(listener: ((SuspendManager) -> Unit)): SuspendManagerAsyncTester {
         afterQueue.addLast(AfterBreak(AfterAction.STEP_INTO, listener))
         return this
     }
 
-    infix fun thenStepOut(listener: ((SuspendManager) -> Unit)?): SuspendManagerAsyncTester {
+    infix fun thenStepOut(listener: ((SuspendManager) -> Unit)): SuspendManagerAsyncTester {
         afterQueue.addLast(AfterBreak(AfterAction.STEP_OUT, listener))
         return this
     }
 
-    private data class AfterBreak(val afterAction: AfterAction, val listener: ((SuspendManager) -> Unit)?)
+    private data class AfterBreak(val afterAction: AfterAction, val listener: ((SuspendManager) -> Unit) = {})
 
     private enum class AfterAction {
         RESUME, STEP_OVER, STEP_INTO, STEP_OUT

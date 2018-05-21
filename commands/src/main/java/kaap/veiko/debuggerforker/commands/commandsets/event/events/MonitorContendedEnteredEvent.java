@@ -1,5 +1,6 @@
 package kaap.veiko.debuggerforker.commands.commandsets.event.events;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import com.google.auto.value.AutoValue;
 
 import kaap.veiko.debuggerforker.types.DataReader;
@@ -41,4 +42,7 @@ public abstract class MonitorContendedEnteredEvent extends VirtualMachineEvent {
     writer.writeType(getObjectId());
     writer.writeType(getLocation());
   }
+
+  public abstract boolean equals(@Nullable Object o);
+
 }

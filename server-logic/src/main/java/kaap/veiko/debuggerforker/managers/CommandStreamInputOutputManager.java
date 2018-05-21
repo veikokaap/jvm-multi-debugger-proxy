@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
+import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.stream.Collectors;
 
+import org.checkerframework.checker.nullness.qual.KeyFor;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,10 +45,15 @@ public class CommandStreamInputOutputManager extends ChannelInputOutputManager<C
   }
 
   public Deque<Command> getWriteQueue(PacketSource packetSource) {
-    return writeQueues.get(packetSource);
+    if (writeQueues.containsKey(packetSource)) {
+      return writeQueues.get(packetSource);
+    }
+    else {
+      throw new IllegalStateException("No write queue for packet source " + packetSource);
+    }
   }
 
-  private Set<PacketSource> allSources() {
+  private Set<@KeyFor("this.sourceStreamMap") PacketSource> allSources() {
     return sourceStreamMap.keySet();
   }
 
@@ -53,7 +61,7 @@ public class CommandStreamInputOutputManager extends ChannelInputOutputManager<C
     return allSources().stream()
         .filter(PacketSource::isVirtualMachine)
         .findFirst()
-        .orElse(null);
+        .orElseThrow(() -> new IllegalStateException("Unable to find VM PacketSource"));
   }
 
   public List<PacketSource> getAllDebuggers() {
@@ -66,16 +74,16 @@ public class CommandStreamInputOutputManager extends ChannelInputOutputManager<C
     readQueue.addLast(command);
   }
 
-  private Command getFromWriteQueue(PacketSource source) {
+  private @Nullable Command getFromWriteQueue(PacketSource source) {
     if (source.isHoldEvents()) {
       return null;
     }
 
-    Deque<Command> writeQueue = writeQueues.get(source);
-    if (writeQueue != null) {
-      return writeQueue.pollFirst();
-    } else {
-      log.warn("Trying to find a writable command from a packet source which isn't registered: {}", source);
+    try {
+      return getWriteQueue(source).pollFirst();
+    }
+    catch (IllegalStateException e) {
+      log.error("Trying to find a writable command from a packet source which isn't registered.", e);
       return null;
     }
   }
@@ -132,7 +140,7 @@ public class CommandStreamInputOutputManager extends ChannelInputOutputManager<C
 
   private void closeIfMarkedAndWriteQueueEmpty(CommandStream commandStream) {
     PacketSource source = commandStream.getSource();
-    if (sourcesMarkedForClosing.contains(source) && writeQueues.get(source).isEmpty()) {
+    if (sourcesMarkedForClosing.contains(source) && getWriteQueue(source).isEmpty()) {
       commandStream.close();
       sourceStreamMap.remove(source);
       sourcesMarkedForClosing.remove(source);

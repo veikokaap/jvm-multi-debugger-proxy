@@ -41,6 +41,7 @@ public class DebuggerProcess implements AutoCloseable {
   private final AtomicReference<Exception> exception = new AtomicReference<>();
   private final AtomicBoolean running = new AtomicBoolean(true);
 
+  @SuppressWarnings("method.invocation.invalid") // Using methods under initialization in thread runnable
   private DebuggerProcess(VirtualMachine virtualMachine) {
     this.virtualMachine = virtualMachine;
     thread = new Thread(() -> listenForEvents(virtualMachine));
@@ -165,7 +166,9 @@ public class DebuggerProcess implements AutoCloseable {
 
   private void registerRequest(EventRequest request, Consumer<SuspendManager> listener) throws ReflectiveOperationException {
     EventRequestIdentifier identifier = EventRequestIdentifier.fromEventRequest(request);
-    requestListenerMap.putIfAbsent(identifier, new ArrayList<>());
+    if (!requestListenerMap.containsKey(identifier)) {
+      requestListenerMap.put(identifier, new ArrayList<>());
+    }
     requestListenerMap.get(identifier).add(listener);
   }
 
@@ -192,6 +195,7 @@ public class DebuggerProcess implements AutoCloseable {
     }
   }
 
+  @SuppressWarnings("dereference.of.nullable") // "hostname" and "port" are definitely in connector arguments. If not, then it's completely reasonable to throw a NPE and fail the test
   private static VirtualMachine connect() throws IOException, IllegalConnectorArgumentsException {
     Connector connector = getConnector();
 

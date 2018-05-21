@@ -43,7 +43,11 @@ public class VmPacketTransformer implements PacketTransformer {
   }
 
   private int getOriginalId(int newId) {
-    return idMap.get(newId);
+    Integer originalId = idMap.get(newId);
+    if (originalId == null) {
+      throw new IllegalStateException("No original Id found for mapped id " + newId);
+    }
+    return originalId;
   }
 
   private class OutputPacketVisitor implements PacketVisitor<Packet> {
