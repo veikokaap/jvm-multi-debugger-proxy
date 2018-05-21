@@ -48,10 +48,6 @@ abstract class DataTypeBase implements DataType {
     return (int) (value ^ (value >>> 32));
   }
 
-  public long asLong() {
-    return value;
-  }
-
   @Override
   public String toString() {
     return this.getClass().getSimpleName() + "{" +

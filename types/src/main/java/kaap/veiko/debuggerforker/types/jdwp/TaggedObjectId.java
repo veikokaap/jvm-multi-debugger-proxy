@@ -33,10 +33,6 @@ public class TaggedObjectId implements DataType {
     return objectId;
   }
 
-  public long asLong() {
-    return getObjectId().asLong();
-  }
-
   @Override
   public void write(DataWriter writer) {
     writer.writeByte(tag);
@@ -71,7 +67,7 @@ public class TaggedObjectId implements DataType {
   public String toString() {
     return "TaggedObjectId{" +
         "tag=" + tag +
-        ", objectId=" + asLong() +
+        ", objectId=" + getObjectId() +
         '}';
   }
 }
