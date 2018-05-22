@@ -14,6 +14,7 @@ import kaap.veiko.debuggerforker.packet.internal.ByteBufferDataWriter;
 import kaap.veiko.debuggerforker.packet.utils.ByteBufferUtil;
 import kaap.veiko.debuggerforker.types.DataReadException;
 import kaap.veiko.debuggerforker.types.DataReader;
+import kaap.veiko.debuggerforker.types.jdwp.ArrayId;
 import kaap.veiko.debuggerforker.types.jdwp.ClassId;
 import kaap.veiko.debuggerforker.types.jdwp.EventKind;
 import kaap.veiko.debuggerforker.types.jdwp.FieldId;
@@ -22,6 +23,7 @@ import kaap.veiko.debuggerforker.types.jdwp.Location;
 import kaap.veiko.debuggerforker.types.jdwp.MethodId;
 import kaap.veiko.debuggerforker.types.jdwp.ObjectId;
 import kaap.veiko.debuggerforker.types.jdwp.ReferenceTypeId;
+import kaap.veiko.debuggerforker.types.jdwp.StringId;
 import kaap.veiko.debuggerforker.types.jdwp.TaggedObjectId;
 import kaap.veiko.debuggerforker.types.jdwp.ThreadId;
 import kaap.veiko.debuggerforker.types.jdwp.Type;
@@ -91,19 +93,27 @@ public abstract class EventTestBase extends TestBase {
     return new TaggedObjectId(randomByte(), randomObjectId());
   }
 
+  StringId randomStringId() {
+    return new StringId(randomLongOfBytes(getIdSizes().getObjectIdSize()));
+  }
+
+  ArrayId randomArrayId() {
+    return new ArrayId(randomLongOfBytes(getIdSizes().getObjectIdSize()));
+  }
+
   //TODO: Support and test all Value types
   Value randomValue() {
     switch (random.nextInt(5)) {
       case 0:
-        return new Value(Type.INT, randomInt());
+        return new Value<>(Type.INT, randomInt());
       case 1:
-        return new Value(Type.ARRAY, randomObjectId());
+        return new Value<>(Type.ARRAY, randomArrayId());
       case 2:
-        return new Value(Type.STRING, randomObjectId());
+        return new Value<>(Type.STRING, randomStringId());
       case 3:
-        return new Value(Type.DOUBLE, random.nextDouble());
+        return new Value<>(Type.DOUBLE, random.nextDouble());
       case 4:
-        return new Value(Type.VOID, null);
+        return new Value<>(Type.VOID, null);
       default:
         throw new IllegalStateException("Default switch");
     }

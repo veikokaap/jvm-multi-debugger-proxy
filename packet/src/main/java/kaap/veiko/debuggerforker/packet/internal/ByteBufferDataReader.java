@@ -44,6 +44,16 @@ public class ByteBufferDataReader implements DataReader {
   }
 
   @Override
+  public char readChar() throws DataReadException {
+    try {
+      return byteBuffer.getChar();
+    }
+    catch (BufferUnderflowException e) {
+      throw new DataReadException(e);
+    }
+  }
+
+  @Override
   public int readInt() throws DataReadException {
     try {
       return byteBuffer.getInt();

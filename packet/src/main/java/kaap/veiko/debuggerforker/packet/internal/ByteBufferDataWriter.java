@@ -44,6 +44,11 @@ public class ByteBufferDataWriter implements DataWriter {
   }
 
   @Override
+  public void writeChar(char c) {
+    byteBuffer.putChar(c);
+  }
+
+  @Override
   public void writeInt(int i) {
     byteBuffer.putInt(i);
   }

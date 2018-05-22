@@ -9,6 +9,8 @@ public interface DataWriter {
 
   void writeShort(short s);
 
+  void writeChar(char c);
+
   void writeInt(int i);
 
   void writeLong(long l);

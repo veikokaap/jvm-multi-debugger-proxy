@@ -7,6 +7,8 @@ public interface DataReader {
 
   short readShort() throws DataReadException;
 
+  char readChar() throws DataReadException;
+
   int readInt() throws DataReadException;
 
   long readLong() throws DataReadException;

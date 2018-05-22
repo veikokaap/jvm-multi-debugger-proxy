@@ -7,16 +7,20 @@ import kaap.veiko.debuggerforker.types.DataReader;
 import kaap.veiko.debuggerforker.types.DataType;
 import kaap.veiko.debuggerforker.types.DataWriter;
 
-public class Value implements DataType {
-  private final Type type;
-  private final @Nullable Object value;
+public class Value<T> implements DataType {
+  private final Type<T> type;
+  private final @Nullable T value;
 
   Value(DataReader reader, byte typeTag) throws DataReadException {
-    this.type = Type.findByValue(typeTag);
+    this(reader, Type.findById(typeTag));
+  }
+
+  Value(DataReader reader, Type<T> type) throws DataReadException {
+    this.type = type;
     this.value = type.read(reader);
   }
 
-  public Value(Type type, @Nullable Object value) {
+  public Value(Type<T> type, T value) {
     this.type = type;
     this.value = value;
   }
@@ -26,18 +30,23 @@ public class Value implements DataType {
     return new Value(reader, typeTag);
   }
 
-  public Type getType() {
+  public Type<T> getType() {
     return type;
   }
 
-  public @Nullable Object getValue() {
+  public @Nullable T getValue() {
     return value;
   }
 
   @Override
   public void write(DataWriter writer) {
     writer.writeByte(type.getId());
-    type.write(writer, value);
+    if (value != null) {
+      getType().write(writer, value);
+    }
+    else if (getType() != Type.VOID) {
+      throw new NullPointerException("Value contains null for non-void type.");
+    }
   }
 
   @Override
