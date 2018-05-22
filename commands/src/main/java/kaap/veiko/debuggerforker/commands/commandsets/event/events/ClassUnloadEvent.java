@@ -2,6 +2,7 @@ package kaap.veiko.debuggerforker.commands.commandsets.event.events;
 
 import com.google.auto.value.AutoValue;
 
+import kaap.veiko.debuggerforker.types.DataReadException;
 import kaap.veiko.debuggerforker.types.DataReader;
 import kaap.veiko.debuggerforker.types.DataWriter;
 import kaap.veiko.debuggerforker.types.jdwp.EventKind;
@@ -19,7 +20,7 @@ public abstract class ClassUnloadEvent extends VirtualMachineEvent {
     return new AutoValue_ClassUnloadEvent(requestId, signature);
   }
 
-  public static ClassUnloadEvent read(DataReader reader) {
+  public static ClassUnloadEvent read(DataReader reader) throws DataReadException {
     return create(
         reader.readInt(),
         reader.readString()

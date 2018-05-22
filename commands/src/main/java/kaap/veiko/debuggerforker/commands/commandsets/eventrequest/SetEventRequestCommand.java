@@ -14,6 +14,7 @@ import kaap.veiko.debuggerforker.commands.commandsets.CommandIdentifier;
 import kaap.veiko.debuggerforker.commands.commandsets.eventrequest.filters.EventRequestFilter;
 import kaap.veiko.debuggerforker.commands.util.CommandDataUtil;
 import kaap.veiko.debuggerforker.packet.CommandPacket;
+import kaap.veiko.debuggerforker.types.DataReadException;
 import kaap.veiko.debuggerforker.types.DataWriter;
 import kaap.veiko.debuggerforker.types.VMInformation;
 import kaap.veiko.debuggerforker.types.jdwp.EventKind;
@@ -35,7 +36,7 @@ public class SetEventRequestCommand extends CommandBase<CommandPacket> {
     return command;
   }
 
-  public static SetEventRequestCommand read(CommandDataReader reader) {
+  public static SetEventRequestCommand read(CommandDataReader reader) throws DataReadException {
     EventKind eventKind = EventKind.read(reader);
     byte suspendPolicy = reader.readByte();
     List<EventRequestFilter> eventRequestFilters = EventRequestFilter.readList(reader);

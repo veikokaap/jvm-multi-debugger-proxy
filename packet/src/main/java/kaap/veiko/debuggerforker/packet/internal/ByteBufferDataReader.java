@@ -1,13 +1,13 @@
 package kaap.veiko.debuggerforker.packet.internal;
 
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import kaap.veiko.debuggerforker.packet.utils.ByteBufferUtil;
+import kaap.veiko.debuggerforker.types.DataReadException;
 import kaap.veiko.debuggerforker.types.DataReader;
-
 import kaap.veiko.debuggerforker.types.VMInformation;
 import kaap.veiko.debuggerforker.types.jdwp.IdSizes;
 
@@ -24,37 +24,67 @@ public class ByteBufferDataReader implements DataReader {
   }
 
   @Override
-  public byte readByte() {
-    return byteBuffer.get();
+  public byte readByte() throws DataReadException {
+    try {
+      return byteBuffer.get();
+    }
+    catch (BufferUnderflowException e) {
+      throw new DataReadException(e);
+    }
   }
 
   @Override
-  public short readShort() {
-    return byteBuffer.getShort();
+  public short readShort() throws DataReadException {
+    try {
+      return byteBuffer.getShort();
+    }
+    catch (BufferUnderflowException e) {
+      throw new DataReadException(e);
+    }
   }
 
   @Override
-  public int readInt() {
-    return byteBuffer.getInt();
+  public int readInt() throws DataReadException {
+    try {
+      return byteBuffer.getInt();
+    }
+    catch (BufferUnderflowException e) {
+      throw new DataReadException(e);
+    }
   }
 
   @Override
-  public long readLong() {
-    return byteBuffer.getLong();
+  public long readLong() throws DataReadException {
+    try {
+      return byteBuffer.getLong();
+    }
+    catch (BufferUnderflowException e) {
+      throw new DataReadException(e);
+    }
   }
 
   @Override
-  public float readFloat() {
-    return byteBuffer.getFloat();
+  public float readFloat() throws DataReadException {
+    try {
+      return byteBuffer.getFloat();
+    }
+    catch (BufferUnderflowException e) {
+      throw new DataReadException(e);
+    }
   }
 
   @Override
-  public double readDouble() {
-    return byteBuffer.getDouble();
+  public double readDouble() throws DataReadException {
+    try {
+      return byteBuffer.getDouble();
+    }
+    catch (BufferUnderflowException e) {
+      throw new DataReadException(e);
+    }
   }
 
   @Override
-  public long readLongOfSize(IdSizes.SizeType sizeType) {
+  public long readLongOfSize(IdSizes.SizeType sizeType) throws DataReadException {
     IdSizes idSizes = vmInformation.getIdSizes();
     int size;
     if (idSizes == null) {
@@ -64,17 +94,32 @@ public class ByteBufferDataReader implements DataReader {
     else {
       size = idSizes.getSizeOfType(sizeType);
     }
-    return ByteBufferUtil.getLong(byteBuffer, size);
+    try {
+      return ByteBufferUtil.getLong(byteBuffer, size);
+    }
+    catch (BufferUnderflowException e) {
+      throw new DataReadException(e);
+    }
   }
 
   @Override
-  public boolean readBoolean() {
-    return byteBuffer.get() != 0;
+  public boolean readBoolean() throws DataReadException {
+    try {
+      return byteBuffer.get() != 0;
+    }
+    catch (BufferUnderflowException e) {
+      throw new DataReadException(e);
+    }
   }
 
   @Override
-  public String readString() {
-    return ByteBufferUtil.getString(byteBuffer);
+  public String readString() throws DataReadException {
+    try {
+      return ByteBufferUtil.getString(byteBuffer);
+    }
+    catch (BufferUnderflowException | IndexOutOfBoundsException e) {
+      throw new DataReadException(e);
+    }
   }
 
 }

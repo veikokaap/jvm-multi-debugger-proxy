@@ -7,6 +7,7 @@ import kaap.veiko.debuggerforker.commands.parser.CommandDataReader;
 import kaap.veiko.debuggerforker.commands.commandsets.CommandIdentifier;
 import kaap.veiko.debuggerforker.commands.util.CommandDataUtil;
 import kaap.veiko.debuggerforker.packet.ReplyPacket;
+import kaap.veiko.debuggerforker.types.DataReadException;
 import kaap.veiko.debuggerforker.types.DataWriter;
 import kaap.veiko.debuggerforker.types.VMInformation;
 import kaap.veiko.debuggerforker.types.jdwp.IdSizes;
@@ -24,7 +25,7 @@ public class IdSizesReply extends CommandBase<ReplyPacket> {
     return command;
   }
 
-  public static IdSizesReply read(CommandDataReader reader) {
+  public static IdSizesReply read(CommandDataReader reader) throws DataReadException {
     IdSizes idSizes = IdSizes.read(reader);
     return new IdSizesReply((ReplyPacket) reader.getPacket(), idSizes);
   }

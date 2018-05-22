@@ -2,6 +2,7 @@ package kaap.veiko.debuggerforker.commands.commandsets.event.events;
 
 import org.junit.Test;
 
+import kaap.veiko.debuggerforker.types.DataReadException;
 import kaap.veiko.debuggerforker.types.jdwp.ClassId;
 import kaap.veiko.debuggerforker.types.jdwp.EventKind;
 import kaap.veiko.debuggerforker.types.jdwp.Location;
@@ -12,7 +13,7 @@ import kaap.veiko.debuggerforker.types.jdwp.ThreadId;
 
 public class ExceptionEventTest extends EventTestBase {
   @Test
-  public void testReadAndWriteEqualsOriginalEvent() throws ReflectiveOperationException {
+  public void testReadAndWriteEqualsOriginalEvent() throws ReflectiveOperationException, DataReadException {
     assertWrittenEventEqualsReadEvent(EventKind.EXCEPTION, ExceptionEvent.create(
         randomInt(),
         randomThreadId(),

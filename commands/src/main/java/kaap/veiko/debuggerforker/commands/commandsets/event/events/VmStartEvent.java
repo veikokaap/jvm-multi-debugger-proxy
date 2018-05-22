@@ -2,6 +2,7 @@ package kaap.veiko.debuggerforker.commands.commandsets.event.events;
 
 import com.google.auto.value.AutoValue;
 
+import kaap.veiko.debuggerforker.types.DataReadException;
 import kaap.veiko.debuggerforker.types.DataReader;
 import kaap.veiko.debuggerforker.types.DataWriter;
 import kaap.veiko.debuggerforker.types.jdwp.EventKind;
@@ -20,7 +21,7 @@ public abstract class VmStartEvent extends VirtualMachineEvent {
     return new AutoValue_VmStartEvent(requestId, thread);
   }
 
-  public static VmStartEvent read(DataReader reader) {
+  public static VmStartEvent read(DataReader reader) throws DataReadException {
     return create(
         reader.readInt(),
         ThreadId.read(reader)

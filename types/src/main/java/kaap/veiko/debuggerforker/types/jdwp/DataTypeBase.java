@@ -4,6 +4,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import kaap.veiko.debuggerforker.types.DataReadException;
 import kaap.veiko.debuggerforker.types.DataReader;
 import kaap.veiko.debuggerforker.types.DataType;
 import kaap.veiko.debuggerforker.types.DataWriter;
@@ -14,7 +15,7 @@ abstract class DataTypeBase implements DataType {
   private final long value;
   private final IdSizes.SizeType sizeType;
 
-  DataTypeBase(DataReader reader, IdSizes.SizeType sizeType) {
+  DataTypeBase(DataReader reader, IdSizes.SizeType sizeType) throws DataReadException {
     this.sizeType = sizeType;
     this.value = reader.readLongOfSize(sizeType);
   }

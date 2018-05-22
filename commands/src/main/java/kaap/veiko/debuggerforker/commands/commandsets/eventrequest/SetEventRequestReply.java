@@ -9,6 +9,7 @@ import kaap.veiko.debuggerforker.commands.parser.CommandDataReader;
 import kaap.veiko.debuggerforker.commands.commandsets.CommandIdentifier;
 import kaap.veiko.debuggerforker.commands.util.CommandDataUtil;
 import kaap.veiko.debuggerforker.packet.ReplyPacket;
+import kaap.veiko.debuggerforker.types.DataReadException;
 import kaap.veiko.debuggerforker.types.DataWriter;
 import kaap.veiko.debuggerforker.types.VMInformation;
 
@@ -25,7 +26,7 @@ public class SetEventRequestReply extends CommandBase<ReplyPacket> {
     return command;
   }
 
-  public static SetEventRequestReply read(CommandDataReader reader) {
+  public static SetEventRequestReply read(CommandDataReader reader) throws DataReadException {
     int requestId = reader.readInt();
     return new SetEventRequestReply((ReplyPacket) reader.getPacket(), requestId);
   }

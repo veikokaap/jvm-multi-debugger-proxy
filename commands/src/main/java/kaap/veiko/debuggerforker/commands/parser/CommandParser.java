@@ -10,6 +10,7 @@ import kaap.veiko.debuggerforker.packet.CommandPacket;
 import kaap.veiko.debuggerforker.packet.Packet;
 import kaap.veiko.debuggerforker.packet.PacketVisitor;
 import kaap.veiko.debuggerforker.packet.ReplyPacket;
+import kaap.veiko.debuggerforker.types.DataReadException;
 import kaap.veiko.debuggerforker.types.VMInformation;
 
 public class CommandParser {
@@ -28,10 +29,10 @@ public class CommandParser {
     CommandDataReader commandDataReader = new CommandDataReader(packet, vmInformation);
     try {
       CommandIdentifier identifier = CommandIdentifier.of(commandPacket.getCommandSetId(), commandPacket.getCommandId(), packet.isReply());
-      return commandDataReader.readCommand(identifier, packet);
+      return commandDataReader.readCommand(identifier);
     }
-    catch (Exception e) {
-      log.warn("", e);
+    catch (DataReadException exception) {
+      log.error("Failed to parse read packet due to an exception.", exception);
       return new UnknownCommand(packet, commandPacket.getCommandSetId(), commandPacket.getCommandId(), packet.isReply());
     }
   }

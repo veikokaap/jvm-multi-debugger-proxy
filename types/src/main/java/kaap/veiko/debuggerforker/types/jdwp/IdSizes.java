@@ -2,6 +2,7 @@ package kaap.veiko.debuggerforker.types.jdwp;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import kaap.veiko.debuggerforker.types.DataReadException;
 import kaap.veiko.debuggerforker.types.DataReader;
 import kaap.veiko.debuggerforker.types.DataType;
 import kaap.veiko.debuggerforker.types.DataWriter;
@@ -13,7 +14,15 @@ public class IdSizes implements DataType {
   private final int referenceTypeIdSize;
   private final int frameIdSize;
 
-  public static IdSizes read(DataReader reader) {
+  public IdSizes(int fieldIdSize, int methodIdSize, int objectIdSize, int referenceTypeIdSize, int frameIdSize) {
+    this.fieldIdSize = fieldIdSize;
+    this.methodIdSize = methodIdSize;
+    this.objectIdSize = objectIdSize;
+    this.referenceTypeIdSize = referenceTypeIdSize;
+    this.frameIdSize = frameIdSize;
+  }
+
+  public static IdSizes read(DataReader reader) throws DataReadException {
     return new IdSizes(
         reader.readInt(),
         reader.readInt(),
@@ -21,14 +30,6 @@ public class IdSizes implements DataType {
         reader.readInt(),
         reader.readInt()
     );
-  }
-
-  public IdSizes(int fieldIdSize, int methodIdSize, int objectIdSize, int referenceTypeIdSize, int frameIdSize) {
-    this.fieldIdSize = fieldIdSize;
-    this.methodIdSize = methodIdSize;
-    this.objectIdSize = objectIdSize;
-    this.referenceTypeIdSize = referenceTypeIdSize;
-    this.frameIdSize = frameIdSize;
   }
 
   @Override

@@ -2,6 +2,7 @@ package kaap.veiko.debuggerforker.types.jdwp;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import kaap.veiko.debuggerforker.types.DataReadException;
 import kaap.veiko.debuggerforker.types.DataReader;
 import kaap.veiko.debuggerforker.types.DataType;
 import kaap.veiko.debuggerforker.types.DataWriter;
@@ -12,11 +13,7 @@ public class Location implements DataType {
   private final MethodId methodId;
   private final long index;
 
-  public static Location read(DataReader reader) {
-    return new Location(reader);
-  }
-
-  Location(DataReader reader) {
+  Location(DataReader reader) throws DataReadException {
     typeTag = reader.readByte();
     classId = ClassId.read(reader);
     methodId = MethodId.read(reader);
@@ -28,6 +25,10 @@ public class Location implements DataType {
     this.classId = classId;
     this.methodId = methodId;
     this.index = index;
+  }
+
+  public static Location read(DataReader reader) throws DataReadException {
+    return new Location(reader);
   }
 
   public byte getTypeTag() {

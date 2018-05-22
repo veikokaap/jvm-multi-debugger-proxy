@@ -2,6 +2,7 @@ package kaap.veiko.debuggerforker.commands.commandsets.event.events;
 
 import com.google.auto.value.AutoValue;
 
+import kaap.veiko.debuggerforker.types.DataReadException;
 import kaap.veiko.debuggerforker.types.DataReader;
 import kaap.veiko.debuggerforker.types.DataWriter;
 import kaap.veiko.debuggerforker.types.jdwp.EventKind;
@@ -24,7 +25,7 @@ public abstract class MonitorContendedEnterEvent extends VirtualMachineEvent {
     return new AutoValue_MonitorContendedEnterEvent(requestId, thread, objectId, location);
   }
 
-  public static MonitorContendedEnterEvent read(DataReader reader) {
+  public static MonitorContendedEnterEvent read(DataReader reader) throws DataReadException {
     return create(
         reader.readInt(),
         ThreadId.read(reader),

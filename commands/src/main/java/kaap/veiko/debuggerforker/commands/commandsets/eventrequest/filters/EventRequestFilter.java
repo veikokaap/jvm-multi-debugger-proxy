@@ -1,14 +1,13 @@
 package kaap.veiko.debuggerforker.commands.commandsets.eventrequest.filters;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import kaap.veiko.debuggerforker.commands.parser.CommandDataReader;
+import kaap.veiko.debuggerforker.types.DataReadException;
 import kaap.veiko.debuggerforker.types.DataType;
 import kaap.veiko.debuggerforker.types.DataWriter;
 
@@ -16,19 +15,22 @@ public abstract class EventRequestFilter implements DataType {
 
   private static Logger log = LoggerFactory.getLogger(EventRequestFilter.class);
 
-  public static List<EventRequestFilter> readList(CommandDataReader reader) {
+  public static List<EventRequestFilter> readList(CommandDataReader reader) throws DataReadException {
     int length = reader.readInt();
     try {
-      return IntStream.range(0, length)
-          .mapToObj(i -> readNext(reader))
-          .collect(Collectors.toList());
+      List<EventRequestFilter> list = new ArrayList<>(length);
+      for (int i = 0; i < length; i++) {
+        EventRequestFilter eventRequestFilter = readNext(reader);
+        list.add(eventRequestFilter);
+      }
+      return list;
     } catch (RuntimeException e) {
       log.error("Failed to read EventRequestFilter list due to exception.", e);
       return Collections.emptyList();
     }
   }
 
-  private static EventRequestFilter readNext(CommandDataReader reader) throws RuntimeException {
+  private static EventRequestFilter readNext(CommandDataReader reader) throws DataReadException {
     byte identifier = reader.readByte();
     switch (identifier) {
       case CountEventRequestFilter.IDENTIFIER:
@@ -56,7 +58,7 @@ public abstract class EventRequestFilter implements DataType {
       case SourceNameMatchEventRequestFilter.IDENTIFIER:
         return SourceNameMatchEventRequestFilter.read(reader);
       default:
-        throw new RuntimeException("Failed to parse");
+        throw new DataReadException("Failed to read EventRequestFilter with identifier '" + identifier + "'.");
     }
   }
 

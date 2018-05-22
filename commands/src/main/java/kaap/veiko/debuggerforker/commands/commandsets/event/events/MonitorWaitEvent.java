@@ -2,6 +2,7 @@ package kaap.veiko.debuggerforker.commands.commandsets.event.events;
 
 import com.google.auto.value.AutoValue;
 
+import kaap.veiko.debuggerforker.types.DataReadException;
 import kaap.veiko.debuggerforker.types.DataReader;
 import kaap.veiko.debuggerforker.types.DataWriter;
 import kaap.veiko.debuggerforker.types.jdwp.EventKind;
@@ -25,7 +26,7 @@ public abstract class MonitorWaitEvent extends VirtualMachineEvent {
     return new AutoValue_MonitorWaitEvent(requestId, thread, objectId, location, timeout);
   }
 
-  public static MonitorWaitEvent read(DataReader reader) {
+  public static MonitorWaitEvent read(DataReader reader) throws DataReadException {
     return create(
         reader.readInt(),
         ThreadId.read(reader),

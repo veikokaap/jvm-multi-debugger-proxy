@@ -10,6 +10,7 @@ import kaap.veiko.debuggerforker.commands.parser.CommandDataReader;
 import kaap.veiko.debuggerforker.commands.commandsets.CommandIdentifier;
 import kaap.veiko.debuggerforker.commands.util.CommandDataUtil;
 import kaap.veiko.debuggerforker.packet.CommandPacket;
+import kaap.veiko.debuggerforker.types.DataReadException;
 import kaap.veiko.debuggerforker.types.DataWriter;
 import kaap.veiko.debuggerforker.types.VMInformation;
 
@@ -27,7 +28,7 @@ public class CompositeEventCommand extends CommandBase<CommandPacket> {
     return command;
   }
 
-  public static CompositeEventCommand read(CommandDataReader reader) {
+  public static CompositeEventCommand read(CommandDataReader reader) throws DataReadException {
     byte suspendPolicy = reader.readByte();
     List<VirtualMachineEvent> events = VirtualMachineEvent.readList(reader);
 

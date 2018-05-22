@@ -21,6 +21,7 @@ import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.ResumeComma
 import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.ResumeReply;
 import kaap.veiko.debuggerforker.packet.Packet;
 import kaap.veiko.debuggerforker.packet.internal.ByteBufferDataReader;
+import kaap.veiko.debuggerforker.types.DataReadException;
 import kaap.veiko.debuggerforker.types.VMInformation;
 
 public class CommandDataReader extends ByteBufferDataReader {
@@ -37,7 +38,7 @@ public class CommandDataReader extends ByteBufferDataReader {
     return packet;
   }
 
-  public Command readCommand(CommandIdentifier identifier, Packet packet) {
+  public Command readCommand(CommandIdentifier identifier) throws DataReadException {
     switch (identifier) {
       /* Commands */
       case COMPOSITE_EVENT_COMMAND:
@@ -68,7 +69,7 @@ public class CommandDataReader extends ByteBufferDataReader {
       case DISPOSE_REPLY:
         return DisposeReply.read(this);
       default:
-        throw new UnsupportedOperationException("No rule for creating a command for command identified: " + identifier);
+        throw new UnsupportedOperationException("No rule for creating a command for command identifier '" + identifier + "'.");
     }
   }
 }

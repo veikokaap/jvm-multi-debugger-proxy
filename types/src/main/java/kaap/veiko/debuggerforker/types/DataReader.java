@@ -3,21 +3,21 @@ package kaap.veiko.debuggerforker.types;
 import kaap.veiko.debuggerforker.types.jdwp.IdSizes;
 
 public interface DataReader {
-  byte readByte();
+  byte readByte() throws DataReadException;
 
-  short readShort();
+  short readShort() throws DataReadException;
 
-  int readInt();
+  int readInt() throws DataReadException;
 
-  long readLong();
+  long readLong() throws DataReadException;
 
-  long readLongOfSize(IdSizes.SizeType sizeType);
+  long readLongOfSize(IdSizes.SizeType sizeType) throws DataReadException;
 
-  boolean readBoolean();
+  boolean readBoolean() throws DataReadException;
 
-  float readFloat();
+  float readFloat() throws DataReadException;
 
-  double readDouble();
+  double readDouble() throws DataReadException;
 
-  String readString();
+  String readString() throws DataReadException;
 }

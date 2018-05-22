@@ -1,5 +1,6 @@
 package kaap.veiko.debuggerforker.commands.commandsets.event.events;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -10,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import kaap.veiko.debuggerforker.commands.parser.CommandDataReader;
+import kaap.veiko.debuggerforker.types.DataReadException;
 import kaap.veiko.debuggerforker.types.DataType;
 import kaap.veiko.debuggerforker.types.DataWriter;
 import kaap.veiko.debuggerforker.types.jdwp.EventKind;
@@ -21,19 +23,22 @@ public abstract class VirtualMachineEvent implements DataType {
   public abstract int getRequestId();
   public abstract EventKind getEventKind();
 
-  public static List<VirtualMachineEvent> readList(CommandDataReader reader) {
+  public static List<VirtualMachineEvent> readList(CommandDataReader reader) throws DataReadException {
     int length = reader.readInt();
     try {
-      return IntStream.range(0, length)
-          .mapToObj(i -> readNext(reader))
-          .collect(Collectors.toList());
+      List<VirtualMachineEvent> list = new ArrayList<>(length);
+      for (int i = 0; i < length; i++) {
+        VirtualMachineEvent virtualMachineEvent = readNext(reader);
+        list.add(virtualMachineEvent);
+      }
+      return list;
     } catch (RuntimeException e) {
       log.error("Failed to read VirtualMachineEvent list due to exception.", e);
       return Collections.emptyList();
     }
   }
 
-  private static VirtualMachineEvent readNext(CommandDataReader reader) throws RuntimeException {
+  private static VirtualMachineEvent readNext(CommandDataReader reader) throws DataReadException {
     EventKind eventKind = EventKind.read(reader);
     switch (eventKind) {
       case VM_START:
@@ -73,7 +78,7 @@ public abstract class VirtualMachineEvent implements DataType {
       case VM_DEATH:
         return VmDeathEvent.read(reader);
       default:
-        throw new RuntimeException("Failed to parse");
+        throw new DataReadException("No rule for parsing EventKind '" + eventKind + "'.");
     }
   }
 

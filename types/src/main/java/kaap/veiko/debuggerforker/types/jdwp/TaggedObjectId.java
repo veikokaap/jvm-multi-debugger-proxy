@@ -2,6 +2,7 @@ package kaap.veiko.debuggerforker.types.jdwp;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import kaap.veiko.debuggerforker.types.DataReadException;
 import kaap.veiko.debuggerforker.types.DataReader;
 import kaap.veiko.debuggerforker.types.DataType;
 import kaap.veiko.debuggerforker.types.DataWriter;
@@ -11,18 +12,18 @@ public class TaggedObjectId implements DataType {
   private final byte tag;
   private final ObjectId objectId;
 
-  public static TaggedObjectId read(DataReader reader) {
-    return new TaggedObjectId(reader);
-  }
-
-  TaggedObjectId(DataReader reader) {
+  TaggedObjectId(DataReader reader) throws DataReadException {
     tag = reader.readByte();
-    objectId = new ObjectId(reader);
+    objectId = ObjectId.read(reader);
   }
 
   public TaggedObjectId(byte tag, ObjectId objectId) {
     this.tag = tag;
     this.objectId = objectId;
+  }
+
+  public static TaggedObjectId read(DataReader reader) throws DataReadException {
+    return new TaggedObjectId(reader);
   }
 
   public byte getTag() {

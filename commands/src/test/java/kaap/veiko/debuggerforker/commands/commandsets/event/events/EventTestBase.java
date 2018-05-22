@@ -12,6 +12,7 @@ import kaap.veiko.debuggerforker.commands.commandsets.TestBase;
 import kaap.veiko.debuggerforker.packet.internal.ByteBufferDataReader;
 import kaap.veiko.debuggerforker.packet.internal.ByteBufferDataWriter;
 import kaap.veiko.debuggerforker.packet.utils.ByteBufferUtil;
+import kaap.veiko.debuggerforker.types.DataReadException;
 import kaap.veiko.debuggerforker.types.DataReader;
 import kaap.veiko.debuggerforker.types.jdwp.ClassId;
 import kaap.veiko.debuggerforker.types.jdwp.EventKind;
@@ -30,7 +31,7 @@ public abstract class EventTestBase extends TestBase {
 
   private final Random random = new Random();
 
-  protected <T extends VirtualMachineEvent> void assertWrittenEventEqualsReadEvent(EventKind expectedEventKind, T originalEvent) throws ReflectiveOperationException {
+  protected <T extends VirtualMachineEvent> void assertWrittenEventEqualsReadEvent(EventKind expectedEventKind, T originalEvent) throws ReflectiveOperationException, DataReadException {
     ByteBuffer buffer = ByteBuffer.allocate(4096);
 
     writeEvent(buffer, originalEvent);

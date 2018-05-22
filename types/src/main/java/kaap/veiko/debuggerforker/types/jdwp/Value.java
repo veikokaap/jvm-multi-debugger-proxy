@@ -2,6 +2,7 @@ package kaap.veiko.debuggerforker.types.jdwp;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import kaap.veiko.debuggerforker.types.DataReadException;
 import kaap.veiko.debuggerforker.types.DataReader;
 import kaap.veiko.debuggerforker.types.DataType;
 import kaap.veiko.debuggerforker.types.DataWriter;
@@ -10,22 +11,19 @@ public class Value implements DataType {
   private final Type type;
   private final @Nullable Object value;
 
-  public static Value read(DataReader reader) {
-    return new Value(reader);
-  }
-
-  private Value(DataReader reader) {
-    this(reader, reader.readByte());
-  }
-
-  protected Value(DataReader reader, byte typeTag) {
+  Value(DataReader reader, byte typeTag) throws DataReadException {
     this.type = Type.findByValue(typeTag);
-    value = type.read(reader);
+    this.value = type.read(reader);
   }
 
   public Value(Type type, @Nullable Object value) {
     this.type = type;
     this.value = value;
+  }
+
+  public static Value read(DataReader reader) throws DataReadException {
+    byte typeTag = reader.readByte();
+    return new Value(reader, typeTag);
   }
 
   public Type getType() {
