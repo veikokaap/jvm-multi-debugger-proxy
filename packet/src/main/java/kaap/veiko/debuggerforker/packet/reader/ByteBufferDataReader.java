@@ -1,4 +1,4 @@
-package kaap.veiko.debuggerforker.packet.internal;
+package kaap.veiko.debuggerforker.packet.reader;
 
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;

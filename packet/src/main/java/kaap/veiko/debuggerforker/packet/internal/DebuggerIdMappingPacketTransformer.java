@@ -12,9 +12,9 @@ import kaap.veiko.debuggerforker.packet.Packet;
 import kaap.veiko.debuggerforker.packet.PacketVisitor;
 import kaap.veiko.debuggerforker.packet.ReplyPacket;
 
-public class DebuggerPacketTransformer implements PacketTransformer {
+public class DebuggerIdMappingPacketTransformer implements PacketTransformer {
 
-  private static final Logger log = LoggerFactory.getLogger(DebuggerPacketTransformer.class);
+  private static final Logger log = LoggerFactory.getLogger(DebuggerIdMappingPacketTransformer.class);
 
   private final ConcurrentMap<Integer, Integer> idMap = new ConcurrentHashMap<>();
   private final AtomicInteger idCounter = new AtomicInteger(0);
@@ -44,7 +44,7 @@ public class DebuggerPacketTransformer implements PacketTransformer {
   }
 
   private int getOriginalId(int newId) {
-    Integer originalId = idMap.get(newId);
+    Integer originalId = idMap.remove(newId);
     if (originalId == null) {
       throw new IllegalStateException("No original Id found for mapped id " + newId);
     }

@@ -11,12 +11,12 @@ import java.util.function.Consumer;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import kaap.veiko.debuggerforker.packet.DebuggerPacketStream;
-import kaap.veiko.debuggerforker.packet.internal.DebuggerPacketTransformer;
+import kaap.veiko.debuggerforker.packet.internal.DebuggerIdMappingPacketTransformer;
 import kaap.veiko.debuggerforker.packet.internal.PacketTransformer;
 
 public class DebuggerConnector extends ConnectorBase<DebuggerPacketStream> {
   private final ServerSocketChannel serverChannel;
-  private final PacketTransformer packetTransformer = new DebuggerPacketTransformer();
+  private final PacketTransformer packetTransformer = new DebuggerIdMappingPacketTransformer();
 
   public static DebuggerConnector create(int port, Consumer<DebuggerPacketStream> listener) throws IOException {
     ServerSocketChannel serverChannel = ServerSocketChannel.open();

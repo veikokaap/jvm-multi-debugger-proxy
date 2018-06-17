@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import kaap.veiko.debuggerforker.packet.Packet;
 import kaap.veiko.debuggerforker.packet.PacketSource;
 import kaap.veiko.debuggerforker.packet.PacketStream;
+import kaap.veiko.debuggerforker.packet.writer.PacketWriter;
+import kaap.veiko.debuggerforker.packet.reader.PacketReader;
 
 public abstract class PacketStreamBase implements PacketStream {
 

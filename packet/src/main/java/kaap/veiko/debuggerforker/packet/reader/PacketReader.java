@@ -1,4 +1,4 @@
-package kaap.veiko.debuggerforker.packet.internal;
+package kaap.veiko.debuggerforker.packet.reader;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -8,7 +8,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import kaap.veiko.debuggerforker.packet.Packet;
 import kaap.veiko.debuggerforker.packet.PacketSource;
 
-class PacketReader {
+public class PacketReader {
 
   private final SocketChannel socketChannel;
   private final PacketSource source;
@@ -20,7 +20,7 @@ class PacketReader {
   private ByteBuffer lengthBuffer = ByteBuffer.allocate(4);
   private @Nullable ByteBuffer dataBuffer = null;
 
-  PacketReader(SocketChannel socketChannel, PacketSource source) {
+  public PacketReader(SocketChannel socketChannel, PacketSource source) {
     this.socketChannel = socketChannel;
     this.source = source;
   }

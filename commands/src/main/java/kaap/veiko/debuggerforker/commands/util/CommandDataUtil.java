@@ -4,7 +4,7 @@ import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 
 import kaap.veiko.debuggerforker.commands.Command;
-import kaap.veiko.debuggerforker.packet.internal.ByteBufferDataWriter;
+import kaap.veiko.debuggerforker.packet.writer.ByteBufferDataWriter;
 import kaap.veiko.debuggerforker.types.VMInformation;
 
 public class CommandDataUtil {

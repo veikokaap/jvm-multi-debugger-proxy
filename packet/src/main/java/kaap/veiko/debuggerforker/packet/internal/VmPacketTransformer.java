@@ -53,7 +53,7 @@ public class VmPacketTransformer implements PacketTransformer {
   private class OutputPacketVisitor implements PacketVisitor<Packet> {
     @Override
     public Packet visit(ReplyPacket packet) {
-      // Changing this id is the task of DebuggerPacketTransformer
+      // Changing this id is the task of DebuggerIdMappingPacketTransformer
       return packet;
     }
 
@@ -80,7 +80,7 @@ public class VmPacketTransformer implements PacketTransformer {
 
     @Override
     public Packet visit(CommandPacket packet) {
-      // Changing this id is the task of DebuggerPacketTransformer
+      // Changing this id is the task of DebuggerIdMappingPacketTransformer
       return packet;
     }
   }

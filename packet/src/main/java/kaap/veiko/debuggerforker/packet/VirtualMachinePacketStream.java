@@ -18,7 +18,7 @@ public class VirtualMachinePacketStream extends PacketStreamBase {
   private final Logger log = LoggerFactory.getLogger(VirtualMachinePacketStream.class);
 
   private final ConcurrentMap<Integer, CommandPacket> writtenCommands = new ConcurrentHashMap<>();
-  private final ReplyPacketVisitor replyPacketVisitor = new ReplyPacketVisitor();
+  private final ReplyPacketVisitor outboundPacketVisitor = new ReplyPacketVisitor();
 
   public VirtualMachinePacketStream(SocketChannel socketChannel) throws IOException {
     super(socketChannel, VIRTUAL_MACHINE, new VmPacketTransformer());
@@ -31,7 +31,7 @@ public class VirtualMachinePacketStream extends PacketStreamBase {
       return null;
     }
 
-    return packet.visit(replyPacketVisitor);
+    return packet.visit(outboundPacketVisitor);
   }
 
   @Override

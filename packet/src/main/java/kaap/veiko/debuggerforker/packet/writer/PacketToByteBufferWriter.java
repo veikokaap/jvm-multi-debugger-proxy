@@ -1,31 +1,13 @@
-package kaap.veiko.debuggerforker.packet.internal;
+package kaap.veiko.debuggerforker.packet.writer;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
 
 import kaap.veiko.debuggerforker.packet.CommandPacket;
 import kaap.veiko.debuggerforker.packet.Packet;
 import kaap.veiko.debuggerforker.packet.PacketVisitor;
 import kaap.veiko.debuggerforker.packet.ReplyPacket;
 
-class PacketWriter {
-
-  private final SocketChannel socketChannel;
-  private final PacketByteBufferConverter packetByteBufferConverter = new PacketByteBufferConverter();
-
-  PacketWriter(SocketChannel socketChannel) {
-    this.socketChannel = socketChannel;
-  }
-
-  void write(Packet packet) throws IOException {
-    ByteBuffer buffer = packet.visit(packetByteBufferConverter);
-    while (buffer.hasRemaining()) {
-      socketChannel.write(buffer);
-    }
-  }
-
-  private class PacketByteBufferConverter implements PacketVisitor<ByteBuffer> {
+class PacketToByteBufferWriter implements PacketVisitor<ByteBuffer> {
 
     private void writeHeader(Packet packet, ByteBuffer byteBuffer) {
       byteBuffer.putInt(packet.getLength());
@@ -66,4 +48,3 @@ class PacketWriter {
       return byteBuffer;
     }
   }
-}

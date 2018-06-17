@@ -6,11 +6,9 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import kaap.veiko.debuggerforker.commands.commandsets.TestBase;
-import kaap.veiko.debuggerforker.packet.internal.ByteBufferDataReader;
-import kaap.veiko.debuggerforker.packet.internal.ByteBufferDataWriter;
+import kaap.veiko.debuggerforker.packet.reader.ByteBufferDataReader;
+import kaap.veiko.debuggerforker.packet.writer.ByteBufferDataWriter;
 import kaap.veiko.debuggerforker.packet.utils.ByteBufferUtil;
 import kaap.veiko.debuggerforker.types.DataReadException;
 import kaap.veiko.debuggerforker.types.DataReader;
@@ -18,7 +16,6 @@ import kaap.veiko.debuggerforker.types.jdwp.ArrayId;
 import kaap.veiko.debuggerforker.types.jdwp.ClassId;
 import kaap.veiko.debuggerforker.types.jdwp.EventKind;
 import kaap.veiko.debuggerforker.types.jdwp.FieldId;
-import kaap.veiko.debuggerforker.types.jdwp.IdSizes;
 import kaap.veiko.debuggerforker.types.jdwp.Location;
 import kaap.veiko.debuggerforker.types.jdwp.MethodId;
 import kaap.veiko.debuggerforker.types.jdwp.ObjectId;

@@ -1,4 +1,4 @@
-package kaap.veiko.debuggerforker.packet.internal;
+package kaap.veiko.debuggerforker.packet.reader;
 
 import java.nio.ByteBuffer;
 import java.util.function.Function;
@@ -6,7 +6,6 @@ import java.util.function.Function;
 import kaap.veiko.debuggerforker.packet.CommandPacket;
 import kaap.veiko.debuggerforker.packet.Packet;
 import kaap.veiko.debuggerforker.packet.PacketSource;
-import kaap.veiko.debuggerforker.packet.PacketStream;
 import kaap.veiko.debuggerforker.packet.ReplyPacket;
 
 class PacketParser {

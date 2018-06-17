@@ -20,7 +20,7 @@ import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.ReleaseEven
 import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.ResumeCommand;
 import kaap.veiko.debuggerforker.commands.commandsets.virtualmachine.ResumeReply;
 import kaap.veiko.debuggerforker.packet.Packet;
-import kaap.veiko.debuggerforker.packet.internal.ByteBufferDataReader;
+import kaap.veiko.debuggerforker.packet.reader.ByteBufferDataReader;
 import kaap.veiko.debuggerforker.types.DataReadException;
 import kaap.veiko.debuggerforker.types.VMInformation;
 

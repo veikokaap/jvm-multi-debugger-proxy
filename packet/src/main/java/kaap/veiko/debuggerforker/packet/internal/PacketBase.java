@@ -7,7 +7,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import kaap.veiko.debuggerforker.packet.Packet;
 import kaap.veiko.debuggerforker.packet.PacketSource;
-import kaap.veiko.debuggerforker.packet.PacketStream;
 
 public abstract class PacketBase implements Packet {
 
