@@ -10,17 +10,15 @@ import kaap.veiko.debuggerforker.packet.ReplyPacket;
 
 class PacketParser {
 
-  private final int length;
   private final byte[] packetBytes;
   private int index = 0;
 
-  private PacketParser(int length, byte[] packetBytes) {
-    this.length = length;
+  private PacketParser(byte[] packetBytes) {
     this.packetBytes = packetBytes;
   }
 
-  static Packet parse(int length, byte[] packetBytes, PacketSource source) {
-    return new PacketParser(length, packetBytes).internalParse(source);
+  static Packet parse(byte[] packetBytes, PacketSource source) {
+    return new PacketParser(packetBytes).internalParse(source);
   }
 
   private Packet internalParse(PacketSource source) {
@@ -53,10 +51,14 @@ class PacketParser {
     return (short) readBytesAndApply(1, ByteBuffer::get);
   }
 
+  private int getLength() {
+    return packetBytes.length + 4;
+  }
+
   private byte[] readData() {
-    if (length > Packet.HEADER_LENGTH) {
-      return readBytesAndApply(length - Packet.HEADER_LENGTH, bf -> {
-        byte[] data = new byte[length - Packet.HEADER_LENGTH];
+    if (getLength() > Packet.HEADER_LENGTH) {
+      return readBytesAndApply(getLength() - Packet.HEADER_LENGTH, bf -> {
+        byte[] data = new byte[getLength() - Packet.HEADER_LENGTH];
         bf.get(data);
         return data;
       });
